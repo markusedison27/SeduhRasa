@@ -128,7 +128,7 @@
       </div>
     </section>
 
-    {{-- 3️⃣ KERANJANG PESANAN --}}
+    {{-- 3️ KERANJANG PESANAN --}}
     <section id="cart" class="bg-white p-8 rounded-2xl shadow border border-stone-100">
       <header class="text-center mb-8">
         <h2 class="text-3xl font-semibold text-stone-800">🛒 Keranjang Pesanan</h2>
