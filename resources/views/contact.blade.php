@@ -44,7 +44,7 @@
     </form>
 
     <div class="mt-10 text-center text-sm text-stone-500">
-      <p>Alamat: Jl. Kopi Nusantara No.12, Jakarta</p>
+      <p>Alamat: Bengkalis</p>
       <p>Email: info@seduhrasa.com | Telp: (021) 1234-5678</p>
     </div>
   </section>
