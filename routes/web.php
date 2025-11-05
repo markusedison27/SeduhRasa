@@ -10,3 +10,4 @@ Route::get('/ping', fn() => 'PONG from '.base_path());
 use App\Http\Controllers\OrderController;
 
 Route::get('/order', [OrderController::class, 'index'])->name('order');
+Route::view('/about', 'about')->name('about');

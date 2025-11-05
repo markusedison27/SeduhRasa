@@ -22,7 +22,11 @@
         </div>
         <div class="hidden md:flex items-center gap-5 text-white/90">
           <a href="#" class="hover:text-white">Home</a>
-          <a href="#about" class="hover:text-white/100">About Us</a>
+
+          {{-- ✅ LINK ABOUT US SUDAH DIBUAT AKTIF --}}
+          <a href="{{ url('/about') }}" class="hover:text-white/100">About Us</a>
+
+
           <a href="#services" class="hover:text-white/100">Services</a>
           <a href="#product" class="hover:text-white/100">Product</a>
           <a href="#contact" class="hover:text-white/100">Contact</a>
@@ -36,7 +40,6 @@
 
   {{-- HERO SECTION --}}
   <section class="relative h-[70vh] md:h-[80vh] w-full overflow-hidden">
-    {{-- Pakai gambar upload kalau ada (storage:link), kalau tidak pakai fallback Unsplash --}}
     @php
       $hero = isset($site) && !empty($site?->hero_image)
         ? asset('storage/'.$site->hero_image)
@@ -58,7 +61,7 @@
       </a>
     </div>
 
-    {{-- “arrow” kiri/kanan (dummy) --}}
+    {{-- Arrow kiri/kanan (dummy) --}}
     <button class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 grid place-items-center rounded-full bg-white/20 text-white hover:bg-white/30">
       ‹
     </button>
@@ -77,7 +80,6 @@
         </p>
       </div>
 
-      {{-- Data produk (mock). Nanti bisa ganti ambil dari DB --}}
       @php
         $products = [
           ['name'=>'Caffè Latte', 'price'=>23, 'image'=>'https://images.unsplash.com/photo-1541167760496-1628856ab772?q=80&w=800&auto=format&fit=crop', 'rating'=>4],
@@ -94,7 +96,6 @@
             <img src="{{ $p['image'] }}" class="w-full h-full object-cover" alt="{{ $p['name'] }}">
           </div>
           <div class="p-4 space-y-2">
-            {{-- rating bintang --}}
             <div class="flex items-center gap-1 text-amber-500">
               @for($i=1;$i<=5;$i++)
                 @if($i <= $p['rating'])
