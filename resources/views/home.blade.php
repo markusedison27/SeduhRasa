@@ -25,7 +25,8 @@
           <a href="{{ url('/about') }}" class="hover:text-white/100">About Us</a>
           <a href="{{ route('services') }}" class="hover:text-white/100">Services</a>
           <a href="#product" class="hover:text-white/100">Product</a>
-          <a href="#contact" class="hover:text-white/100">Contact</a>
+          <a href="{{ route('contact') }}" class="hover:text-white/100">Contact</a>
+
         </div>
       </div>
 

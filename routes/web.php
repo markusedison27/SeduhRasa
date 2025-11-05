@@ -12,3 +12,4 @@ use App\Http\Controllers\OrderController;
 Route::view('/about', 'about')->name('about');
 Route::view('/services', 'services')->name('services');
 Route::view('/order', 'order')->name('order');
+Route::view('/contact', 'contact')->name('contact');
