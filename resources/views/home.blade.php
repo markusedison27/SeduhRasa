@@ -7,7 +7,7 @@
   <title>SeduhRasa Coffee</title>
   @vite(['resources/css/app.css','resources/js/app.js'])
 
-  {{-- Font cursive untuk judul hero (mirip di contoh) --}}
+  {{-- Font cursive untuk judul hero --}}
   <link href="https://fonts.bunny.net/css?family=playfair-display:700|great-vibes:400" rel="stylesheet"/>
 </head>
 <body class="bg-stone-50 text-stone-900">
@@ -22,20 +22,22 @@
         </div>
         <div class="hidden md:flex items-center gap-5 text-white/90">
           <a href="#" class="hover:text-white">Home</a>
-
-          {{-- LINK ABOUT US SUDAH DIBUAT AKTIF --}}
           <a href="{{ url('/about') }}" class="hover:text-white/100">About Us</a>
-
-
           <a href="{{ route('services') }}" class="hover:text-white/100">Services</a>
-
           <a href="#product" class="hover:text-white/100">Product</a>
           <a href="#contact" class="hover:text-white/100">Contact</a>
         </div>
       </div>
+
+      {{-- Bagian ini saya ubah supaya tombol Order bisa diklik --}}
       <div class="hidden md:flex items-center gap-2 text-white/90">
-        <button class="px-3 py-1.5 rounded bg-amber-500 hover:bg-amber-600 text-stone-900 font-medium">Order</button>
+        <a href="{{ route('order') }}">
+          <button class="px-3 py-1.5 rounded bg-amber-500 hover:bg-amber-600 text-stone-900 font-medium">
+            Order
+          </button>
+        </a>
       </div>
+      {{-- Selesai ubahan --}}
     </div>
   </header>
 
