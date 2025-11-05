@@ -23,11 +23,12 @@
         <div class="hidden md:flex items-center gap-5 text-white/90">
           <a href="#" class="hover:text-white">Home</a>
 
-          {{-- ✅ LINK ABOUT US SUDAH DIBUAT AKTIF --}}
+          {{-- LINK ABOUT US SUDAH DIBUAT AKTIF --}}
           <a href="{{ url('/about') }}" class="hover:text-white/100">About Us</a>
 
 
-          <a href="#services" class="hover:text-white/100">Services</a>
+          <a href="{{ route('services') }}" class="hover:text-white/100">Services</a>
+
           <a href="#product" class="hover:text-white/100">Product</a>
           <a href="#contact" class="hover:text-white/100">Contact</a>
         </div>
