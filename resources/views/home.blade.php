@@ -125,8 +125,11 @@
   </section>
 
   {{-- FOOTER --}}
-  <footer class="py-8 text-center text-sm text-stone-500">
-    © {{ date('Y') }} SeduhRasa Coffee. All rights reserved.
-  </footer>
+ <footer class="bg-orange-500 text-stone-800 text-center py-4 font-medium">
+    © 2025 SeduhRasa Coffee. All rights reserved.
+</footer>
+
+
 </body>
 </html>
+
