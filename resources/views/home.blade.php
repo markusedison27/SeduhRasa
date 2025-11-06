@@ -57,11 +57,11 @@
       <p class="tracking-[0.35em] uppercase text-amber-300 text-xs md:text-sm mb-3">Best Coffee Shop</p>
 
       <h1 class="font-['Great_Vibes'] text-4xl md:text-6xl leading-tight">
-        Coffee from the Best Sunny<br/>Plantations
+        Kopi dari Perkebunan Cerah<br/>Terbaik
       </h1>
 
       <a href="#product" class="mt-6 inline-block bg-amber-500 hover:bg-amber-600 text-stone-900 font-semibold rounded px-5 py-2">
-        Shop Now
+        Belanja Sekarang
       </a>
     </div>
 
@@ -78,7 +78,7 @@
   <section id="product" class="py-12 md:py-16 bg-[#f6efe7]">
     <div class="max-w-7xl mx-auto px-4">
       <div class="text-center mb-8">
-        <h2 class="font-['Great_Vibes'] text-3xl md:text-5xl">Best Seller Product This Week!</h2>
+        <h2 class="font-['Great_Vibes'] text-3xl md:text-5xl">Produk Terlaris Minggu Ini!</h2>
         <p class="text-stone-600 max-w-2xl mx-auto mt-2">
           Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
         </p>
