@@ -23,9 +23,7 @@
   <main class="max-w-4xl mx-auto py-16 px-6 text-center">
     <h1 class="text-4xl font-bold mb-6 text-gray-800">Tentang Kami</h1>
     <p class="text-lg text-gray-600 mb-4">
-      <strong>SeduhRasa Coffee</strong> lahir dari kecintaan kami terhadap kopi berkualitas tinggi.
-      Kami menghadirkan biji kopi pilihan dari berbagai daerah di Indonesia,
-      diseduh dengan penuh cinta oleh barista profesional kami.
+      <strong>SeduhRasa Coffee</strong> Sistem informasi coffee shop berbasis website ini dibuat untuk membantu pemilik usaha dalam mengelola menu, promosi, pesanan, dan informasi operasional secara modern.
     </p>
     <p class="text-lg text-gray-600">
       Kami percaya setiap cangkir kopi punya cerita — dari petani hingga pelanggan.
