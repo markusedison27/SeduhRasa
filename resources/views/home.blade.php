@@ -80,7 +80,7 @@
       <div class="text-center mb-8">
         <h2 class="font-['Great_Vibes'] text-3xl md:text-5xl">Produk Terlaris Minggu Ini!</h2>
         <p class="text-stone-600 max-w-2xl mx-auto mt-2">
-          Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+          Setiap cangkir diseduh dengan kualitas tinggi dan komitmen untuk memberikan pengalaman terbaik bagi pecinta kopi sejati.
         </p>
       </div>
 
