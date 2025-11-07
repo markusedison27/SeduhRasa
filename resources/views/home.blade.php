@@ -21,24 +21,23 @@
           <span>Seduh<span class="text-amber-500">Rasa</span></span>
         </div>
         <div class="hidden md:flex items-center gap-5 text-white/90">
-          <a href="#" class="hover:text-white">Home</a>
-          <a href="{{ url('/about') }}" class="hover:text-white/100">About Us</a>
-          <a href="{{ route('services') }}" class="hover:text-white/100">Services</a>
-          <a href="#product" class="hover:text-white/100">Product</a>
-          <a href="{{ route('contact') }}" class="hover:text-white/100">Contact</a>
-
+          {{-- EDIT DI SINI AGAR MENU NYAMBUNG --}}
+          <a href="{{ url('/') }}" class="hover:text-white">Home</a>
+          <a href="{{ url('/dashboard') }}" class="hover:text-white/100">Dashboard</a>
+          <a href="{{ url('/services') }}" class="hover:text-white/100">Services</a>
+          <a href="{{ url('/product') }}" class="hover:text-white/100">Product</a>
+          <a href="{{ url('/contact') }}" class="hover:text-white/100">Contact</a>
         </div>
       </div>
 
-      {{-- Bagian ini saya ubah supaya tombol Order bisa diklik --}}
+      {{-- Tombol Order --}}
       <div class="hidden md:flex items-center gap-2 text-white/90">
-        <a href="{{ route('order') }}">
+        <a href="{{ url('/transaksi') }}">
           <button class="px-3 py-1.5 rounded bg-amber-500 hover:bg-amber-600 text-stone-900 font-medium">
             Order
           </button>
         </a>
       </div>
-      {{-- Selesai ubahan --}}
     </div>
   </header>
 
@@ -125,11 +124,9 @@
   </section>
 
   {{-- FOOTER --}}
- <footer class="bg-orange-500 text-stone-800 text-center py-4 font-medium">
+  <footer class="bg-orange-500 text-stone-800 text-center py-4 font-medium">
     © 2025 SeduhRasa Coffee. All rights reserved.
-</footer>
-
+  </footer>
 
 </body>
 </html>
-
