@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 // use App\Models\Menu; // Import Model Anda jika sudah dibuat
 
-class MenuController extends Controller
+class ProdukController extends Controller
 {
     /**
      * Menampilkan daftar semua Menu.
