@@ -7,23 +7,23 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * Jalankan migrasi untuk membuat tabel orders.
      */
     public function up(): void
     {
         Schema::create('orders', function (Blueprint $table) {
-            $table->id();
-            $table->string('nama_pelanggan');
-            $table->string('menu_dipesan');
-            $table->integer('jumlah');
-            $table->decimal('total_harga', 10, 2);
-            $table->string('status')->default('pending'); // contoh: pending, selesai, batal
-            $table->timestamps();
+            $table->id(); // primary key
+            $table->string('nama_pelanggan'); // nama customer
+            $table->string('menu_dipesan');   // nama menu yang dipesan
+            $table->integer('jumlah');        // jumlah item
+            $table->decimal('total_harga', 10, 2); // total harga pesanan
+            $table->string('status')->default('pending'); // pending, selesai, batal
+            $table->timestamps(); // created_at & updated_at
         });
     }
 
     /**
-     * Reverse the migrations.
+     * Kembalikan (hapus) tabel orders jika rollback.
      */
     public function down(): void
     {

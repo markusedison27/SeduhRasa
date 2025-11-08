@@ -7,21 +7,26 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * Jalankan migrasi untuk membuat tabel karyawan.
      */
     public function up(): void
     {
-        Schema::create('karyawans', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+        Schema::create('karyawan', function (Blueprint $table) {
+            $table->id(); // Primary key
+            $table->string('nama'); // Nama karyawan
+            $table->string('jabatan')->nullable(); // Jabatan, opsional
+            $table->string('email')->unique()->nullable(); // Email unik (boleh kosong)
+            $table->string('telepon')->nullable(); // Nomor telepon
+            $table->string('alamat')->nullable(); // Alamat karyawan
+            $table->timestamps(); // Kolom created_at dan updated_at
         });
     }
 
     /**
-     * Reverse the migrations.
+     * Rollback migrasi (hapus tabel jika dibatalkan).
      */
     public function down(): void
     {
-        Schema::dropIfExists('karyawans');
+        Schema::dropIfExists('karyawan');
     }
 };

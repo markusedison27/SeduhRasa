@@ -9,8 +9,10 @@ class Pelanggan extends Model
 {
     use HasFactory;
 
-    protected $table = 'pelanggan';
-    
+    // ✅ Ikuti konvensi Laravel → pakai bentuk jamak
+    protected $table = 'pelanggans';
+
+    // ✅ Kolom yang bisa diisi lewat mass assignment
     protected $fillable = [
         'nama',
         'alamat',
