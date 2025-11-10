@@ -26,7 +26,9 @@
           <a href="{{ route('transaksi.index') }}" class="block px-4 py-2 rounded-lg text-stone-600 hover:bg-amber-50 hover:text-amber-600 transition">Transaksi</a>
           <a href="{{ route('pelanggan.index') }}" class="block px-4 py-2 rounded-lg text-stone-600 hover:bg-amber-50 hover:text-amber-600 transition">Pelanggan</a>
           <a href="{{ route('karyawan.index') }}" class="block px-4 py-2 rounded-lg text-stone-600 hover:bg-amber-50 hover:text-amber-600 transition">Karyawan</a>
-          <a href="{{ route('orders.index') }}" class="block px-4 py-2 rounded-lg text-stone-600 hover:bg-amber-50 hover:text-amber-600 transition">Order</a>
+
+          {{-- 🔹 Diperbaiki agar Order menuju halaman publik (produk) --}}
+          <a href="{{ url('/order') }}" class="block px-4 py-2 rounded-lg text-stone-600 hover:bg-amber-50 hover:text-amber-600 transition">Order</a>
         </nav>
       </div>
 

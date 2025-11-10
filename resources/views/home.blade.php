@@ -26,6 +26,7 @@
           <a href="{{ url('/dashboard') }}" class="hover:text-white/100">Dashboard</a>
           <a href="{{ url('/services') }}" class="hover:text-white/100">Services</a>
           <a href="{{ url('/product') }}" class="hover:text-white/100">Product</a>
+          <a href="{{ url('/about') }}" class="hover:text-white/100">Tentang Kami</a> {{-- ✅ Tambahan --}}
           <a href="{{ url('/contact') }}" class="hover:text-white/100">Contact</a>
         </div>
       </div>
