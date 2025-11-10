@@ -69,39 +69,25 @@
     <button class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 grid place-items-center rounded-full bg-white/20 text-white hover:bg-white/30">›</button>
   </section>
 
-  {{-- ABOUT --}}
-  <section id="about" class="scroll-mt-20 py-12 md:py-16 bg-white">
-    <div class="max-w-7xl mx-auto px-4">
-      <h2 class="font-['Great_Vibes'] text-3xl md:text-5xl mb-2">About Us</h2>
-      <p class="text-stone-600 max-w-3xl">Cerita singkat tentang SeduhRasa...</p>
-    </div>
-  </section>
-
-  {{-- SERVICES --}}
-  <section id="services" class="scroll-mt-20 py-12 md:py-16 bg-stone-100">
-    <div class="max-w-7xl mx-auto px-4">
-      <h2 class="font-['Great_Vibes'] text-3xl md:text-5xl mb-2">Services</h2>
-      <p class="text-stone-600 max-w-3xl">Beberapa layanan yang tersedia...</p>
-    </div>
-  </section>
-
   {{-- BEST SELLER --}}
   <section id="product" class="scroll-mt-20 py-12 md:py-16 bg-[#f6efe7]">
     <div class="max-w-7xl mx-auto px-4">
       <div class="text-center mb-8">
         <h2 class="font-['Great_Vibes'] text-3xl md:text-5xl">Best Seller Product This Week!</h2>
         <p class="text-stone-600 max-w-2xl mx-auto mt-2">
-          Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+         Kadang hidup cuma butuh satu hal sederhana: secangkir kopi dan waktu untuk menikmatinya. Kami percaya setiap tegukan bisa jadi awal dari ide baru, obrolan hangat, atau sekadar pelarian kecil dari hiruk-pikuk dunia. Karena di balik setiap kopi, selalu ada ketenangan yang siap menemanimu. 
         </p>
       </div>
 
       @php
-        $products = [
-          ['name'=>'Caffè Latte','image'=>'https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&w=800&q=80','rating'=>4],
-          ['name'=>'Cappuccino','image'=>'https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?auto=format&fit=crop&w=800&q=80','rating'=>5],
-          ['name'=>'Americano','image'=>'https://images.unsplash.com/photo-1503602642458-232111445657?auto=format&fit=crop&w=800&q=80','rating'=>4],
-          ['name'=>'Cortado','image'=>'https://images.unsplash.com/photo-1529070538774-1843cb3265df?auto=format&fit=crop&w=800&q=80','rating'=>5],
-        ];
+  $products = [
+  ['name' => 'Caffè Latte', 'image' => 'https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&w=800&q=80', 'rating' => 4],
+  ['name' => 'Cappuccino',  'image' => 'https://cdn.kerbel.in/assets/product/product_IDVGUOCHLR_1664033686_1.webp', 'rating' => 5],
+  ['name' => 'Americano',   'image' => 'https://res.cloudinary.com/dk0z4ums3/image/upload/v1747970767/attached_image/5-manfaat-americano-untuk-diet-yang-sayang-untuk-dilewatkan-0-alodokter.jpg', 'rating' => 4],
+  ['name' => 'Matcha Latte',     'image' => 'https://assets.bonappetit.com/photos/57b4df9f3e1d654349a2fefb/1:1/w_1920,c_limit/iced-matcha-latte.jpg', 'rating' => 5],
+];
+
+
       @endphp
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -128,14 +114,6 @@
           </div>
         @endforeach
       </div>
-    </div>
-  </section>
-
-  {{-- CONTACT (anchor di home tetap ada) --}}
-  <section id="contact" class="scroll-mt-20 py-12 md:py-16 bg-white">
-    <div class="max-w-7xl mx-auto px-4">
-      <h2 class="font-['Great_Vibes'] text-3xl md:text-5xl mb-2">Contact</h2>
-      <p class="text-stone-600 max-w-3xl">Hubungi kami di email atau datang langsung ke kedai.</p>
     </div>
   </section>
 
