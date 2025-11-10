@@ -30,9 +30,9 @@
         </div>
       </div>
 
-      {{-- Tombol Order --}}
+      {{-- Tombol Order (langsung ke menus tanpa login) --}}
       <div class="hidden md:flex items-center gap-2 text-white/90">
-        <a href="{{ url('/transaksi') }}">
+        <a href="{{ url('/menus') }}">
           <button class="px-3 py-1.5 rounded bg-amber-500 hover:bg-amber-600 text-stone-900 font-medium">
             Order
           </button>
