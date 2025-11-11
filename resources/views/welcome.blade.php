@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-<<<<<<< HEAD
 
 <head>
     <meta charset="utf-8">
@@ -122,7 +121,7 @@
                 </div>
             </main>
         </div>
-=======
+
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -392,15 +391,10 @@
                 </div>
             </main>
         </div>
-
->>>>>>> 04abe1f (Flatten structure: move SeduhRasa1/ up one level and remove nested folder)
         @if (Route::has('login'))
             <div class="h-14.5 hidden lg:block"></div>
         @endif
     </body>
-<<<<<<< HEAD
-
     </html>
-=======
 </html>
->>>>>>> 04abe1f (Flatten structure: move SeduhRasa1/ up one level and remove nested folder)
+

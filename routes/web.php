@@ -1,7 +1,13 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use App\Http\Controllers\MenuController;
+use App\Http\Controllers\TransaksiController;
+use App\Http\Controllers\PelangganController;
+use App\Http\Controllers\KaryawanController;
+use App\Http\Controllers\OrderController;
 
 // ===================
 // Public pages
@@ -10,21 +16,42 @@ Route::view('/', 'home')->name('home');
 Route::view('/about', 'about')->name('about');
 Route::view('/services', 'services')->name('services');
 
-// Kalau halaman order itu 'menu', pakai salah satu saja (hapus duplikat)
-Route::view('/order', 'menu')->name('order');   // -> resources/views/menu.blade.php
+// Halaman order publik (pakai view menu.blade.php)
+Route::view('/order', 'menu')->name('order');
 
 // Contact (GET halaman + POST kirim form)
-Route::view('/contact', 'contact')->name('contact');          // GET /contact => resources/views/contact.blade.php
+Route::view('/contact', 'contact')->name('contact');
 Route::post('/contact', function (Request $request) {
-    // TODO: validasi & simpan kalau perlu
+    // TODO: validasi atau simpan pesan ke database
     return back()->with('success', 'Pesan berhasil dikirim!');
 })->name('contact.submit');
 
 // ===================
-// Dashboard (opsional contoh)
+// Auth (logout)
+// ===================
+Route::post('/logout', function (Request $request) {
+    Auth::logout();
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+    return redirect()->route('home');
+})->name('logout');
+
+// ===================
+// Dashboard (opsional)
 // ===================
 Route::view('/dashboard', 'dashboard')->name('dashboard');
-// Kalau ada halaman contact khusus dashboard, taruh di /dashboard/contact (view-nya beda)
-// Route::view('/dashboard/contact', 'dashboard.contact')->name('dashboard.contact');
 
+// Tes koneksi server
 Route::get('/ping', fn() => 'PONG from ' . base_path());
+
+// ===================
+// Admin area
+// ===================
+// (kalau nanti sudah pakai login, tinggal tambahkan ->middleware('auth'))
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::get('/menus',     [MenuController::class,     'index'])->name('menus.index');
+    Route::get('/transaksi', [TransaksiController::class,'index'])->name('transaksi.index');
+    Route::get('/pelanggan', [PelangganController::class,'index'])->name('pelanggan.index');
+    Route::get('/karyawan',  [KaryawanController::class, 'index'])->name('karyawan.index');
+    Route::get('/orders',    [OrderController::class,    'index'])->name('orders.index');
+});
