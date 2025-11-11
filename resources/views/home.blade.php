@@ -130,9 +130,9 @@
     (function () {
       const slides = [
         "{{ $hero }}",
-        "{{ asset('welcome(1).jpeg') }}",
-        "{{ asset('welcome(2).jpeg') }}",
-        "{{ asset('welcome3.jpg') }}"
+        "{{ asset('welcome(1).jpg') }}",
+        "{{ asset('welcome(2).jpg') }}",
+        "{{ asset('welcome4.jpg') }}"
       ];
 
       const unique = [...new Set(slides.filter(Boolean))];
