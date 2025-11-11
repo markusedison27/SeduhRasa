@@ -47,11 +47,11 @@ Route::get('/ping', fn() => 'PONG from ' . base_path());
 // ===================
 // Admin area
 // ===================
-// (kalau nanti sudah pakai login, tinggal tambahkan ->middleware('auth'))
+// (nanti tinggal tambahkan ->middleware('auth') kalau sudah ada login)
 Route::prefix('admin')->name('admin.')->group(function () {
-    Route::get('/menus',     [MenuController::class,     'index'])->name('menus.index');
-    Route::get('/transaksi', [TransaksiController::class,'index'])->name('transaksi.index');
-    Route::get('/pelanggan', [PelangganController::class,'index'])->name('pelanggan.index');
-    Route::get('/karyawan',  [KaryawanController::class, 'index'])->name('karyawan.index');
-    Route::get('/orders',    [OrderController::class,    'index'])->name('orders.index');
+    Route::resource('menus', MenuController::class);           // admin.menus.*
+    Route::resource('transaksi', TransaksiController::class);  // admin.transaksi.*
+    Route::resource('pelanggan', PelangganController::class);  // admin.pelanggan.*
+    Route::resource('karyawan', KaryawanController::class);    // admin.karyawan.*
+    Route::resource('orders', OrderController::class);         // admin.orders.*
 });
