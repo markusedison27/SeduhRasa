@@ -14,10 +14,11 @@ use App\Http\Controllers\OrderController;
 | Public pages
 |--------------------------------------------------------------------------
 */
+// Rute untuk Halaman Publik (Multi-page structure)
 Route::view('/', 'home')->name('home');
 Route::view('/about', 'about')->name('about');
 Route::view('/services', 'services')->name('services');
-Route::view('/order', 'menu')->name('order');
+Route::view('/order', 'menu')->name('order'); // /order akan memuat menu.blade.php (sebagai Produk)
 Route::view('/contact', 'contact')->name('contact');
 Route::post('/contact', function (Request $request) {
     // TODO: validasi atau simpan pesan ke database
@@ -70,7 +71,7 @@ Route::middleware('auth')->group(function () {
 
     // Admin area (prefix /admin, nama route admin.*)
     Route::prefix('admin')->name('admin.')->group(function () {
-        Route::resource('menus', MenuController::class);           // admin.menus.*
+        Route::resource('menus', MenuController::class);        // admin.menus.*
         Route::resource('transaksi', TransaksiController::class);  // admin.transaksi.*
         Route::resource('pelanggan', PelangganController::class);  // admin.pelanggan.*
         Route::resource('karyawan', KaryawanController::class);    // admin.karyawan.*
