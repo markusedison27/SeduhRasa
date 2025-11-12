@@ -177,9 +177,9 @@
   </main>
 
   {{-- FOOTER --}}
-  <footer class="py-10 text-center text-sm text-stone-500 border-t">
-    © {{ date('Y') }} <span class="font-semibold text-stone-700">SeduhRasa Coffee</span>. All rights reserved.
-  </footer>
+ <footer class="py-8 text-center text-sm bg-amber-500 text-stone-900 font-medium">
+  © {{ date('Y') }} SeduhRasa Coffee. All rights reserved.
+</footer>
 
 </body>
 </html>

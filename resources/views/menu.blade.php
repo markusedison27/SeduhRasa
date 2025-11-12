@@ -208,8 +208,8 @@
     </div>
   </main>
 
-  <footer class="py-8 text-center text-sm text-stone-500">
-    © {{ date('Y') }} SeduhRasa Coffee. All rights reserved.
-  </footer>
+ <footer class="py-8 text-center text-sm bg-amber-500 text-stone-900 font-medium">
+  © {{ date('Y') }} SeduhRasa Coffee. All rights reserved.
+</footer>
 </body>
 </html>
