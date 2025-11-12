@@ -1,49 +1,69 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - SeduhRasa</title>
-    <style>
-        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f8f9fa; }
-        .login-box { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 350px; }
-        h2 { margin-bottom: 20px; text-align: center; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
-        .form-control { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        .btn-primary { width: 100%; padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
-        .alert-error { color: red; margin-top: 10px; font-size: 0.9em; }
-    </style>
-</head>
-<body>
+@extends('layouts.guest')
+@section('title','Masuk - SeduhRasa')
 
-    <div class="login-box">
-        <h2>Login Admin SeduhRasa</h2>
-        
-        <form method="POST" action="{{ url('/login') }}">
-            @csrf
+@section('content')
+<div class="w-full max-w-sm">
+  <div class="mb-5 flex items-center gap-2 justify-center">
+    <div class="h-8 w-8 rounded-lg bg-[#C67C4E] text-white grid place-items-center text-sm font-bold">SR</div>
+    <span class="text-base font-semibold tracking-tight">SeduhRasa</span>
+  </div>
 
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input id="email" type="email" class="form-control" name="email" value="{{ old('email') }}" required autofocus>
-                @error('email')
-                    <div class="alert-error">{{ $message }}</div>
-                @enderror
-            </div>
+  <div class="bg-white/85 backdrop-blur rounded-xl ring-1 ring-stone-200 shadow-[0_10px_30px_-12px_rgba(0,0,0,.25)] p-6">
+    <h1 class="text-lg font-semibold">Masuk</h1>
+    <p class="text-sm text-stone-500 mb-5">Kelola operasional kedai kopi.</p>
 
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input id="password" type="password" class="form-control" name="password" required>
-                @error('password')
-                    <div class="alert-error">{{ $message }}</div>
-                @enderror
-            </div>
+    @if ($errors->any())
+      <div class="mb-4 rounded-lg bg-red-50 text-red-700 ring-1 ring-red-200 px-3 py-2 text-sm">
+        {{ $errors->first() }}
+      </div>
+    @endif
 
-            <div class="form-group">
-                <button type="submit" class="btn-primary">Login</button>
-            </div>
-        </form>
-    </div>
+    <form method="POST" action="{{ route('login.post') }}" class="space-y-4">
+      @csrf
 
-</body>
-</html>
+      {{-- Floating label input --}}
+      <div class="relative">
+        <input id="email" name="email" type="email" autocomplete="username" required
+               value="{{ old('email') }}"
+               class="peer w-full rounded-lg border-stone-300 focus:border-[#C67C4E] focus:ring-[#C67C4E] placeholder-transparent"
+               placeholder="Email">
+        <label for="email"
+               class="absolute left-3 top-2 px-1 text-stone-500 text-sm transition-all
+                      peer-focus:text-xs peer-focus:-top-2 peer-focus:bg-white peer-focus:text-[#7B3F00]
+                      peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:-top-2 peer-[:not(:placeholder-shown)]:bg-white">
+          Email
+        </label>
+      </div>
+
+      <div class="relative">
+        <input id="password" name="password" type="password" autocomplete="current-password" required
+               class="peer w-full rounded-lg border-stone-300 focus:border-[#C67C4E] focus:ring-[#C67C4E] placeholder-transparent"
+               placeholder="Password">
+        <label for="password"
+               class="absolute left-3 top-2 px-1 text-stone-500 text-sm transition-all
+                      peer-focus:text-xs peer-focus:-top-2 peer-focus:bg-white peer-focus:text-[#7B3F00]
+                      peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:-top-2 peer-[:not(:placeholder-shown)]:bg-white">
+          Password
+        </label>
+      </div>
+
+      <div class="flex items-center justify-between">
+        <label class="inline-flex items-center gap-2 text-sm">
+          <input type="checkbox" name="remember" class="rounded border-stone-300 text-[#7B3F00] focus:ring-[#C67C4E]">
+          Ingat saya
+        </label>
+        <a href="#" class="text-sm text-stone-500 hover:text-stone-700">Lupa password?</a>
+      </div>
+
+      <button type="submit"
+        class="w-full py-2.5 rounded-lg bg-[#7B3F00] text-white font-medium
+               shadow-[0_6px_0_0_#5a2b00] hover:translate-y-[-1px] active:translate-y-[1px] active:shadow-[0_3px_0_0_#5a2b00]
+               transition-transform">
+        Masuk
+      </button>
+    </form>
+  </div>
+
+  <p class="text-center text-xs text-stone-500 mt-4">© {{ date('Y') }} SeduhRasa</p>
+</div>
+@endsection
