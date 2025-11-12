@@ -25,3 +25,5 @@ class MenuController extends Controller
         return back()->with('success', 'Menu berhasil ditambahkan (dummy).');
     }
 }
+
+#udbdub4
