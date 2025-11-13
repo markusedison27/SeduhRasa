@@ -24,6 +24,10 @@ Route::post('/contact', function (Request $request) {
     return back()->with('success', 'Pesan berhasil dikirim!');
 })->name('contact.submit');
 
+/* === Public Orders (checkout dari halaman menu) === */
+Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+
 /*
 |--------------------------------------------------------------------------
 | Auth (LOGIN, LOGOUT)
