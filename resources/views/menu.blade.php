@@ -163,8 +163,9 @@
                       <div class="price-pill inline-flex items-center rounded-full px-3 py-1 text-sm">
                         Rp {{ $item['price'] }}
                       </div>
+                      {{-- TOMBOL TAMBAH --}}
                       <button
-                        class="cta w-full mt-2 inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2 text-xs md:text-sm"
+                        class="cta add-btn w-full mt-2 inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2 text-xs md:text-sm"
                         data-name="{{ $item['name'] }}"
                         data-price="{{ $item['price'] }}">
                         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M11 11V6h2v5h5v2h-5v5h-2v-5H6v-2z"/></svg>
@@ -198,40 +199,66 @@
       <h3 class="text-lg font-semibold">Keranjang</h3>
       <button id="cart-close" class="rounded-md px-3 py-1.5 hover:bg-stone-100">Tutup</button>
     </div>
+
     <div id="cart-empty" class="p-6 text-stone-500">Keranjang masih kosong.</div>
     <ul id="cart-list" class="flex-1 overflow-auto divide-y hidden"></ul>
-    <div class="border-t p-5 space-y-3">
+
+    <div class="border-t p-5 space-y-4">
       <div class="flex items-center justify-between">
         <span class="text-stone-600">Subtotal</span>
         <strong id="cart-subtotal">Rp 0</strong>
       </div>
-      <button class="w-full cta rounded-xl py-3">Lanjutkan Order</button>
-      <p class="text-xs text-stone-500">*Tersimpan di perangkat (localStorage).</p>
+
+      {{-- PILIHAN METODE PEMBAYARAN --}}
+      <div class="space-y-2">
+        <p class="text-sm font-medium text-stone-700">Metode Pembayaran</p>
+        <div class="space-y-1 text-sm">
+          <label class="flex items-center gap-2">
+            <input type="radio" name="metode_pembayaran_ui" value="cod" class="accent-amber-600" checked>
+            <span>Bayar di Tempat (kasir)</span>
+          </label>
+          <label class="flex items-center gap-2">
+            <input type="radio" name="metode_pembayaran_ui" value="transfer" class="accent-amber-600">
+            <span>Transfer Bank / Virtual Account</span>
+          </label>
+        </div>
+      </div>
+
+      {{-- TOMBOL CHECKOUT --}}
+      <button id="checkout-btn" class="w-full cta rounded-xl py-3">Lanjutkan Order</button>
+
+      <p class="text-xs text-stone-500">*Keranjang tersimpan di perangkat (localStorage).</p>
     </div>
   </div>
 </aside>
+
 <div id="backdrop" class="fixed inset-0 bg-black/40 z-30 opacity-0 pointer-events-none transition-opacity"></div>
 
-{{-- ========= SCRIPT (tanpa pilihan panas/dingin) ========= --}}
+{{-- ========= SCRIPT ========= --}}
 <script>
   // Format & parser
   const rupiah = n => 'Rp '+ n.toString().replace(/\B(?=(\d{3})+(?!\d))/g,'.');
-  const parsePrice = s => { s=(s||'').toUpperCase().trim(); if(s.endsWith('K')) return parseInt(s)*1000; return parseInt(s.replace(/\D/g,''))||0; };
+  const parsePrice = s => {
+    s = (s || '').toUpperCase().trim();
+    if (s.endsWith('K')) return parseInt(s) * 1000;
+    return parseInt(s.replace(/\D/g,'')) || 0;
+  };
 
   // State
-  let cart = JSON.parse(localStorage.getItem('sr_cart')||'[]');
+  let cart = JSON.parse(localStorage.getItem('sr_cart') || '[]');
 
   // Refs
-  const cartFab=document.getElementById('cart-fab');
-  const cartCount=document.getElementById('cart-count');
-  const cartDrawer=document.getElementById('cart-drawer');
-  const cartClose=document.getElementById('cart-close');
-  const backdrop=document.getElementById('backdrop');
-  const cartList=document.getElementById('cart-list');
-  const cartEmpty=document.getElementById('cart-empty');
-  const cartSubtotal=document.getElementById('cart-subtotal');
+  const cartFab      = document.getElementById('cart-fab');
+  const cartCount    = document.getElementById('cart-count');
+  const cartDrawer   = document.getElementById('cart-drawer');
+  const cartClose    = document.getElementById('cart-close');
+  const backdrop     = document.getElementById('backdrop');
+  const cartList     = document.getElementById('cart-list');
+  const cartEmpty    = document.getElementById('cart-empty');
+  const cartSubtotal = document.getElementById('cart-subtotal');
+  const checkoutBtn  = document.getElementById('checkout-btn');
 
-  // Tambah ke keranjang (tanpa serve)
+  // Tambah ke keranjang
   document.querySelectorAll('.cta.add-btn, .add-btn').forEach(btn=>{
     btn.addEventListener('click',()=>{
       const name = btn.dataset.name;
@@ -242,18 +269,36 @@
 
   function addToCart(item){
     const f = cart.find(x=>x.name===item.name);
-    if(f) f.qty += 1; else cart.push({...item, qty:1});
+    if (f) f.qty += 1;
+    else cart.push({...item, qty:1});
     persist(); renderCart(); openCart();
   }
-  function updateQty(i,d){ cart[i].qty+=d; if(cart[i].qty<=0) cart.splice(i,1); persist(); renderCart(); }
-  function removeItem(i){ cart.splice(i,1); persist(); renderCart(); }
-  function persist(){ localStorage.setItem('sr_cart', JSON.stringify(cart)); }
-  function subtotal(){ return cart.reduce((t,i)=>t+i.price*i.qty,0); }
+
+  function updateQty(i,d){
+    cart[i].qty += d;
+    if (cart[i].qty <= 0) cart.splice(i,1);
+    persist(); renderCart();
+  }
+
+  function removeItem(i){
+    cart.splice(i,1);
+    persist(); renderCart();
+  }
+
+  function persist(){
+    localStorage.setItem('sr_cart', JSON.stringify(cart));
+  }
+
+  function subtotal(){
+    return cart.reduce((t,i)=>t+i.price*i.qty,0);
+  }
+
   function renderCart(){
     cartCount.textContent = cart.reduce((t,i)=>t+i.qty,0);
-    const has = cart.length>0;
-    cartEmpty.classList.toggle('hidden',has);
-    cartList.classList.toggle('hidden',!has);
+    const has = cart.length > 0;
+    cartEmpty.classList.toggle('hidden', has);
+    cartList.classList.toggle('hidden', !has);
+
     cartList.innerHTML = cart.map((it,idx)=>`
       <li class="p-4 flex items-center justify-between gap-3">
         <div class="min-w-0">
@@ -268,23 +313,72 @@
         </div>
       </li>
     `).join('');
+
     cartList.querySelectorAll('button').forEach(b=>{
-      const i=+b.dataset.i;
+      const i = +b.dataset.i;
       b.addEventListener('click',()=>{
-        if(b.dataset.act==='inc') updateQty(i,1);
-        if(b.dataset.act==='dec') updateQty(i,-1);
-        if(b.dataset.act==='del') removeItem(i);
+        if (b.dataset.act === 'inc') updateQty(i,1);
+        if (b.dataset.act === 'dec') updateQty(i,-1);
+        if (b.dataset.act === 'del') removeItem(i);
       });
     });
+
     cartSubtotal.textContent = rupiah(subtotal());
   }
 
   // Drawer
-  function openCart(){ cartDrawer.classList.remove('translate-x-full'); backdrop.classList.remove('pointer-events-none'); requestAnimationFrame(()=>backdrop.style.opacity='1'); }
-  function closeCart(){ cartDrawer.classList.add('translate-x-full'); backdrop.style.opacity='0'; setTimeout(()=>backdrop.classList.add('pointer-events-none'),200); }
+  function openCart(){
+    cartDrawer.classList.remove('translate-x-full');
+    backdrop.classList.remove('pointer-events-none');
+    requestAnimationFrame(()=>backdrop.style.opacity='1');
+  }
+
+  function closeCart(){
+    cartDrawer.classList.add('translate-x-full');
+    backdrop.style.opacity='0';
+    setTimeout(()=>backdrop.classList.add('pointer-events-none'),200);
+  }
+
   cartFab.addEventListener('click',openCart);
   cartClose.addEventListener('click',closeCart);
   backdrop.addEventListener('click',closeCart);
+
+  // Checkout: kirim pesanan + data pembeli + metode pembayaran ke Laravel
+  checkoutBtn.addEventListener('click', () => {
+    if (!cart.length) {
+      alert('Keranjang masih kosong.');
+      return;
+    }
+
+    // ambil data pembeli dari localStorage
+    const buyer = JSON.parse(localStorage.getItem('sr_buyer') || '{}');
+
+    if (!buyer.nama_pelanggan || !buyer.email || !buyer.telepon) {
+      alert('Data pembeli belum lengkap. Silakan isi dulu di halaman sebelumnya.');
+      window.location.href = "{{ route('order') }}";
+      return;
+    }
+
+    // ambil metode pembayaran
+    const metodeRadio = document.querySelector('input[name="metode_pembayaran_ui"]:checked');
+    const metode = metodeRadio ? metodeRadio.value : 'cod';
+
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = "{{ route('orders.store') }}";
+
+    form.innerHTML = `
+      <input type="hidden" name="_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="nama_pelanggan" value="${buyer.nama_pelanggan}">
+      <input type="hidden" name="email" value="${buyer.email}">
+      <input type="hidden" name="telepon" value="${buyer.telepon}">
+      <input type="hidden" name="items" value='${JSON.stringify(cart)}'>
+      <input type="hidden" name="metode_pembayaran" value="${metode}">
+    `;
+
+    document.body.appendChild(form);
+    form.submit();
+  });
 
   renderCart();
 </script>
