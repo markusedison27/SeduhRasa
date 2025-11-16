@@ -1,71 +1,41 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Layanan Kami - SeduhRasa Coffee</title>
-  @vite(['resources/css/app.css','resources/js/app.js'])
-</head>
-<body class="bg-stone-50 text-stone-900">
+@extends('layouts.public') {{-- ✅ INI PERBAIKANNYA: Menggunakan Layout Publik --}}
 
-  {{-- HEADER --}}
-  <header class="bg-stone-900 text-white py-4">
-    <div class="max-w-6xl mx-auto px-4 flex justify-between items-center">
-      <a href="{{ url('/') }}" class="font-bold text-lg">
-        Seduh<span class="text-amber-400">Rasa</span>
-      </a>
-      <nav class="flex gap-4 text-sm">
-        <a href="{{ url('/') }}" class="hover:text-amber-400">Home</a>
-        <a href="{{ route('about') }}" class="hover:text-amber-400">About Us</a>
-        <a href="{{ route('services') }}" class="text-amber-400 font-semibold">Services</a>
-      </nav>
-    </div>
-  </header>
+@section('title', 'Layanan Kami | SeduhRasa Coffee')
 
-  {{-- MAIN CONTENT --}}
-  <main class="max-w-6xl mx-auto py-16 px-6 text-center">
-    <h1 class="text-4xl font-bold mb-8 text-gray-800">Layanan Kami</h1>
-    <p class="text-lg text-gray-600 mb-12">
-      Kami menyediakan berbagai layanan untuk memberikan pengalaman kopi terbaik bagi pelanggan kami.
-    </p>
+@section('content')
+    {{-- Tambahkan padding atas yang cukup karena header bersifat fixed di layouts/public.blade.php --}}
+    <section class="py-16 bg-[#fbf5ef] pt-32 md:pt-40"> 
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            
+            {{-- Konten Services --}}
+            <h2 class="font-['Great_Vibes'] text-3xl md:text-5xl mb-6">Our Services</h2>
+            <p class="max-w-2xl mx-auto text-stone-600 mb-10">
+                Kami menyediakan berbagai layanan untuk memastikan pengalaman terbaik bagi pelanggan SeduhRasa Coffee.
+            </p>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-      {{-- Service 1 --}}
-      <div class="bg-white shadow rounded-xl p-6">
-        <img src="https://images.unsplash.com/photo-1510626176961-4b37d6afc6f4?q=80&w=800" 
-             alt="Coffee Brewing" class="rounded-lg mb-4 w-full h-48 object-cover">
-        <h3 class="text-xl font-semibold mb-2">Coffee Brewing Class</h3>
-        <p class="text-gray-600 text-sm">
-          Belajar menyeduh kopi dari barista profesional kami dengan berbagai metode manual brew.
-        </p>
-      </div>
+            {{-- KONTEN SERVICES CARDS --}}
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                <div class="p-6 bg-white rounded-lg shadow border hover:shadow-md transition">
+                    <img src="https://cdn-icons-png.flaticon.com/512/3515/3515301.png"
+                        class="w-16 h-16 mx-auto mb-4" alt="Fresh Coffee Icon"/>
+                    <h3 class="font-semibold text-lg mb-2">Fresh Coffee</h3>
+                    <p class="text-stone-600 text-sm">Biji kopi pilihan dengan kualitas terbaik.</p>
+                </div>
 
-      {{-- Service 2 --}}
-      <div class="bg-white shadow rounded-xl p-6">
-        <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=800"
-             alt="Coffee Beans" class="rounded-lg mb-4 w-full h-48 object-cover">
-        <h3 class="text-xl font-semibold mb-2">Coffee Bean Supply</h3>
-        <p class="text-gray-600 text-sm">
-          Menyediakan biji kopi premium untuk kafe, restoran, dan individu pecinta kopi.
-        </p>
-      </div>
+                <div class="p-6 bg-white rounded-lg shadow border hover:shadow-md transition">
+                    <img src="https://cdn-icons-png.flaticon.com/512/1046/1046784.png"
+                        class="w-16 h-16 mx-auto mb-4" alt="Fast Delivery Icon"/>
+                    <h3 class="font-semibold text-lg mb-2">Fast Delivery</h3>
+                    <p class="text-stone-600 text-sm">Pesanan diantar cepat & aman ke lokasi Anda.</p>
+                </div>
 
-      {{-- Service 3 --}}
-      <div class="bg-white shadow rounded-xl p-6">
-        <img src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?q=80&w=800"
-             alt="Coffee Catering" class="rounded-lg mb-4 w-full h-48 object-cover">
-        <h3 class="text-xl font-semibold mb-2">Coffee Catering</h3>
-        <p class="text-gray-600 text-sm">
-          Layanan coffee bar untuk acara kantor, seminar, dan pesta spesial Anda.
-        </p>
-      </div>
-    </div>
-  </main>
-
- {{-- FOOTER --}}
-  <footer class="bg-orange-500 text-stone-900 text-center py-4 font-medium">
-    © {{ date('Y') }} SeduhRasa Coffee. All rights reserved.
-  </footer>
-
-</body>
-</html>
+                <div class="p-6 bg-white rounded-lg shadow border hover:shadow-md transition">
+                    <img src="https://cdn-icons-png.flaticon.com/512/609/609361.png"
+                        class="w-16 h-16 mx-auto mb-4" alt="Premium Quality Icon"/>
+                    <h3 class="font-semibold text-lg mb-2">Premium Quality</h3>
+                    <p class="text-stone-600 text-sm">Kami selalu menjaga kualitas dan rasa kopi.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+@endsection
