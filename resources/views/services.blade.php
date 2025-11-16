@@ -62,10 +62,10 @@
     </div>
   </main>
 
-  {{-- FOOTER --}}
-   <footer class="py-8 text-center text-sm text-stone-500">
-  © {{ date('Y') }} SeduhRasa Coffee. All rights reserved.
-</footer>
+ {{-- FOOTER --}}
+  <footer class="bg-orange-500 text-stone-900 text-center py-4 font-medium">
+    © {{ date('Y') }} SeduhRasa Coffee. All rights reserved.
+  </footer>
 
 </body>
 </html>

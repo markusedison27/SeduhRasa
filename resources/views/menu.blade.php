@@ -182,7 +182,10 @@
   </div>
 </main>
 
-<footer class="py-10 text-center text-xs text-stone-500">© {{ date('Y') }} SeduhRasa Coffee</footer>
+{{-- FOOTER --}}
+  <footer class="bg-orange-500 text-stone-900 text-center py-4 font-medium">
+    © {{ date('Y') }} SeduhRasa Coffee. All rights reserved.
+  </footer>
 
 {{-- FAB CART --}}
 <button id="cart-fab"
