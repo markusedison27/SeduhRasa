@@ -130,9 +130,9 @@
     (function () {
       const slides = [
         "{{ $hero }}",
-        "{{ asset('welcome(1).jpg') }}",
-        "{{ asset('welcome(2).jpg') }}",
-        "{{ asset('welcome4.jpg') }}"
+        "{{ asset('leccata1.jpg') }}",
+        "{{ asset('leccata2.jpg') }}",
+        "{{ asset('leccata3.jpg') }}"
       ];
 
       const unique = [...new Set(slides.filter(Boolean))];
@@ -169,4 +169,3 @@
   </script>
 </body>
 </html>
-wwa
