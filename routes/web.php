@@ -3,29 +3,49 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\TransaksiController;
 use App\Http\Controllers\PelangganController;
 use App\Http\Controllers\KaryawanController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
-| Public pages
+| Public pages (tanpa login)
 |--------------------------------------------------------------------------
 */
+
 Route::view('/', 'home')->name('home');
 Route::view('/about', 'about')->name('about');
 Route::view('/services', 'services')->name('services');
-Route::view('/order', 'menu')->name('order');
+
+// Halaman 1: isi data pembeli
+Route::view('/order', 'order')->name('order');
+
+// Halaman 2: pilih menu (menu.blade.php yang panjang itu)
+Route::view('/menu', 'menu')->name('menu');
+
 Route::view('/contact', 'contact')->name('contact');
+
 Route::post('/contact', function (Request $request) {
-    // TODO: validasi atau simpan pesan ke database
     return back()->with('success', 'Pesan berhasil dikirim!');
 })->name('contact.submit');
 
-/* === Public Orders (checkout dari halaman menu) === */
+/*
+|--------------------------------------------------------------------------
+| Public Orders (checkout dari halaman menu)
+|--------------------------------------------------------------------------
+*/
+
+// List order publik (opsional)
+Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+
+// Simpan pesanan dari halaman menu (checkout)
 Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+
+// Detail pesanan
 Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
 
 /*
@@ -33,7 +53,8 @@ Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.sh
 | Auth (LOGIN, LOGOUT)
 |--------------------------------------------------------------------------
 */
-// Tampilkan form login (pakai resources/views/auth/login.blade.php)
+
+// Tampilkan form login
 Route::middleware('guest')->get('/login', function () {
     return view('auth.login');
 })->name('login');
@@ -68,9 +89,10 @@ Route::post('/logout', function (Request $request) {
 | Area yang butuh login
 |--------------------------------------------------------------------------
 */
+
 Route::middleware('auth')->group(function () {
     // Dashboard
-    Route::view('/dashboard', 'dashboard')->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Admin area (prefix /admin, nama route admin.*)
     Route::prefix('admin')->name('admin.')->group(function () {
@@ -87,4 +109,5 @@ Route::middleware('auth')->group(function () {
 | Utilities
 |--------------------------------------------------------------------------
 */
+
 Route::get('/ping', fn () => 'PONG from ' . base_path());

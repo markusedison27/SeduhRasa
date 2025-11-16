@@ -1,12 +1,13 @@
-@extends('layouts.app') 
+@extends('layouts.app')
 
-@section('title', 'Manajemen Karyawan') 
+@section('title', 'Manajemen Karyawan')
 
 @section('content')
     <div class="container-fluid" style="padding-top: 20px;">
         <h3>Daftar Karyawan</h3>
         
-        <a href="{{ route('karyawan.create') }}" class="btn btn-primary mb-3">
+        {{-- pakai nama route yang benar: admin.karyawan.create --}}
+        <a href="{{ route('admin.karyawan.create') }}" class="btn btn-primary mb-3">
             Tambah Karyawan Baru
         </a>
 
@@ -18,7 +19,7 @@
                             <th>ID</th>
                             <th>Nama</th>
                             <th>Jabatan</th>
-                            <th>Status</th>
+                            <th>Kontak</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>

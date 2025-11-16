@@ -1,12 +1,13 @@
-@extends('layouts.app') 
+@extends('layouts.app')
 
-@section('title', 'Manajemen Pelanggan') 
+@section('title', 'Manajemen Pelanggan')
 
 @section('content')
     <div class="container-fluid" style="padding-top: 20px;">
         <h3>Daftar Pelanggan</h3>
         
-        <a href="{{ route('pelanggan.create') }}" class="btn btn-primary mb-3">
+        {{-- pakai nama route yang benar: admin.pelanggan.create --}}
+        <a href="{{ route('admin.pelanggan.create') }}" class="btn btn-primary mb-3">
             Tambah Pelanggan Baru
         </a>
 
@@ -23,6 +24,7 @@
                         </tr>
                     </thead>
                     <tbody>
+                        {{-- nanti di-loop dari database, sementara placeholder dulu --}}
                         <tr>
                             <td colspan="5" class="text-center">
                                 Data Pelanggan belum tersedia.

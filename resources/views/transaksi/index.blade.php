@@ -6,7 +6,7 @@
     <div class="container-fluid" style="padding-top: 20px;">
         <h3>Daftar Transaksi</h3>
         
-        <a href="{{ route('transaksi.create') }}" class="btn btn-primary mb-3">
+        <a href="{{ route('admin.transaksi.create') }}" class="btn btn-primary">
             Tambah Transaksi Baru
         </a>
 
