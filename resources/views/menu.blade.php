@@ -184,9 +184,9 @@
 </main>
 
 {{-- FOOTER --}}
-  <footer class="bg-orange-500 text-stone-900 text-center py-4 font-medium">
-    © {{ date('Y') }} SeduhRasa Coffee. All rights reserved.
-  </footer>
+<footer class="bg-orange-500 text-stone-900 text-center py-4 font-medium">
+  © {{ date('Y') }} SeduhRasa Coffee. All rights reserved.
+</footer>
 
 {{-- FAB CART --}}
 <button id="cart-fab"
@@ -230,7 +230,7 @@
       {{-- TOMBOL CHECKOUT --}}
       <button id="checkout-btn" class="w-full cta rounded-xl py-3">Lanjutkan Order</button>
 
-      <p class="text-xs text-stone-500">*Keranjang tersimpan di perangkat (localStorage).</p>
+      <p class="text-xs text-stone-500">*Keranjang hanya berlaku untuk pesanan ini.</p>
     </div>
   </div>
 </aside>
@@ -247,8 +247,10 @@
     return parseInt(s.replace(/\D/g,'')) || 0;
   };
 
-  // State
-  let cart = JSON.parse(localStorage.getItem('sr_cart') || '[]');
+  // ====== STATE KERANJANG ======
+  // Sekarang keranjang SELALU baru (mulai dari kosong),
+  // dan TIDAK disimpan ke localStorage.
+  let cart = [];
 
   // Refs
   const cartFab      = document.getElementById('cart-fab');
@@ -288,8 +290,9 @@
     persist(); renderCart();
   }
 
+  // Tidak pakai localStorage lagi untuk keranjang
   function persist(){
-    localStorage.setItem('sr_cart', JSON.stringify(cart));
+    // dibiarkan kosong; cart hanya hidup di memori halaman ini
   }
 
   function subtotal(){
@@ -353,7 +356,7 @@
       return;
     }
 
-    // ambil data pembeli dari localStorage
+    // ambil data pembeli dari localStorage (tetap)
     const buyer = JSON.parse(localStorage.getItem('sr_buyer') || '{}');
 
     if (!buyer.nama_pelanggan || !buyer.email || !buyer.telepon) {

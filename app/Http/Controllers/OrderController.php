@@ -62,17 +62,17 @@ class OrderController extends Controller
             'menu_dipesan'      => $menuDipesan,
             'jumlah'            => $totalQty,
             'total_harga'       => $totalHarga,
-            'status'            => 'pending',
-            'metode_pembayaran' => $metodePembayaran,   // <--- baru
+            'status'            => 'pending',          // awalnya pending
+            'metode_pembayaran' => $metodePembayaran,
         ]);
 
-        // Redirect ke halaman detail pesanan
+        // Redirect ke halaman detail pesanan (pembeli)
         return redirect()
             ->route('orders.show', $order->id)
-            ->with('success', 'Pesanan berhasil dibuat!');
+            ->with('success', 'Pesanan berhasil dibuat! Kami akan segera memproses pesanan kamu.');
     }
 
-    // GET /orders/{order}  -> route('orders.show')
+    // GET /orders/{order}  -> route('orders.show') (HALAMAN PEMBELI)
     public function show(Order $order)
     {
         return view('orders.show', [
@@ -91,13 +91,36 @@ class OrderController extends Controller
     {
         $orders = Order::latest()->paginate(15);
 
-        return view('admin.orders.index', compact('orders'));
+        if (view()->exists('admin.orders.index')) {
+            return view('admin.orders.index', compact('orders'));
+        }
+
+        return view('orders.index', compact('orders'));
     }
 
     // GET /admin/orders/{order} -> admin.orders.show
     public function adminShow(Order $order)
     {
-        return view('admin.orders.show', compact('order'));
+        if (view()->exists('admin.orders.show')) {
+            return view('admin.orders.show', compact('order'));
+        }
+
+        return view('orders.show', compact('order'));
+    }
+
+    // PATCH /admin/orders/{order}/status -> admin.orders.updateStatus
+    public function updateStatus(Request $request, Order $order)
+    {
+        // status yang diizinkan
+        $request->validate([
+            'status' => 'required|in:pending,proses,selesai,batal',
+        ]);
+
+        $order->update([
+            'status' => $request->status,
+        ]);
+
+        return back()->with('success', 'Status order berhasil diperbarui.');
     }
 
     // DELETE /admin/orders/{order} -> admin.orders.destroy

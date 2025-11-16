@@ -101,6 +101,10 @@ Route::middleware('auth')->group(function () {
         Route::resource('pelanggan', PelangganController::class);  // admin.pelanggan.*
         Route::resource('karyawan', KaryawanController::class);    // admin.karyawan.*
         Route::resource('orders', OrderController::class);         // admin.orders.*
+
+        // 👉 route tambahan untuk ubah status order
+        Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus'])
+            ->name('orders.updateStatus');
     });
 });
 

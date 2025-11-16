@@ -1,38 +1,44 @@
-@extends('layouts.app') 
+@extends('layouts.app')
 
-@section('title', 'Manajemen Order') 
+@section('title', 'Riwayat Order')
 
 @section('content')
-    <div class="container-fluid" style="padding-top: 20px;">
-        <h3>Daftar Order Masuk</h3>
-        
-        {{-- Order biasanya tidak dibuat melalui tombol create admin, melainkan dari form pelanggan --}}
-        {{-- Namun, route create tetap ada jika diperlukan --}}
-        <a href="{{ route('orders.create') }}" class="btn btn-primary mb-3">
-            Buat Order Manual
-        </a> 
+    <div class="container py-4">
+        <h4 class="mb-3 fw-semibold">Riwayat Order Kamu</h4>
 
-        <div class="card">
-            <div class="card-body">
-                <table class="table table-striped table-bordered">
+        @if ($orders->count())
+            <div class="table-responsive">
+                <table class="table table-sm align-middle">
                     <thead>
                         <tr>
-                            <th>ID Order</th>
+                            <th>ID</th>
                             <th>Tanggal</th>
-                            <th>Pelanggan</th>
+                            <th>Nama</th>
                             <th>Status</th>
-                            <th>Aksi</th>
+                            <th>Total</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td colspan="5" class="text-center">
-                                Data Order belum tersedia.
-                            </td>
-                        </tr>
+                        @foreach ($orders as $o)
+                            <tr>
+                                <td>#{{ $o->id }}</td>
+                                <td>{{ $o->created_at->format('d M Y H:i') }}</td>
+                                <td>{{ $o->nama_pelanggan }}</td>
+                                <td>{{ ucfirst($o->status) }}</td>
+                                <td>Rp {{ number_format($o->total_harga, 0, ',', '.') }}</td>
+                            </tr>
+                        @endforeach
                     </tbody>
                 </table>
             </div>
-        </div>
+
+            @if ($orders->hasPages())
+                <div class="mt-3">
+                    {{ $orders->links() }}
+                </div>
+            @endif
+        @else
+            <p class="text-muted">Belum ada order.</p>
+        @endif
     </div>
 @endsection
