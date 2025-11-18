@@ -6,19 +6,29 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->string('metode_pembayaran')
-                  ->default('cod')
-                  ->after('status'); // boleh after kolom lain, bebas
+            // tambah kolom hanya kalau BELUM ada
+            if (!Schema::hasColumn('orders', 'metode_pembayaran')) {
+                $table->string('metode_pembayaran')->default('cod')->after('status');
+            }
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->dropColumn('metode_pembayaran');
+            // hapus kolom hanya kalau ADA
+            if (Schema::hasColumn('orders', 'metode_pembayaran')) {
+                $table->dropColumn('metode_pembayaran');
+            }
         });
     }
 };

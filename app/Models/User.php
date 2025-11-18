@@ -21,6 +21,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',      // <— tambahin
+        'owner_id',  // <— tambahin
     ];
 
     /**
@@ -42,7 +44,21 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'password'          => 'hashed',
         ];
+    }
+
+    // ====== RELASI TAMBAHAN ======
+
+    // kalau user ini karyawan, dia punya 1 owner
+    public function owner()
+    {
+        return $this->belongsTo(User::class, 'owner_id');
+    }
+
+    // kalau user ini owner, dia bisa punya banyak staff
+    public function staff()
+    {
+        return $this->hasMany(User::class, 'owner_id');
     }
 }

@@ -11,6 +11,11 @@ use App\Http\Controllers\KaryawanController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\DashboardController;
 
+// controller baru untuk multi role
+use App\Http\Controllers\SuperAdminController;
+use App\Http\Controllers\OwnerController;
+use App\Http\Controllers\Auth\LoginController;
+
 /*
 |--------------------------------------------------------------------------
 | Public pages (tanpa login)
@@ -20,18 +25,14 @@ use App\Http\Controllers\DashboardController;
 Route::view('/', 'home')->name('home');
 Route::view('/about', 'about')->name('about');
 Route::view('/services', 'services')->name('services');
-
-// Halaman 1: isi data pembeli
-Route::view('/order', 'order')->name('order');
-
-// Halaman 2: pilih menu (menu.blade.php yang panjang itu)
-Route::view('/menu', 'menu')->name('menu');
-
 Route::view('/contact', 'contact')->name('contact');
 
 Route::post('/contact', function (Request $request) {
     return back()->with('success', 'Pesan berhasil dikirim!');
 })->name('contact.submit');
+
+Route::view('/order', 'order')->name('order');
+Route::view('/menu', 'menu')->name('menu');
 
 /*
 |--------------------------------------------------------------------------
@@ -39,70 +40,77 @@ Route::post('/contact', function (Request $request) {
 |--------------------------------------------------------------------------
 */
 
-// List order publik (opsional)
 Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
-
-// Simpan pesanan dari halaman menu (checkout)
 Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
-
-// Detail pesanan
 Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
 
 /*
 |--------------------------------------------------------------------------
-| Auth (LOGIN, LOGOUT)
+| AUTH (LOGIN + LOGOUT)
 |--------------------------------------------------------------------------
 */
 
-// Tampilkan form login
-Route::middleware('guest')->get('/login', function () {
-    return view('auth.login');
-})->name('login');
+// tampilkan form login
+Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 
-// Proses login
-Route::middleware('guest')->post('/login', function (Request $request) {
-    $cred = $request->validate([
-        'email' => ['required', 'email'],
-        'password' => ['required'],
-    ]);
+// proses login
+Route::post('/login', [LoginController::class, 'login'])->name('login.post');
 
-    $remember = $request->boolean('remember');
-
-    if (Auth::attempt($cred, $remember)) {
-        $request->session()->regenerate();
-        return redirect()->intended(route('dashboard'));
-    }
-
-    return back()->withErrors(['email' => 'Email atau password salah.'])->onlyInput('email');
-})->name('login.post');
-
-// Logout
-Route::post('/logout', function (Request $request) {
-    Auth::logout();
-    $request->session()->invalidate();
-    $request->session()->regenerateToken();
-    return redirect()->route('login')->with('status', 'Berhasil keluar.');
-})->name('logout');
+// logout
+Route::post('/logout', [LoginController::class, 'logout'])
+    ->middleware('auth')
+    ->name('logout');
 
 /*
 |--------------------------------------------------------------------------
-| Area yang butuh login
+| SUPER ADMIN
 |--------------------------------------------------------------------------
 */
+Route::middleware(['auth', 'role:super_admin'])->group(function () {
+    Route::get('/super-admin/dashboard', [SuperAdminController::class, 'index'])
+        ->name('super.dashboard');
 
-Route::middleware('auth')->group(function () {
-    // Dashboard
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    // kelola owner
+    Route::get('/super-admin/owners', [SuperAdminController::class, 'ownersIndex'])
+        ->name('super.owners.index');
 
-    // Admin area (prefix /admin, nama route admin.*)
+    Route::get('/super-admin/owners/create', [SuperAdminController::class, 'ownersCreate'])
+        ->name('super.owners.create');
+
+    Route::post('/super-admin/owners', [SuperAdminController::class, 'ownersStore'])
+        ->name('super.owners.store');
+});
+
+/*
+|--------------------------------------------------------------------------
+| OWNER
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'role:owner'])->group(function () {
+    Route::get('/owner/dashboard', [OwnerController::class, 'index'])
+        ->name('owner.dashboard');
+
+    Route::get('/owner/finance', [OwnerController::class, 'finance'])
+        ->name('owner.finance');
+});
+
+/*
+|--------------------------------------------------------------------------
+| STAFF / KARYAWAN
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'role:staff'])->group(function () {
+
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+        ->name('staff.dashboard');
+
     Route::prefix('admin')->name('admin.')->group(function () {
-        Route::resource('menus', MenuController::class);           // admin.menus.*
-        Route::resource('transaksi', TransaksiController::class);  // admin.transaksi.*
-        Route::resource('pelanggan', PelangganController::class);  // admin.pelanggan.*
-        Route::resource('karyawan', KaryawanController::class);    // admin.karyawan.*
-        Route::resource('orders', OrderController::class);         // admin.orders.*
+        Route::resource('menus', MenuController::class);
+        Route::resource('transaksi', TransaksiController::class);
+        Route::resource('pelanggan', PelangganController::class);
+        Route::resource('karyawan', KaryawanController::class);
+        Route::resource('orders', OrderController::class);
 
-        // 👉 route tambahan untuk ubah status order
         Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus'])
             ->name('orders.updateStatus');
     });
@@ -110,8 +118,7 @@ Route::middleware('auth')->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| Utilities
+| UTILITIES
 |--------------------------------------------------------------------------
 */
-
 Route::get('/ping', fn () => 'PONG from ' . base_path());

@@ -23,22 +23,36 @@ class LoginController extends Controller
     {
         // 1. Validasi Input
         $credentials = $request->validate([
-            'email' => ['required', 'email'],
+            'email'    => ['required', 'email'],
             'password' => ['required'],
         ]);
 
         // 2. Coba Otentikasi
-        if (Auth::attempt($credentials)) {
+        if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
 
-            // Berhasil login, arahkan ke dashboard
-            return redirect()->intended('/dashboard');
+            $user = Auth::user();
+
+            // 3. Tentukan redirect berdasarkan role
+            if ($user->role === 'super_admin') {
+                // pakai nama route yg ada di web.php ->name('super.dashboard')
+                $fallback = route('super.dashboard');
+            } elseif ($user->role === 'owner') {
+                $fallback = route('owner.dashboard');
+            } elseif ($user->role === 'staff') {
+                $fallback = route('staff.dashboard');
+            } else {
+                $fallback = route('home');
+            }
+
+            // intended = kalau sebelumnya akses halaman yang butuh login, balik ke sana
+            return redirect()->intended($fallback);
         }
 
-        // 3. Gagal Otentikasi
-        return back()->withErrors([
-            'email' => 'Email atau Password yang Anda masukkan salah.',
-        ])->onlyInput('email');
+        // 4. Gagal Otentikasi
+        return back()
+            ->withErrors(['email' => 'Email atau Password yang Anda masukkan salah.'])
+            ->onlyInput('email');
     }
 
     /**
@@ -51,7 +65,6 @@ class LoginController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        // Arahkan kembali ke halaman utama (home)
-        return redirect('/');
+        return redirect()->route('login')->with('status', 'Berhasil keluar.');
     }
 }

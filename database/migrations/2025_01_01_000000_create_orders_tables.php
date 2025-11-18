@@ -8,17 +8,20 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('orders', function (Blueprint $table) {
-            $table->id();
-            $table->string('kode_order')->unique();
-            $table->string('status')->default('pending');     // pending | diproses | siap | selesai | batal
-            $table->string('customer_name')->nullable();
-            $table->string('meja_nomor')->nullable();
-            $table->unsignedBigInteger('subtotal')->default(0);
-            $table->dateTime('waktu_order')->nullable();
-            $table->text('keterangan')->nullable();
-            $table->timestamps();
-        });
+        // CEK DULU: kalau tabel orders belum ada, baru dibuat
+        if (!Schema::hasTable('orders')) {
+            Schema::create('orders', function (Blueprint $table) {
+                $table->id();
+                $table->string('kode_order')->unique();
+                $table->string('status')->default('pending');     // pending | diproses | siap | selesai | batal
+                $table->string('customer_name')->nullable();
+                $table->string('meja_nomor')->nullable();
+                $table->unsignedBigInteger('subtotal')->default(0);
+                $table->dateTime('waktu_order')->nullable();
+                $table->text('keterangan')->nullable();
+                $table->timestamps();
+            });
+        }
     }
 
     public function down(): void

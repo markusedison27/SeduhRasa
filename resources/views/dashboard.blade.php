@@ -11,7 +11,6 @@
         <strong style="color:#b45309;">{{ $pendingCount }} order</strong>
     </p>
 
-
     {{-- kalau di layout lain kamu pakai Vite/Tailwind, boleh aktifkan ini --}}
     {{-- @vite(['resources/css/app.css', 'resources/js/app.js']) --}}
 
@@ -287,7 +286,8 @@
 
             <div>
                 <div class="nav-title">Navigasi</div>
-                <a href="{{ route('dashboard') }}" class="nav-link active">
+                {{-- ini yang tadi error, sudah diganti ke staff.dashboard --}}
+                <a href="{{ route('staff.dashboard') }}" class="nav-link active">
                     <span class="icon"></span>
                     <span>Dashboard</span>
                 </a>

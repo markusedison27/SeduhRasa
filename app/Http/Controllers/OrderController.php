@@ -9,9 +9,7 @@ class OrderController extends Controller
 {
     /*
     |--------------------------------------------------------------------------
-    | PUBLIC (checkout dari halaman menu)
-    |--------------------------------------------------------------------------
-    */
+    | PUBLIC (checkout dari halaman menu)    */
 
     // POST /orders  -> route('orders.store')
     public function store(Request $request)
