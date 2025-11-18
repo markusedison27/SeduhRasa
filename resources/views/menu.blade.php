@@ -183,10 +183,10 @@
   </div>
 </main>
 
-{{-- FOOTER --}}
-<footer class="bg-orange-500 text-stone-900 text-center py-4 font-medium">
-  © {{ date('Y') }} SeduhRasa Coffee. All rights reserved.
+<footer class="w-full bg-[#ff8c00] text-white text-center py-4 text-sm">
+    © {{ date('Y') }} SeduhRasa Coffee. All rights reserved.
 </footer>
+
 
 {{-- FAB CART --}}
 <button id="cart-fab"

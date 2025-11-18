@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-+
-=======
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -39,12 +36,21 @@
                 <div class="text-xs font-semibold uppercase tracking-wider text-stone-400 px-2">Navigasi Panel</div>
 
                 {{-- Link: Dashboard --}}
-                <a href="{{ route('dashboard') }}"
-                    @class([
-                        'flex items-center gap-3 px-3 py-2 rounded-xl transition group',
-                        'bg-amber-100 text-amber-800 ring-1 ring-amber-200' => request()->routeIs('dashboard'),
-                        'text-stone-700 hover:bg-amber-50 hover:text-amber-700' => !request()->routeIs('dashboard'),
-                    ])>
+@if (Route::has('dashboard'))
+    <a href="{{ route('dashboard') }}"
+        @class([
+            'flex items-center gap-3 px-3 py-2 rounded-xl transition group',
+            'bg-amber-100 text-amber-800 ring-1 ring-amber-200' => request()->routeIs('dashboard'),
+            'text-stone-700 hover:bg-amber-50 hover:text-amber-700' => !request()->routeIs('dashboard'),
+        ])>
+@else
+    <a href="#"
+        @class([
+            'flex items-center gap-3 px-3 py-2 rounded-xl transition group',
+            'text-stone-700 hover:bg-amber-50 hover:text-amber-700',
+        ])>
+@endif
+
                     <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         {{-- Icon Home --}}
                         <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2 7-7 7 7 2 2v8a2 2 0 01-2 2h-3a2 2 0 01-2-2v-3H9v3a2 2 0 01-2 2H5a2 2 0 01-2-2v-8z" />
@@ -204,4 +210,4 @@
     </script>
 </body>
 </html>
->>>>>>> 344cf020e57d61057b3a888ab2dab91e9789a584
+

@@ -97,9 +97,9 @@
   </main>
 
   {{-- FOOTER --}}
-  <footer class="py-8 mt-16 text-center text-sm text-stone-500 border-t border-stone-200">
+  <footer class="w-full bg-[#ff8c00] text-white text-center py-4 text-sm">
     © {{ date('Y') }} SeduhRasa Coffee. All rights reserved.
-  </footer>
+</footer>
 
 </body>
 </html>  

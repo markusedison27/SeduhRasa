@@ -74,9 +74,10 @@
     </section>
   </main>
 
-  <footer class="py-10 text-center text-sm text-stone-500 border-t">
-    © {{ date('Y') }} <span class="font-semibold text-stone-700">SeduhRasa Coffee</span>. All rights reserved.
-  </footer>
+   {{-- FOOTER --}}
+  <footer class="w-full bg-[#ff8c00] text-white text-center py-4 text-sm">
+    © {{ date('Y') }} SeduhRasa Coffee. All rights reserved.
+</footer>
 
   <script>
     // saat tombol diklik, simpan data pembeli di localStorage lalu pindah ke /menu
