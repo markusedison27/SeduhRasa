@@ -10,7 +10,7 @@ class Order extends Model
     use HasFactory;
 
     // Nama tabel
-    protected $table = 'orders';
+
 
     // Kolom yang boleh diisi mass assignment
  protected $fillable = [

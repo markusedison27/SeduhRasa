@@ -1,82 +1,81 @@
-{{-- resources/views/about.blade.php --}}
-<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Tentang Kami — SeduhRasa</title>
-  @vite(['resources/css/app.css','resources/js/app.js'])
-  {{-- Palet: 
-       Espresso  #3F2F28
-       Mocha     #6B4E3D
-       Caramel   #B07A5A
-       Cream     #F7F1E8
-       Foam      #EDE3D9
-  --}}
-</head>
-<body class="bg-[#F7F1E8] text-[#3F2F28] antialiased">
+@extends('layouts.public')
 
-  {{-- NAV (minimal, cream + outline mocha) --}}
-  <header class="sticky top-0 z-10 border-b border-[#E6D9CC] bg-[#F7F1E8]/90 backdrop-blur">
-    <div class="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
-      <a href="{{ route('home') }}" class="font-semibold tracking-tight">
-        <span>Seduh</span><span class="text-[#B07A5A]">Rasa</span>
-      </a>
-      <nav class="flex items-center gap-5 text-sm">
-        <a href="{{ route('home') }}" class="text-[#6B4E3D]/70 hover:text-[#6B4E3D] transition-colors">Home</a>
-        <a href="{{ route('about') }}" class="text-[#3F2F28] font-medium">About Us</a>
-      </nav>
-    </div>
-  </header>
+@section('title', 'Tentang Kami | SeduhRasa Coffee')
 
-  {{-- CONTENT --}}
-  <main class="max-w-3xl mx-auto px-4 py-16">
-    <div class="text-center">
-      <h1 class="text-3xl md:text-4xl font-semibold tracking-tight">Tentang Kami</h1>
-      <p class="mt-4 text-[#6B4E3D]/80">
-        SeduhRasa adalah sistem informasi coffee shop yang ringan untuk mengelola menu, promosi, dan pesanan—
-        dibuat agar operasional senyaman menyeruput kopi hangat.
-      </p>
-    </div>
+@section('content')
+    {{-- SECTION: ABOUT US & TEAM --}}
+    {{-- Tambahkan padding atas yang cukup karena header bersifat fixed di layouts/public --}}
+    <section class="py-16 bg-white pt-32 md:pt-40"> 
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            
+            {{-- JUDUL DAN DESKRIPSI --}}
+            <h2 class="font-['Great_Vibes'] text-3xl md:text-5xl mb-6">About Us</h2>
+            <p class="max-w-2xl mx-auto text-stone-600 mb-10">
+                Kami adalah kelompok pengembang SeduhRasa Coffee yang berfokus menciptakan website modern,
+                responsif, dan nyaman digunakan. Berikut adalah anggota tim kami:
+            </p>
 
-    <div class="mt-10 grid gap-4 sm:grid-cols-3">
-      <div class="rounded-lg border border-[#E6D9CC] bg-[#FFFFFF] p-4">
-        <div class="text-[10px] uppercase tracking-wide text-[#B07A5A]">Misi</div>
-        <p class="mt-2 text-sm text-[#3F2F28]/80">
-          Menyatukan kualitas rasa dan kemudahan layanan—dari barista hingga pelanggan.
-        </p>
-      </div>
-      <div class="rounded-lg border border-[#E6D9CC] bg-[#FFFFFF] p-4">
-        <div class="text-[10px] uppercase tracking-wide text-[#B07A5A]">Nilai</div>
-        <p class="mt-2 text-sm text-[#3F2F28]/80">
-          Sederhana, cepat, ramah. Tanpa ribet, fokus pada pengalaman.
-        </p>
-      </div>
-      <div class="rounded-lg border border-[#E6D9CC] bg-[#FFFFFF] p-4">
-        <div class="text-[10px] uppercase tracking-wide text-[#B07A5A]">Kontak</div>
-        <p class="mt-2 text-sm text-[#3F2F28]/80">
-          Butuh bantuan? <a href="{{ url('/contact') }}" class="underline decoration-[#B07A5A]/50 underline-offset-4 hover:text-[#6B4E3D]">Hubungi kami</a>.
-        </p>
-      </div>
-    </div>
+            @php
+                // Data tim pengembang
+                $team = [
+                    ['name' => 'M. Arifin Ilham', 'img' => 'https://cdn-icons-png.flaticon.com/512/4140/4140048.png', 'ig' => 'https://instagram.com/arifinilham'],
+                    ['name' => 'Mazira', 'img' => 'https://cdn-icons-png.flaticon.com/512/4140/4140051.png', 'ig' => 'https://instagram.com/mazira'],
+                    ['name' => 'Markus Edison', 'img' => 'https://cdn-icons-png.flaticon.com/512/4140/4140037.png', 'ig' => 'https://instagram.com/markusedison'],
+                    ['name' => 'Elsa Syafitriani', 'img' => 'https://cdn-icons-png.flaticon.com/512/4140/4140051.png', 'ig' => 'https://instagram.com/elsasyafitriani'],
+                ];
+            @endphp
 
-    {{-- CTA opsional --}}
-    <div class="mt-10 flex justify-center">
-      <a
-        href="{{ route('services') }}"
-        class="inline-flex items-center gap-2 rounded-md bg-[#B07A5A] px-5 py-2 text-white hover:bg-[#9C6C50] active:bg-[#8B6048] transition-colors text-sm font-medium"
-      >
-        Lihat Layanan
-      </a>
-    </div>
-  </main>
+            {{-- KONTEN TIM --}}
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
+                @foreach ($team as $t)
+                    <a href="{{ $t['ig'] }}" target="_blank"
+                        class="bg-stone-50 border rounded-lg shadow hover:shadow-md transition p-5 flex flex-col items-center">
+                        <img src="{{ $t['img'] }}" class="w-20 h-20 mb-4" alt="{{ $t['name'] }} Avatar">
+                        <div class="font-semibold text-stone-800">{{ $t['name'] }}</div>
+                        <div class="text-amber-500 text-sm mt-1">@ Instagram</div>
+                    </a>
+                @endforeach
+            </div>
+        </div>
+    </section>
 
-  {{-- FOOTER (foam) --}}
-  <footer class="border-t border-[#E6D9CC] bg-[#EDE3D9]/60">
-    <div class="max-w-6xl mx-auto px-4 py-6 text-xs text-[#6B4E3D]/80">
-      © {{ date('Y') }} SeduhRasa. All rights reserved.
-    </div>
-  </footer>
-
-</body>
-</html>
+    {{-- SECTION: NILAI DAN MISI (Menggunakan gaya yang Anda kirimkan sebelumnya) --}}
+    <section class="py-16 bg-[#fbf5ef]">
+        <div class="max-w-3xl mx-auto px-4">
+            <h2 class="text-2xl font-semibold text-center mb-10">Filosofi Kami</h2>
+            <div class="grid gap-4 sm:grid-cols-3">
+                {{-- Misi --}}
+                <div class="rounded-lg border border-stone-200 bg-white p-4 shadow-sm">
+                    <div class="text-[10px] uppercase tracking-wide text-amber-600 font-bold">Misi</div>
+                    <p class="mt-2 text-sm text-stone-700/90">
+                        Menyatukan kualitas rasa dan kemudahan layanan—dari barista hingga pelanggan.
+                    </p>
+                </div>
+                {{-- Nilai --}}
+                <div class="rounded-lg border border-stone-200 bg-white p-4 shadow-sm">
+                    <div class="text-[10px] uppercase tracking-wide text-amber-600 font-bold">Nilai</div>
+                    <p class="mt-2 text-sm text-stone-700/90">
+                        Sederhana, cepat, ramah. Tanpa ribet, fokus pada pengalaman.
+                    </p>
+                </div>
+                {{-- Kontak --}}
+                <div class="rounded-lg border border-stone-200 bg-white p-4 shadow-sm">
+                    <div class="text-[10px] uppercase tracking-wide text-amber-600 font-bold">Kontak</div>
+                    <p class="mt-2 text-sm text-stone-700/90">
+                        Butuh bantuan? <a href="{{ route('contact') }}" class="underline text-amber-700 hover:text-amber-600">Hubungi kami</a>.
+                    </p>
+                </div>
+            </div>
+            
+            {{-- CTA opsional --}}
+            <div class="mt-10 flex justify-center">
+                <a
+                    href="{{ route('services') }}"
+                    class="inline-flex items-center gap-2 rounded-md bg-amber-600 px-5 py-2 text-white hover:bg-amber-700 transition-colors text-sm font-medium"
+                >
+                    Lihat Layanan
+                </a>
+            </div>
+        </div>
+    </section>
+@endsection

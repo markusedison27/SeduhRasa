@@ -8,9 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Produk extends Model
 {
     use HasFactory;
-    
-    // Nama tabel di database
-    protected $table = 'produk'; 
+
 
     // Kolom yang dapat diisi
     protected $fillable = [
