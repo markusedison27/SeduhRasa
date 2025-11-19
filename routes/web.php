@@ -74,8 +74,10 @@ Route::middleware(['auth', 'role:super_admin'])->group(function () {
     Route::get('/super-admin/owners', [SuperAdminController::class, 'ownersIndex'])
         ->name('super.owners.index');
 
-    Route::get('/super-admin/owners/create', [SuperAdminController::class, 'ownersCreate'])
-        ->name('super.owners.create');
+    // TIDAK pakai halaman create terpisah, redirect balik ke index
+    Route::get('/super-admin/owners/create', function () {
+        return redirect()->route('super.owners.index');
+    })->name('super.owners.create');
 
     Route::post('/super-admin/owners', [SuperAdminController::class, 'ownersStore'])
         ->name('super.owners.store');
@@ -87,11 +89,23 @@ Route::middleware(['auth', 'role:super_admin'])->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'role:owner'])->group(function () {
+    // dashboard owner
     Route::get('/owner/dashboard', [OwnerController::class, 'index'])
         ->name('owner.dashboard');
 
+    // halaman keuangan (pemasukan & pengeluaran)
     Route::get('/owner/finance', [OwnerController::class, 'finance'])
         ->name('owner.finance');
+
+    // kelola kasir (pakai KaryawanController yang sama, tapi route khusus owner)
+    Route::get('/owner/kasir', [KaryawanController::class, 'index'])
+        ->name('owner.kasir.index');
+
+    Route::get('/owner/kasir/create', [KaryawanController::class, 'create'])
+        ->name('owner.kasir.create');
+
+    Route::post('/owner/kasir', [KaryawanController::class, 'store'])
+        ->name('owner.kasir.store');
 });
 
 /*
@@ -101,9 +115,11 @@ Route::middleware(['auth', 'role:owner'])->group(function () {
 */
 Route::middleware(['auth', 'role:staff'])->group(function () {
 
+    // dashboard kasir/staff
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->name('staff.dashboard');
 
+    // area admin untuk kasir
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('menus', MenuController::class);
         Route::resource('transaksi', TransaksiController::class);

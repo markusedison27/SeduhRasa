@@ -23,23 +23,22 @@
           $user = auth()->user();
 
           if (!$user) {
-              // kalau belum login, pakai home saja
               $dashboardRoute = 'home';
           } elseif ($user->role === 'super_admin') {
               $dashboardRoute = 'super.dashboard';
           } elseif ($user->role === 'owner') {
               $dashboardRoute = 'owner.dashboard';
           } else {
-              // default: staff/kasir
               $dashboardRoute = 'staff.dashboard';
           }
       @endphp
 
       <nav class="p-4 space-y-3 flex-1 overflow-y-auto">
-        {{-- Navigasi Panel --}}
-        <div class="text-xs font-semibold uppercase tracking-wider text-stone-400 px-2">Navigasi Panel</div>
+        <div class="text-xs font-semibold uppercase tracking-wider text-stone-400 px-2">
+            Navigasi Panel
+        </div>
 
-        {{-- Link: Dashboard (menyesuaikan role) --}}
+        {{-- DASHBOARD --}}
         <a href="{{ route($dashboardRoute) }}"
            @class([
              'flex items-center gap-3 px-3 py-2 rounded-xl transition',
@@ -52,94 +51,248 @@
           <span>Dashboard</span>
         </a>
 
-        {{-- ===== MENU BERDASARKAN ROLE ===== --}}
+        {{-- =============== SUPER ADMIN =============== --}}
         @if($user && $user->role === 'super_admin')
-          {{-- SUPER ADMIN: hanya manajemen pemilik --}}
-          <div class="pt-2">
-            <div class="text-xs font-semibold uppercase tracking-wider text-stone-400 px-2 mb-1">
-              Manajemen User
+            <div class="pt-2">
+                <div class="text-xs font-semibold uppercase tracking-wider text-stone-400 px-2 mb-1">
+                    Manajemen User
+                </div>
+
+                <a href="{{ route('super.owners.index') }}"
+                   @class([
+                     'flex items-center gap-3 px-3 py-2 rounded-xl transition',
+                     'bg-amber-100 text-amber-800 ring-1 ring-amber-200' => request()->routeIs('super.owners.*'),
+                     'text-stone-700 hover:bg-amber-50 hover:text-amber-700' => !request()->routeIs('super.owners.*'),
+                   ])>
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path d="M16 11V7a4 4 0 10-8 0v4M5 11h14v9H5z"/>
+                  </svg>
+                  <span>Pemilik Coffee Shop</span>
+                </a>
             </div>
 
-            <a href="{{ route('super.owners.index') }}"
-               @class([
-                 'flex items-center gap-3 px-3 py-2 rounded-xl transition',
-                 'bg-amber-100 text-amber-800 ring-1 ring-amber-200' => request()->routeIs('super.owners.*'),
-                 'text-stone-700 hover:bg-amber-50 hover:text-amber-700' => !request()->routeIs('super.owners.*'),
-               ])>
-              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path d="M16 11V7a4 4 0 10-8 0v4M5 11h14v9H5z"/>
-              </svg>
-              <span>Pemilik Coffee Shop</span>
-            </a>
-          </div>
+        {{-- =============== OWNER =============== --}}
+        @elseif($user && $user->role === 'owner')
+            <div class="pt-2">
+                <div class="text-xs font-semibold uppercase tracking-wider text-stone-400 px-2 mb-1">
+                    Manajemen Usaha
+                </div>
+
+<<<<<<< HEAD
+                {{-- Keuangan --}}
+                <a href="{{ route('owner.finance') }}"
+                   @class([
+                     'flex items-center gap-3 px-3 py-2 rounded-xl transition',
+                     'bg-amber-100 text-amber-800 ring-1 ring-amber-200' => request()->routeIs('owner.finance'),
+                     'text-stone-700 hover:bg-amber-50 hover:text-amber-700' => !request()->routeIs('owner.finance'),
+                   ])>
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path d="M3 12h18M9 6h6M9 18h6"/>
+                  </svg>
+                  <span>Keuangan (Masuk & Keluar)</span>
+                </a>
+
+                {{-- Kelola Kasir --}}
+                <a href="{{ route('owner.kasir.index') }}"
+                   @class([
+                     'flex items-center gap-3 px-3 py-2 rounded-xl transition',
+                     'bg-amber-100 text-amber-800 ring-1 ring-amber-200' => request()->routeIs('owner.kasir.*'),
+                     'text-stone-700 hover:bg-amber-50 hover:text-amber-700' => !request()->routeIs('owner.kasir.*'),
+                   ])>
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 12a4 4 0 100-8 4 4 0 000 8zM4 20a8 8 0 0116 0"/>
+                  </svg>
+                  <span>Kelola Kasir</span>
+                </a>
+            </div>
+
+        {{-- =============== STAFF / KASIR =============== --}}
+        @else
+            <div class="pt-2">
+                <div class="text-xs font-semibold uppercase tracking-wider text-stone-400 px-2 mb-1">
+                    Manajemen Data
+                </div>
+
+                <a href="{{ route('admin.menus.index') }}"
+                   @class([
+                     'flex items-center gap-3 px-3 py-2 rounded-xl transition',
+                     'bg-amber-100 text-amber-800 ring-1 ring-amber-200' => request()->routeIs('admin.menus.*'),
+                     'text-stone-700 hover:bg-amber-50 hover:text-amber-700' => !request()->routeIs('admin.menus.*'),
+                   ])>
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path d="M4 6h16M4 12h16M4 18h16"/>
+                  </svg>
+                  <span>Menu</span>
+                </a>
+
+                <a href="{{ route('admin.transaksi.index') }}"
+                   @class([
+                     'flex items-center gap-3 px-3 py-2 rounded-xl transition',
+                     'bg-amber-100 text-amber-800 ring-1 ring-amber-200' => request()->routeIs('admin.transaksi.*'),
+                     'text-stone-700 hover:bg-amber-50 hover:text-amber-700' => !request()->routeIs('admin.transaksi.*'),
+                   ])>
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path d="M3 10h18M7 15h10M5 6h14"/>
+                  </svg>
+                  <span>Transaksi</span>
+                </a>
+
+                <a href="{{ route('admin.pelanggan.index') }}"
+                   @class([
+                     'flex items-center gap-3 px-3 py-2 rounded-xl transition',
+                     'bg-amber-100 text-amber-800 ring-1 ring-amber-200' => request()->routeIs('admin.pelanggan.*'),
+                     'text-stone-700 hover:bg-amber-50 hover:text-amber-700' => !request()->routeIs('admin.pelanggan.*'),
+                   ])>
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path d="M16 11V7a4 4 0 10-8 0v4M5 11h14v9H5z"/>
+                  </svg>
+                  <span>Pelanggan</span>
+                </a>
+
+                <a href="{{ route('admin.karyawan.index') }}"
+                   @class([
+                     'flex items-center gap-3 px-3 py-2 rounded-xl transition',
+                     'bg-amber-100 text-amber-800 ring-1 ring-amber-200' => request()->routeIs('admin.karyawan.*'),
+                     'text-stone-700 hover:bg-amber-50 hover:text-amber-700' => !request()->routeIs('admin.karyawan.*'),
+                   ])>
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 14l9-5-9-5-9 5 9 5zM12 14v7"/>
+                  </svg>
+                  <span>Karyawan</span>
+                </a>
+
+                <a href="{{ route('admin.orders.index') }}"
+                   @class([
+                     'flex items-center gap-3 px-3 py-2 rounded-xl transition',
+                     'bg-amber-100 text-amber-800 ring-1 ring-amber-200' => request()->routeIs('admin.orders.*'),
+                     'text-stone-700 hover:bg-amber-50 hover:text-amber-700' => !request()->routeIs('admin.orders.*'),
+                   ])>
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path d="M3 7h18M3 12h18M3 17h18"/>
+                  </svg>
+                  <span>Order</span>
+                </a>
+=======
+
+                {{-- Link: Dashboard --}}
+@if (Route::has('dashboard'))
+    <a href="{{ route('dashboard') }}"
+        @class([
+            'flex items-center gap-3 px-3 py-2 rounded-xl transition group',
+            'bg-amber-100 text-amber-800 ring-1 ring-amber-200' => request()->routeIs('dashboard'),
+            'text-stone-700 hover:bg-amber-50 hover:text-amber-700' => !request()->routeIs('dashboard'),
+        ])>
+@else
+    <a href="#"
+        @class([
+            'flex items-center gap-3 px-3 py-2 rounded-xl transition group',
+            'text-stone-700 hover:bg-amber-50 hover:text-amber-700',
+        ])>
+@endif
+
+                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        {{-- Icon Home --}}
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2 7-7 7 7 2 2v8a2 2 0 01-2 2h-3a2 2 0 01-2-2v-3H9v3a2 2 0 01-2 2H5a2 2 0 01-2-2v-8z" />
+                    </svg>
+                    <span>Dashboard</span>
+                </a>
+
+                <div class="pt-2">
+                    <div class="text-xs font-semibold uppercase tracking-wider text-stone-400 px-2 mb-1">Manajemen Data</div>
+
+                    {{-- Link: Menu --}}
+                    <a href="{{ route('admin.menus.index') }}"
+                        @class([
+                            'flex items-center gap-3 px-3 py-2 rounded-xl transition group',
+                            'bg-amber-100 text-amber-800 ring-1 ring-amber-200' => request()->routeIs('admin.menus.*'),
+                            'text-stone-700 hover:bg-amber-50 hover:text-amber-700' => !request()->routeIs('admin.menus.*'),
+                        ])>
+                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            {{-- Icon Menu --}}
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                        <span>Menu</span>
+                    </a>
+
+                    {{-- Link: Transaksi --}}
+                    <a href="{{ route('admin.transaksi.index') }}"
+                        @class([
+                            'flex items-center gap-3 px-3 py-2 rounded-xl transition group',
+                            'bg-amber-100 text-amber-800 ring-1 ring-amber-200' => request()->routeIs('admin.transaksi.*'),
+                            'text-stone-700 hover:bg-amber-50 hover:text-amber-700' => !request()->routeIs('admin.transaksi.*'),
+                        ])>
+                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            {{-- Icon Transaksi --}}
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8V6m0 12v-2" />
+                        </svg>
+                        <span>Transaksi</span>
+                    </a>
+
+                    {{-- Link: Pelanggan --}}
+                    <a href="{{ route('admin.pelanggan.index') }}"
+                        @class([
+                            'flex items-center gap-3 px-3 py-2 rounded-xl transition group',
+                            'bg-amber-100 text-amber-800 ring-1 ring-amber-200' => request()->routeIs('admin.pelanggan.*'),
+                            'text-stone-700 hover:bg-amber-50 hover:text-amber-700' => !request()->routeIs('admin.pelanggan.*'),
+                        ])>
+                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            {{-- Icon Users --}}
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                        <span>Pelanggan</span>
+                    </a>
+
+                    {{-- Link: Karyawan --}}
+                    <a href="{{ route('admin.karyawan.index') }}"
+                        @class([
+                            'flex items-center gap-3 px-3 py-2 rounded-xl transition group',
+                            'bg-amber-100 text-amber-800 ring-1 ring-amber-200' => request()->routeIs('admin.karyawan.*'),
+                            'text-stone-700 hover:bg-amber-50 hover:text-amber-700' => !request()->routeIs('admin.karyawan.*'),
+                        ])>
+                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            {{-- Icon Briefcase / Job --}}
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.593 23.593 0 0112 15c-3.18 0-6.357-.492-9-1.745V20a2 2 0 002 2h14a2 2 0 002-2v-6.745zM16 11V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                        <span>Karyawan</span>
+                    </a>
+
+                    {{-- Link: Order --}}
+                    <a href="{{ route('admin.orders.index') }}"
+                        @class([
+                            'flex items-center gap-3 px-3 py-2 rounded-xl transition group',
+                            'bg-amber-100 text-amber-800 ring-1 ring-amber-200' => request()->routeIs('admin.orders.*'),
+                            'text-stone-700 hover:bg-amber-50 hover:text-amber-700' => !request()->routeIs('admin.orders.*'),
+                        ])>
+                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            {{-- Icon Clipboard List --}}
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M10 15h.01" />
+                        </svg>
+                        <span>Order</span>
+                    </a>
+                </div>
+            </nav>
+
+            {{-- Logout Button --}}
+            <div class="mt-auto p-4 border-t border-stone-200">
+                <form action="{{ route('logout') }}" method="POST">
+                    @csrf
+                    <button type="submit"
+                            class="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-red-300 text-red-600 hover:bg-red-50 px-4 py-2 font-medium transition">
+                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                        Logout
+                    </button>
+                </form>
 
         @else
           {{-- OWNER / STAFF: manajemen data biasa --}}
           <div class="pt-2">
             <div class="text-xs font-semibold uppercase tracking-wider text-stone-400 px-2 mb-1">
               Manajemen Data
+
+>>>>>>> 844eadf832aa36d981a897d5b1e18f8269a5a183
             </div>
-
-            <a href="{{ route('admin.menus.index') }}"
-               @class([
-                 'flex items-center gap-3 px-3 py-2 rounded-xl transition',
-                 'bg-amber-100 text-amber-800 ring-1 ring-amber-200' => request()->routeIs('admin.menus.*'),
-                 'text-stone-700 hover:bg-amber-50 hover:text-amber-700' => !request()->routeIs('admin.menus.*'),
-               ])>
-              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path d="M4 6h16M4 12h16M4 18h16"/>
-              </svg>
-              <span>Menu</span>
-            </a>
-
-            <a href="{{ route('admin.transaksi.index') }}"
-               @class([
-                 'flex items-center gap-3 px-3 py-2 rounded-xl transition',
-                 'bg-amber-100 text-amber-800 ring-1 ring-amber-200' => request()->routeIs('admin.transaksi.*'),
-                 'text-stone-700 hover:bg-amber-50 hover:text-amber-700' => !request()->routeIs('admin.transaksi.*'),
-               ])>
-              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path d="M3 10h18M7 15h10M5 6h14"/>
-              </svg>
-              <span>Transaksi</span>
-            </a>
-
-            <a href="{{ route('admin.pelanggan.index') }}"
-               @class([
-                 'flex items-center gap-3 px-3 py-2 rounded-xl transition',
-                 'bg-amber-100 text-amber-800 ring-1 ring-amber-200' => request()->routeIs('admin.pelanggan.*'),
-                 'text-stone-700 hover:bg-amber-50 hover:text-amber-700' => !request()->routeIs('admin.pelanggan.*'),
-               ])>
-              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path d="M16 11V7a4 4 0 10-8 0v4M5 11h14v9H5z"/>
-              </svg>
-              <span>Pelanggan</span>
-            </a>
-
-            <a href="{{ route('admin.karyawan.index') }}"
-               @class([
-                 'flex items-center gap-3 px-3 py-2 rounded-xl transition',
-                 'bg-amber-100 text-amber-800 ring-1 ring-amber-200' => request()->routeIs('admin.karyawan.*'),
-                 'text-stone-700 hover:bg-amber-50 hover:text-amber-700' => !request()->routeIs('admin.karyawan.*'),
-               ])>
-              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path d="M12 14l9-5-9-5-9 5 9 5zM12 14v7"/>
-              </svg>
-              <span>Karyawan</span>
-            </a>
-
-            <a href="{{ route('admin.orders.index') }}"
-               @class([
-                 'flex items-center gap-3 px-3 py-2 rounded-xl transition',
-                 'bg-amber-100 text-amber-800 ring-1 ring-amber-200' => request()->routeIs('admin.orders.*'),
-                 'text-stone-700 hover:bg-amber-50 hover:text-amber-700' => !request()->routeIs('admin.orders.*'),
-               ])>
-              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path d="M3 7h18M3 12h18M3 17h18"/>
-              </svg>
-              <span>Order</span>
-            </a>
-          </div>
         @endif
       </nav>
 
@@ -192,7 +345,6 @@
   @stack('scripts')
 
   <script>
-    // Sidebar toggle for mobile
     const sb   = document.getElementById('sidebar');
     const bd   = document.getElementById('backdrop');
     function toggleSidebar() {
@@ -211,8 +363,10 @@
   </script>
 
   <style>
-    /* small slide-in animation for sidebar */
     @keyframes slideIn { from { transform: translateX(-12px); opacity:.6 } to { transform: translateX(0); opacity:1 } }
   </style>
 </body>
 </html>
+
+
+

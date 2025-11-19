@@ -53,9 +53,9 @@
     </div>
 
     {{-- FOOTER --}}
-    <footer class="py-8 text-center text-sm text-stone-500 border-t border-stone-200 mt-auto">
-        © {{ date('Y') }} SeduhRasa Coffee. All rights reserved.
-    </footer>
+  <footer class="w-full bg-[#ff8c00] text-white text-center py-4 text-sm">
+    © {{ date('Y') }} SeduhRasa Coffee. All rights reserved.
+</footer>
 
     @stack('scripts')
 </body>
