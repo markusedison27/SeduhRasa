@@ -1,4 +1,4 @@
-{{-- resources/views/menu.blade.php --}}
+{{-- resources/views/menu.blade.php (FINAL RESPONSIVE VERSION) --}}
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -7,14 +7,15 @@
   <title>Menu • SeduhRasa</title>
   @vite(['resources/css/app.css','resources/js/app.js'])
   <link href="https://fonts.bunny.net/css?family=dm-sans:400,600|playfair-display:700" rel="stylesheet"/>
+
   <style>
     :root{
-      --cream:#f6efe9;      /* background */
-      --latte:#d7c0ae;      /* chip/lines */
-      --latte-ink:#8d6f5b;  /* text accent */
-      --espresso:#3b2f2f;   /* utama btn */
-      --mocha:#4b3a32;      /* hover */
-      --card:#ffffffcc;     /* glass */
+      --cream:#f6efe9;
+      --latte:#d7c0ae;
+      --latte-ink:#8d6f5b;
+      --espresso:#3b2f2f;
+      --mocha:#4b3a32;
+      --card:#ffffffcc;
     }
     html{scroll-behavior:smooth}
     body{font-family:"DM Sans",ui-sans-serif,system-ui}
@@ -23,6 +24,7 @@
         radial-gradient(60rem 60rem at 10% -20%, rgba(0,0,0,.06), transparent 60%),
         radial-gradient(70rem 70rem at 110% 10%, rgba(0,0,0,.05), transparent 55%),
         linear-gradient(180deg, var(--cream), #fff);
+      min-height: 100vh;
     }
     .glass{
       background: var(--card);
@@ -31,362 +33,411 @@
       border: 1px solid rgba(0,0,0,.08);
       box-shadow: 0 8px 30px rgba(0,0,0,.06);
     }
-    .thumb{width:82px;height:82px;border-radius:14px;overflow:hidden}
-    .thumb img{width:100%;height:100%;object-fit:cover;transform:scale(1);transition:transform .35s ease}
-    .thumb:hover img{transform:scale(1.05)}
-    .price-pill{border:1px dashed rgba(0,0,0,.18); background:#fff8}
+    .thumb{
+      width:80px;
+      height:80px;
+      border-radius:12px;
+      overflow:hidden;
+      flex-shrink: 0;
+    }
+    @media (max-width: 640px) {
+      .thumb{
+        width:70px;
+        height:70px;
+      }
+    }
+    .thumb img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      transition:transform .35s ease;
+    }
+    .thumb:hover img{transform:scale(1.08)}
+    .price-pill{
+      border:1px dashed rgba(0,0,0,.18);
+      background:#fff8;
+      white-space: nowrap;
+    }
     .cta{
       background: linear-gradient(135deg, var(--espresso), var(--mocha));
-      color:#fff; transition:transform .12s ease, opacity .12s ease;
+      color:#fff;
+      transition:transform .12s ease, opacity .12s ease, box-shadow .12s ease;
+      font-weight: 500;
+      box-shadow: 0 2px 8px rgba(59,47,47,.2);
     }
-    .cta:hover{opacity:.95; transform:translateY(-1px)}
-    .chip{background:#fff; border:1px solid #ead9cd; color:#5f4635}
-    .stickybar{backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px)}
-    .clamp-2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .cta:hover{
+      opacity:.95;
+      transform:translateY(-1px);
+      box-shadow: 0 4px 12px rgba(59,47,47,.3);
+    }
+    .cta:active{
+      transform:translateY(0);
+    }
+    .chip{
+      background:#fff;
+      border:1px solid #ead9cd;
+      color:#5f4635;
+      transition: all .2s ease;
+    }
+    .chip:hover{
+      background:#faf8f6;
+      border-color:#d7c0ae;
+      transform: translateY(-1px);
+    }
+    .stickybar{
+      backdrop-filter:blur(12px);
+      -webkit-backdrop-filter:blur(12px);
+      background: rgba(255,255,255,.85);
+      box-shadow: 0 4px 20px rgba(0,0,0,.06);
+    }
+    .clamp-2{
+      display:-webkit-box;
+      -webkit-line-clamp:2;
+      -webkit-box-orient:vertical;
+      overflow:hidden;
+    }
+    
+    /* Cart Floating Button */
+    .cart-fab{
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--espresso), var(--mocha));
+      color: white;
+      box-shadow: 0 8px 24px rgba(59,47,47,.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all .3s ease;
+      z-index: 50;
+    }
+    .cart-fab:hover{
+      transform: scale(1.1);
+      box-shadow: 0 12px 32px rgba(59,47,47,.4);
+    }
+    @media (max-width: 640px) {
+      .cart-fab{
+        width: 56px;
+        height: 56px;
+        bottom: 20px;
+        right: 20px;
+      }
+    }
+    .cart-badge{
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      background: #ef4444;
+      color: white;
+      border-radius: 12px;
+      padding: 2px 6px;
+      font-size: 11px;
+      font-weight: 600;
+      min-width: 20px;
+      text-align: center;
+    }
+    
+    /* Cart Drawer */
+    .drawer{
+      position: fixed;
+      top: 0;
+      right: -100%;
+      width: 100%;
+      max-width: 420px;
+      height: 100vh;
+      background: white;
+      box-shadow: -4px 0 24px rgba(0,0,0,.15);
+      transition: right .3s ease;
+      z-index: 60;
+      display: flex;
+      flex-direction: column;
+    }
+    .drawer.open{
+      right: 0;
+    }
+    .backdrop{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.4);
+      backdrop-filter: blur(2px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .3s ease;
+      z-index: 55;
+    }
+    .backdrop.show{
+      opacity: 1;
+      pointer-events: all;
+    }
+    
+    /* Responsive Adjustments */
+    @media (max-width: 1024px) {
+      .price-pill{
+        font-size: 13px;
+        padding: 4px 10px;
+      }
+    }
+    @media (max-width: 640px) {
+      .glass{
+        padding: 1rem;
+      }
+      .price-pill{
+        font-size: 12px;
+        padding: 3px 8px;
+      }
+    }
   </style>
 </head>
 <body class="bg-canvas text-stone-900 antialiased">
 
-@php
-  /* ========= DATA MENU (boleh kamu ubah) ========= */
-  $menu = [
-    ['title'=>'Mocktail & Tea','items'=>[
-      ['name'=>'Early Berry','price'=>'28K','img'=>'https://images.unsplash.com/photo-1514362545857-3bc16c4c76f2?w=900&q=80&auto=format&fit=crop','serve'=>['Dingin']],
-      ['name'=>'Lazy Bones','price'=>'25K','img'=>'https://images.unsplash.com/photo-1541976076758-347942db1970?w=900&q=80&auto=format&fit=crop','serve'=>['Dingin']],
-      ['name'=>'Lemon Slayer','price'=>'25K','img'=>'https://images.unsplash.com/photo-1497534446932-c925b458314e?w=900&q=80&auto=format&fit=crop','serve'=>['Dingin']],
-      ['name'=>'Ocean Blue','price'=>'30K','img'=>'https://images.unsplash.com/photo-1508253578933-a0b73d55d0f0?w=900&q=80&auto=format&fit=crop','serve'=>['Dingin']],
-      ['name'=>'Sweet Shour','price'=>'30K','img'=>'https://images.unsplash.com/photo-1517677208171-0bc6725a3e60?w=900&q=80&auto=format&fit=crop','serve'=>['Dingin']],
-      ['name'=>'Monalisa','price'=>'30K','img'=>'https://images.unsplash.com/photo-1544145945-f90425340c7e?w=900&q=80&auto=format&fit=crop','serve'=>['Dingin']],
-      ['name'=>'Kiwi Mojito','price'=>'25K','img'=>'https://images.unsplash.com/photo-1556679343-c7306c71a929?w=900&q=80&auto=format&fit=crop','serve'=>['Dingin']],
-      ['name'=>'Peach Tea','price'=>'18K','img'=>'https://images.unsplash.com/photo-1506059612708-99d6c258160e?w=900&q=80&auto=format&fit=crop','serve'=>['Dingin','Panas']],
-      ['name'=>'Lychee Tea','price'=>'18K','img'=>'https://images.unsplash.com/photo-1540148426945-6cf190134e84?w=900&q=80&auto=format&fit=crop','serve'=>['Dingin']],
-      ['name'=>'Blackcurrant Tea','price'=>'20K','img'=>'https://images.unsplash.com/photo-1517701604599-bb29b565090c?w=900&q=80&auto=format&fit=crop','serve'=>['Dingin']],
-    ]],
-    ['title'=>'Coffee','items'=>[
-      ['name'=>'Americano','price'=>'20K','img'=>'https://images.unsplash.com/photo-1498804103079-a6351b050096?w=900&q=80&auto=format&fit=crop','serve'=>['Dingin','Panas']],
-      ['name'=>'Cafe Latte','price'=>'23K','img'=>'https://images.unsplash.com/photo-1541167760496-1628856ab772?w=900&q=80&auto=format&fit=crop','serve'=>['Dingin','Panas']],
-      ['name'=>'Butterscotch','price'=>'25K','img'=>'https://images.unsplash.com/photo-1517705008128-361805f42e86?w=900&q=80&auto=format&fit=crop','serve'=>['Panas']],
-      ['name'=>'Classic Caramel Latte','price'=>'23K','img'=>'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=900&q=80&auto=format&fit=crop','serve'=>['Dingin','Panas']],
-      ['name'=>'Halzenut Brown Sugar','price'=>'26K','img'=>'https://images.unsplash.com/photo-1512568400610-62da28bc8a13?w=900&q=80&auto=format&fit=crop','serve'=>['Dingin']],
-      ['name'=>'Lecca Sweet Latte','price'=>'26K','img'=>'https://images.unsplash.com/photo-1534777410147-084c3f5f3d07?w=900&q=80&auto=format&fit=crop','serve'=>['Panas']],
-      ['name'=>'Sweet Corn Latte','price'=>'26K','img'=>'https://images.unsplash.com/photo-1512207846876-c6c77755f5b9?w=900&q=80&auto=format&fit=crop','serve'=>['Dingin','Panas']],
-    ]],
-    ['title'=>'Desserts','items'=>[
-      ['name'=>'Chocolate Cake','price'=>'15K','img'=>'https://images.unsplash.com/photo-1606313564200-e75d5e30476a?w=900&q=80&auto=format&fit=crop','desc'=>'Chocolate cake sprinkled with grated cheese mixture'],
-      ['name'=>'Greentea Lumer','price'=>'15K','img'=>'https://images.unsplash.com/photo-1551024506-0bccd828d307?w=900&q=80&auto=format&fit=crop','desc'=>'Greentea dessert with sprinkled greentea mixture'],
-      ['name'=>'Tiramisu Malted','price'=>'15K','img'=>'https://images.unsplash.com/photo-1612208695882-03a6b3e561b0?w=900&q=80&auto=format&fit=crop','desc'=>'Tiramisu dessert with a mixture of milk and eggs'],
-    ]],
-    ['title'=>'Kitchen Menu','items'=>[
-      ['name'=>'Chicken Butter','price'=>'33K','img'=>'https://images.unsplash.com/photo-1529042410759-befb1204b468?w=900&q=80&auto=format&fit=crop'],
-      ['name'=>'Chicken Garlic','price'=>'28K','img'=>'https://images.unsplash.com/photo-1604908554007-83e9b06bfa4e?w=900&q=80&auto=format&fit=crop'],
-      ['name'=>'Chicken Teriyaki','price'=>'25K','img'=>'https://images.unsplash.com/photo-1512058564366-18510be2db19?w=900&q=80&auto=format&fit=crop'],
-      ['name'=>'Chicken Black Paper','price'=>'28K','img'=>'https://images.unsplash.com/photo-1588167056547-c183313da9ce?w=900&q=80&auto=format&fit=crop'],
-      ['name'=>'Chicken Fried Rice','price'=>'25K','img'=>'https://images.unsplash.com/photo-1544025162-d76694265947?w=900&q=80&auto=format&fit=crop'],
-      ['name'=>'Chicken Matah','price'=>'28K','img'=>'https://images.unsplash.com/photo-1498654077810-12f43e6555ab?w=900&q=80&auto=format&fit=crop'],
-    ]],
-    ['title'=>'Cemilan','items'=>[
-      ['name'=>'Chicken Strip','price'=>'20K','img'=>'https://images.unsplash.com/photo-1606756790138-261d2b21cd75?w=900&q=80&auto=format&fit=crop'],
-      ['name'=>'Mix','price'=>'30K','img'=>'https://images.unsplash.com/photo-1544025162-d76694265947?w=900&q=80&auto=format&fit=crop'],
-      ['name'=>'French Fries','price'=>'15K','img'=>'https://images.unsplash.com/photo-1541592106381-b31e9677c0e5?w=900&q=80&auto=format&fit=crop'],
-    ]],
-    ['title'=>'Dimsum','items'=>[
-      ['name'=>'Dimsum Telur Asin','price'=>'28K','img'=>'https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=900&q=80&auto=format&fit=crop'],
-      ['name'=>'Dimsum Ayam','price'=>'26K','img'=>'https://images.unsplash.com/photo-1581287053822-834b9d6f2d7d?w=900&q=80&auto=format&fit=crop'],
-      ['name'=>'Dimsum Rumput Laut','price'=>'30K','img'=>'https://images.unsplash.com/photo-1604908554007-83e9b06bfa4e?w=900&q=80&auto=format&fit=crop'],
-      ['name'=>'Mix Dimsum','price'=>'35K','img'=>'https://images.unsplash.com/photo-1625944528100-1c0e1d233a7a?w=900&q=80&auto=format&fit=crop'],
-      ['name'=>'Dimsum Kepiting','price'=>'25K','img'=>'https://images.unsplash.com/photo-1617093727343-bf2e2c58e445?w=900&q=80&auto=format&fit=crop'],
-      ['name'=>'Dimsum Udang','price'=>'25K','img'=>'https://images.unsplash.com/photo-1617195737493-6a5f7e9de86c?w=900&q=80&auto=format&fit=crop'],
-    ]],
-    ['title'=>'Mie','items'=>[
-      ['name'=>'Spaghetti Carbonara','price'=>'35K','img'=>'https://images.unsplash.com/photo-1526312426976-593c2b999512?w=900&q=80&auto=format&fit=crop','desc'=>'Spaghetti with a mixture of cheese, milk and eggs.'],
-      ['name'=>'Spaghetti Bolognese','price'=>'30K','img'=>'https://images.unsplash.com/photo-1523986371872-9d3ba2e2f642?w=900&q=80&auto=format&fit=crop','desc'=>'Spaghetti with a mixture of bolognese sauce and a sprinkling of parsley.'],
-      ['name'=>'Mie Yamin Noodle','price'=>'28K','img'=>'https://images.unsplash.com/photo-1544025162-68df1a6f7c5c?w=900&q=80&auto=format&fit=crop','desc'=>'Mix noodles with fish oil, garlic oil, and dumplings'],
-      ['name'=>'Lecca Fried Noodle','price'=>'20K','img'=>'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=900&q=80&auto=format&fit=crop','desc'=>'Fried noodles cooked with chili sauce and egg.'],
-    ]],
-  ];
-  // urutan: minuman dulu -> makanan
-  $priority = ['Mocktail & Tea'=>1,'Coffee'=>2,'Desserts'=>3,'Kitchen Menu'=>4,'Cemilan'=>5,'Dimsum'=>6,'Mie'=>7];
-  usort($menu, fn($a,$b)=>($priority[$a['title']]??999)<=>($priority[$b['title']]??999));
-@endphp
-
-<header class="pt-10 pb-6 text-center">
-  <h1 class="font-['Playfair_Display'] text-5xl md:text-6xl tracking-tight">MENU</h1>
-  <p class="text-[15px] mt-2" style="color:var(--latte-ink)">Seduh yang elegan, rasa yang bicara.</p>
+<!-- Header -->
+<header class="pt-8 pb-6 px-4 text-center">
+  <h1 class="font-['Playfair_Display'] text-4xl sm:text-5xl md:text-6xl tracking-tight">MENU</h1>
+  <p class="text-sm sm:text-[15px] mt-2" style="color:var(--latte-ink)">Seduh yang elegan, rasa yang bicara.</p>
 </header>
 
-{{-- Quick jump --}}
-<nav class="sticky top-0 z-20 px-4">
-  <div class="stickybar glass rounded-2xl mx-auto max-w-6xl px-4 py-3 flex flex-wrap gap-2">
-    @foreach($menu as $g)
-      <a href="#{{ Str::slug($g['title']) }}" class="chip px-3 py-1.5 rounded-full text-sm hover:bg-white">
-        {{ $g['title'] }}
+<!-- Sticky Navigation -->
+<nav class="sticky top-0 z-20 px-3 sm:px-4 mb-6">
+  <div class="stickybar rounded-2xl mx-auto max-w-6xl px-3 sm:px-4 py-2.5 sm:py-3 flex flex-wrap gap-1.5 sm:gap-2">
+    @forelse($menuGroups as $group)
+      <a href="#{{ Str::slug($group->kategori) }}" class="chip px-2.5 sm:px-3 py-1.5 rounded-full text-xs sm:text-sm hover:bg-white">
+        {{ $group->kategori }}
       </a>
-    @endforeach
+    @empty
+      <p class="text-sm text-stone-500 py-1">Belum ada kategori menu</p>
+    @endforelse
   </div>
 </nav>
 
-<main class="max-w-6xl mx-auto px-4 pb-28">
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    @foreach($menu as $group)
-      <section id="{{ Str::slug($group['title']) }}" class="glass rounded-3xl p-6 md:p-7">
-        <h2 class="uppercase tracking-widest text-stone-600 mb-4">{{ $group['title'] }}</h2>
-        <ul class="divide-y divide-stone-200/70">
-          @foreach($group['items'] as $item)
-            <li class="py-4">
-              <div class="flex items-center gap-4">
-                <div class="thumb ring-1 ring-stone-200 shrink-0">
-                  <img loading="lazy" src="{{ $item['img'] ?? '' }}" alt="{{ $item['name'] }}">
-                </div>
-                <div class="flex-1 min-w-0">
-                  <div class="flex items-start justify-between gap-3">
-                    <div class="min-w-0">
-                      <div class="font-semibold tracking-tight text-[15px] md:text-base">{{ $item['name'] }}</div>
-                      @if(!empty($item['desc']))
-                        <p class="text-sm text-stone-500 clamp-2 mt-1">{{ $item['desc'] }}</p>
-                      @endif
-
-                      {{-- Badge info Dingin/Panas (kalau ada) --}}
-                      @if(!empty($item['serve']))
-                        <div class="mt-2 flex flex-wrap gap-2">
-                          @foreach($item['serve'] as $s)
-                            @php $cold = strtolower($s)==='dingin'; @endphp
-                            <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs ring-1
-                                         {{ $cold ? 'bg-sky-50 text-sky-700 ring-sky-200' : 'bg-amber-50 text-amber-700 ring-amber-200' }}">
-                              {!! $cold ? '❄️' : '🔥' !!} {{ $s }}
-                            </span>
-                          @endforeach
-                        </div>
-                      @endif
-                    </div>
-
-                    <div class="text-right shrink-0">
-                      <div class="price-pill inline-flex items-center rounded-full px-3 py-1 text-sm">
-                        Rp {{ $item['price'] }}
+<!-- Main Content -->
+<main class="max-w-6xl mx-auto px-3 sm:px-4 pb-32">
+  @forelse($menuGroups as $group)
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6">
+      <section id="{{ Str::slug($group->kategori) }}" class="glass rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-7">
+        <h2 class="uppercase tracking-widest text-stone-600 text-sm sm:text-base mb-4">{{ $group->kategori }}</h2>
+        
+        @if($group->items->count() > 0)
+          <ul class="divide-y divide-stone-200/70">
+            @foreach($group->items as $item)
+              <li class="py-3 sm:py-4">
+                <div class="flex items-start gap-3 sm:gap-4">
+                  <!-- Thumbnail -->
+                  <div class="thumb ring-1 ring-stone-200">
+                    @if($item->gambar)
+                      <img loading="lazy" src="{{ asset('storage/'.$item->gambar) }}" alt="{{ $item->nama_menu }}">
+                    @else
+                      <div class="w-full h-full bg-stone-200 flex items-center justify-center">
+                        <svg class="w-8 h-8 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
                       </div>
-                      {{-- TOMBOL TAMBAH --}}
-                      <button
-                        class="cta add-btn w-full mt-2 inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2 text-xs md:text-sm"
-                        data-name="{{ $item['name'] }}"
-                        data-price="{{ $item['price'] }}">
-                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M11 11V6h2v5h5v2h-5v5h-2v-5H6v-2z"/></svg>
-                        Tambah
-                      </button>
+                    @endif
+                  </div>
+
+                  <!-- Content -->
+                  <div class="flex-1 min-w-0">
+                    <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-2 sm:gap-3">
+                      <!-- Info -->
+                      <div class="min-w-0 flex-1">
+                        <h3 class="font-semibold tracking-tight text-sm sm:text-[15px] md:text-base leading-snug">
+                          {{ $item->nama_menu }}
+                        </h3>
+                        @if($item->suhu)
+                          <p class="text-xs sm:text-sm text-stone-500 mt-1">{{ $item->suhu }}</p>
+                        @endif
+                      </div>
+
+                      <!-- Price & Button -->
+                      <div class="flex sm:flex-col items-center sm:items-end gap-2 sm:gap-2 shrink-0">
+                        <div class="price-pill inline-flex items-center rounded-full px-2.5 sm:px-3 py-1 text-xs sm:text-sm font-medium">
+                          Rp {{ number_format($item->harga,0,',','.') }}
+                        </div>
+
+                        <button
+                          class="cta add-btn inline-flex items-center justify-center gap-1.5 rounded-lg sm:rounded-xl px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm whitespace-nowrap"
+                          data-name="{{ $item->nama_menu }}"
+                          data-price="{{ $item->harga }}">
+                          <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M11 11V6h2v5h5v2h-5v5h-2v-5H6v-2z"/>
+                          </svg>
+                          Tambah
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </li>
-          @endforeach
-        </ul>
+              </li>
+            @endforeach
+          </ul>
+        @else
+          <p class="text-sm text-stone-400 text-center py-8">Belum ada menu di kategori ini</p>
+        @endif
       </section>
-    @endforeach
-  </div>
+    </div>
+  @empty
+    <div class="glass rounded-3xl p-12 text-center">
+      <svg class="w-16 h-16 mx-auto text-stone-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+      </svg>
+      <h3 class="text-xl font-semibold text-stone-600 mb-2">Belum Ada Menu</h3>
+      <p class="text-stone-500">Menu akan ditampilkan setelah admin menambahkan data</p>
+    </div>
+  @endforelse
 </main>
 
-<footer class="w-full bg-[#ff8c00] text-white text-center py-4 text-sm">
-    © {{ date('Y') }} SeduhRasa Coffee. All rights reserved.
-</footer>
-
-
-{{-- FAB CART --}}
-<button id="cart-fab"
-  class="fixed bottom-5 right-5 z-30 inline-flex items-center gap-2 rounded-full cta px-4 py-3 shadow-lg">
-  <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2S15.9 22 17 22s2-.9 2-2-.9-2-2-2zM7.16 14h9.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1 1 0 0 0 21.08 5H6.21L5.27 3H2v2h2l3.6 7.59-1.35 2.45C5.52 15.37 6.16 16 7 16h12v-2H7.42l.74-1.34z"/></svg>
-  <span id="cart-count" class="text-sm">0</span>
+<!-- Cart Floating Button -->
+<button class="cart-fab" id="cart-fab" aria-label="Buka keranjang">
+  <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+  </svg>
+  <span class="cart-badge" id="cart-count">0</span>
 </button>
 
-{{-- CART DRAWER --}}
-<aside id="cart-drawer" class="fixed inset-y-0 right-0 w-full max-w-md bg-white/95 glass z-40 translate-x-full transition-transform">
-  <div class="h-full flex flex-col">
-    <div class="px-5 py-4 border-b flex items-center justify-between">
-      <h3 class="text-lg font-semibold">Keranjang</h3>
-      <button id="cart-close" class="rounded-md px-3 py-1.5 hover:bg-stone-100">Tutup</button>
-    </div>
+<!-- Backdrop -->
+<div class="backdrop" id="backdrop"></div>
 
-    <div id="cart-empty" class="p-6 text-stone-500">Keranjang masih kosong.</div>
-    <ul id="cart-list" class="flex-1 overflow-auto divide-y hidden"></ul>
-
-    <div class="border-t p-5 space-y-4">
-      <div class="flex items-center justify-between">
-        <span class="text-stone-600">Subtotal</span>
-        <strong id="cart-subtotal">Rp 0</strong>
-      </div>
-
-      {{-- PILIHAN METODE PEMBAYARAN --}}
-      <div class="space-y-2">
-        <p class="text-sm font-medium text-stone-700">Metode Pembayaran</p>
-        <div class="space-y-1 text-sm">
-          <label class="flex items-center gap-2">
-            <input type="radio" name="metode_pembayaran_ui" value="cod" class="accent-amber-600" checked>
-            <span>Bayar di Tempat (kasir)</span>
-          </label>
-          <label class="flex items-center gap-2">
-            <input type="radio" name="metode_pembayaran_ui" value="transfer" class="accent-amber-600">
-            <span>Transfer Bank / Virtual Account</span>
-          </label>
-        </div>
-      </div>
-
-      {{-- TOMBOL CHECKOUT --}}
-      <button id="checkout-btn" class="w-full cta rounded-xl py-3">Lanjutkan Order</button>
-
-      <p class="text-xs text-stone-500">*Keranjang hanya berlaku untuk pesanan ini.</p>
-    </div>
+<!-- Cart Drawer -->
+<div class="drawer" id="cart-drawer">
+  <!-- Header -->
+  <div class="p-4 sm:p-6 border-b border-stone-200 flex items-center justify-between">
+    <h2 class="text-lg sm:text-xl font-semibold">Keranjang Belanja</h2>
+    <button id="cart-close" class="w-8 h-8 rounded-full hover:bg-stone-100 flex items-center justify-center transition">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+      </svg>
+    </button>
   </div>
-</aside>
 
-<div id="backdrop" class="fixed inset-0 bg-black/40 z-30 opacity-0 pointer-events-none transition-opacity"></div>
+  <!-- Cart Items -->
+  <div class="flex-1 overflow-y-auto">
+    <div id="cart-empty" class="p-8 text-center">
+      <svg class="w-16 h-16 mx-auto text-stone-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+      </svg>
+      <p class="text-stone-500">Keranjang masih kosong</p>
+    </div>
 
-{{-- ========= SCRIPT ========= --}}
+    <ul id="cart-list" class="hidden divide-y divide-stone-200"></ul>
+  </div>
+
+  <!-- Footer -->
+  <div class="p-4 sm:p-6 border-t border-stone-200 bg-stone-50">
+    <div class="flex items-center justify-between mb-4">
+      <span class="text-stone-600">Subtotal</span>
+      <span class="text-xl font-bold" id="cart-subtotal">Rp 0</span>
+    </div>
+    <button id="checkout-btn" class="cta w-full py-3 rounded-xl text-base font-semibold flex items-center justify-center gap-2">
+      <span>Checkout</span>
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="w-full bg-[#ff8c00] text-white text-center py-4 text-xs sm:text-sm">
+  © {{ date('Y') }} SeduhRasa Coffee. All rights reserved.
+</footer>
+
 <script>
-  // Format & parser
   const rupiah = n => 'Rp '+ n.toString().replace(/\B(?=(\d{3})+(?!\d))/g,'.');
-  const parsePrice = s => {
-    s = (s || '').toUpperCase().trim();
-    if (s.endsWith('K')) return parseInt(s) * 1000;
-    return parseInt(s.replace(/\D/g,'')) || 0;
-  };
-
-  // ====== STATE KERANJANG ======
-  // Sekarang keranjang SELALU baru (mulai dari kosong),
-  // dan TIDAK disimpan ke localStorage.
   let cart = [];
 
-  // Refs
-  const cartFab      = document.getElementById('cart-fab');
-  const cartCount    = document.getElementById('cart-count');
-  const cartDrawer   = document.getElementById('cart-drawer');
-  const cartClose    = document.getElementById('cart-close');
-  const backdrop     = document.getElementById('backdrop');
-  const cartList     = document.getElementById('cart-list');
-  const cartEmpty    = document.getElementById('cart-empty');
+  const cartFab = document.getElementById('cart-fab');
+  const cartCount = document.getElementById('cart-count');
+  const cartDrawer = document.getElementById('cart-drawer');
+  const cartClose = document.getElementById('cart-close');
+  const backdrop = document.getElementById('backdrop');
+  const cartList = document.getElementById('cart-list');
+  const cartEmpty = document.getElementById('cart-empty');
   const cartSubtotal = document.getElementById('cart-subtotal');
-  const checkoutBtn  = document.getElementById('checkout-btn');
-
-  // Tambah ke keranjang
-  document.querySelectorAll('.cta.add-btn, .add-btn').forEach(btn=>{
-    btn.addEventListener('click',()=>{
-      const name = btn.dataset.name;
-      const price = parsePrice(btn.dataset.price);
-      addToCart({name, price});
-    });
-  });
-
-  function addToCart(item){
-    const f = cart.find(x=>x.name===item.name);
-    if (f) f.qty += 1;
-    else cart.push({...item, qty:1});
-    persist(); renderCart(); openCart();
-  }
-
-  function updateQty(i,d){
-    cart[i].qty += d;
-    if (cart[i].qty <= 0) cart.splice(i,1);
-    persist(); renderCart();
-  }
-
-  function removeItem(i){
-    cart.splice(i,1);
-    persist(); renderCart();
-  }
-
-  // Tidak pakai localStorage lagi untuk keranjang
-  function persist(){
-    // dibiarkan kosong; cart hanya hidup di memori halaman ini
-  }
-
-  function subtotal(){
-    return cart.reduce((t,i)=>t+i.price*i.qty,0);
-  }
+  const checkoutBtn = document.getElementById('checkout-btn');
 
   function renderCart(){
-    cartCount.textContent = cart.reduce((t,i)=>t+i.qty,0);
-    const has = cart.length > 0;
-    cartEmpty.classList.toggle('hidden', has);
-    cartList.classList.toggle('hidden', !has);
+    const totalItems = cart.reduce((t,i)=>t+i.qty,0);
+    cartCount.textContent = totalItems;
+    cartCount.classList.toggle('hidden', totalItems === 0);
+    
+    const hasItems = cart.length > 0;
+    cartEmpty.classList.toggle('hidden', hasItems);
+    cartList.classList.toggle('hidden', !hasItems);
 
     cartList.innerHTML = cart.map((it,idx)=>`
       <li class="p-4 flex items-center justify-between gap-3">
-        <div class="min-w-0">
-          <div class="font-medium">${it.name}</div>
-          <div class="text-sm text-stone-500">${rupiah(it.price)}</div>
+        <div class="min-w-0 flex-1">
+          <div class="font-medium text-sm sm:text-base">${it.name}</div>
+          <div class="text-xs sm:text-sm text-stone-500">${rupiah(it.price)}</div>
         </div>
         <div class="flex items-center gap-2">
-          <button class="px-2 py-1 rounded-md ring-1 ring-stone-200 hover:bg-stone-100" data-act="dec" data-i="${idx}">−</button>
-          <span class="w-6 text-center">${it.qty}</span>
-          <button class="px-2 py-1 rounded-md ring-1 ring-stone-200 hover:bg-stone-100" data-act="inc" data-i="${idx}">+</button>
-          <button class="ml-2 px-2 py-1 rounded-md text-stone-500 hover:bg-stone-100" data-act="del" data-i="${idx}">Hapus</button>
+          <button data-act="dec" data-i="${idx}" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-stone-100 hover:bg-stone-200 flex items-center justify-center transition text-sm sm:text-base">−</button>
+          <span class="w-8 text-center font-medium text-sm sm:text-base">${it.qty}</span>
+          <button data-act="inc" data-i="${idx}" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-stone-100 hover:bg-stone-200 flex items-center justify-center transition text-sm sm:text-base">+</button>
+          <button data-act="del" data-i="${idx}" class="ml-2 text-red-500 hover:text-red-700 text-xs sm:text-sm transition">Hapus</button>
         </div>
       </li>
     `).join('');
 
     cartList.querySelectorAll('button').forEach(b=>{
       const i = +b.dataset.i;
-      b.addEventListener('click',()=>{
-        if (b.dataset.act === 'inc') updateQty(i,1);
-        if (b.dataset.act === 'dec') updateQty(i,-1);
-        if (b.dataset.act === 'del') removeItem(i);
-      });
+      if (b.dataset.act === 'inc') b.onclick = ()=>{cart[i].qty++; renderCart()};
+      if (b.dataset.act === 'dec') b.onclick = ()=>{cart[i].qty--; if(cart[i].qty<=0)cart.splice(i,1); renderCart()};
+      if (b.dataset.act === 'del') b.onclick = ()=>{cart.splice(i,1); renderCart()};
     });
 
-    cartSubtotal.textContent = rupiah(subtotal());
+    cartSubtotal.textContent = rupiah(cart.reduce((t,i)=>t+i.price*i.qty,0));
   }
 
-  // Drawer
-  function openCart(){
-    cartDrawer.classList.remove('translate-x-full');
-    backdrop.classList.remove('pointer-events-none');
-    requestAnimationFrame(()=>backdrop.style.opacity='1');
-  }
-
-  function closeCart(){
-    cartDrawer.classList.add('translate-x-full');
-    backdrop.style.opacity='0';
-    setTimeout(()=>backdrop.classList.add('pointer-events-none'),200);
-  }
-
-  cartFab.addEventListener('click',openCart);
-  cartClose.addEventListener('click',closeCart);
-  backdrop.addEventListener('click',closeCart);
-
-  // Checkout: kirim pesanan + data pembeli + metode pembayaran ke Laravel
-  checkoutBtn.addEventListener('click', () => {
-    if (!cart.length) {
-      alert('Keranjang masih kosong.');
-      return;
-    }
-
-    // ambil data pembeli dari localStorage (tetap)
-    const buyer = JSON.parse(localStorage.getItem('sr_buyer') || '{}');
-
-    if (!buyer.nama_pelanggan || !buyer.email || !buyer.telepon) {
-      alert('Data pembeli belum lengkap. Silakan isi dulu di halaman sebelumnya.');
-      window.location.href = "{{ route('order') }}";
-      return;
-    }
-
-    // ambil metode pembayaran
-    const metodeRadio = document.querySelector('input[name="metode_pembayaran_ui"]:checked');
-    const metode = metodeRadio ? metodeRadio.value : 'cod';
-
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = "{{ route('orders.store') }}";
-
-    form.innerHTML = `
-      <input type="hidden" name="_token" value="{{ csrf_token() }}">
-      <input type="hidden" name="nama_pelanggan" value="${buyer.nama_pelanggan}">
-      <input type="hidden" name="email" value="${buyer.email}">
-      <input type="hidden" name="telepon" value="${buyer.telepon}">
-      <input type="hidden" name="items" value='${JSON.stringify(cart)}'>
-      <input type="hidden" name="metode_pembayaran" value="${metode}">
-    `;
-
-    document.body.appendChild(form);
-    form.submit();
+  // Add to cart
+  document.querySelectorAll('.add-btn').forEach(btn=>{
+    btn.onclick = ()=>{
+      const name = btn.dataset.name;
+      const price = parseInt(btn.dataset.price);
+      const existing = cart.find(x=>x.name===name);
+      if (existing) {
+        existing.qty++;
+      } else {
+        cart.push({name, price, qty:1});
+      }
+      renderCart();
+      
+      // Show feedback
+      btn.textContent = '✓ Ditambahkan';
+      setTimeout(() => {
+        btn.innerHTML = '<svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M11 11V6h2v5h5v2h-5v5h-2v-5H6v-2z"/></svg> Tambah';
+      }, 1000);
+    };
   });
+
+  // Open/Close drawer
+  cartFab.onclick = () => {
+    cartDrawer.classList.add('open');
+    backdrop.classList.add('show');
+  };
+
+  const closeDrawer = () => {
+    cartDrawer.classList.remove('open');
+    backdrop.classList.remove('show');
+  };
+
+  cartClose.onclick = closeDrawer;
+  backdrop.onclick = closeDrawer;
+
+  // Checkout
+  checkoutBtn.onclick = () => {
+    if (cart.length === 0) {
+      alert('Keranjang masih kosong!');
+      return;
+    }
+    alert('Fitur checkout akan segera hadir!\n\nTotal: ' + cartSubtotal.textContent);
+  };
 
   renderCart();
 </script>
+
 </body>
 </html>

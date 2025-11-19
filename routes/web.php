@@ -32,7 +32,7 @@ Route::post('/contact', function (Request $request) {
 })->name('contact.submit');
 
 Route::view('/order', 'order')->name('order');
-Route::view('/menu', 'menu')->name('menu');
+Route::get('/menu', [MenuController::class, 'publicMenu'])->name('menu');
 
 /*
 |--------------------------------------------------------------------------
