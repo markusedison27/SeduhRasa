@@ -6,22 +6,25 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('menus', function (Blueprint $table) {
             $table->id();
-            $table->string('nama_menu'); // kolom untuk nama menu
-            $table->decimal('harga', 10, 2); // kolom untuk harga menu
-            $table->timestamps(); // kolom created_at & updated_at
+            // Disarankan menggunakan 'name' untuk konvensi Model Laravel, tapi kita tetap pakai 'nama_menu'
+            $table->string('nama_menu')->unique(); 
+            // Kolom harga diubah menjadi Integer karena input Admin menggunakan nilai bulat (Rp 25.000)
+            $table->integer('harga'); 
+            
+            // Kolom Fungsionalitas Aplikasi
+            $table->string('group'); // Contoh: Coffee, Desserts, Mocktail & Tea
+            $table->string('image')->nullable(); // Path foto menu (diperlukan untuk tampilan menu)
+            $table->string('description')->nullable();
+            $table->json('serve_options')->nullable(); // Contoh: ["Dingin", "Panas"]
+
+            $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('menus');
