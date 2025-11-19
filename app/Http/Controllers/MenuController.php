@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Menu; // ← DITAMBAHKAN
 
 class MenuController extends Controller
 {
@@ -11,9 +12,11 @@ class MenuController extends Controller
     // ==========================
 
     public function index()
-    {
-        return view('menus.index'); // sudah ada
-    }
+{
+    $menus = Menu::all(); // AMBIL DATA DARI DATABASE
+    return view('menus.index', compact('menus'));
+}
+
 
     public function create()
     {
@@ -22,8 +25,31 @@ class MenuController extends Controller
 
     public function store(Request $request)
     {
-        // TODO: simpan ke DB (sementara kita terima saja)
-        return back()->with('success', 'Menu berhasil ditambahkan (dummy).');
+        // ← DITAMBAHKAN (TANPA HAPUS YANG LAIN)
+        $request->validate([
+            'nama_menu' => 'required',
+            'kategori' => 'required',
+            'harga' => 'required|numeric',
+            'suhu' => 'nullable',
+            'gambar' => 'nullable|image',
+        ]);
+
+        $gambar = null;
+        if ($request->hasFile('gambar')) {
+            $gambar = $request->file('gambar')->store('menu', 'public');
+        }
+
+        Menu::create([
+            'nama_menu' => $request->nama_menu,
+            'kategori' => $request->kategori,
+            'harga' => $request->harga,
+            'suhu' => $request->suhu,
+            'gambar' => $gambar,
+        ]);
+
+        // tetap memakai baris kamu
+        return redirect()->route('admin.menus.index')->with('success', 'Menu berhasil ditambahkan!');
+
     }
 
     // ==========================
@@ -31,59 +57,8 @@ class MenuController extends Controller
     // ==========================
     public function publicOrder()
     {
-        // sementara: data menu dummy (supaya kelihatan dulu)
-        $menus = [
-            [
-                'category' => 'Coffee',
-                'items' => [
-                    [
-                        'name'  => 'Espresso',
-                        'price' => 18000,
-                        'image' => 'https://images.unsplash.com/photo-1510626176961-4b37d6af3c4a?q=80&w=800&auto=format&fit=crop',
-                    ],
-                    [
-                        'name'  => 'Cappuccino',
-                        'price' => 23000,
-                        'image' => 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?q=80&w=800&auto=format&fit=crop',
-                    ],
-                    [
-                        'name'  => 'Latte',
-                        'price' => 24000,
-                        'image' => 'https://images.unsplash.com/photo-1521302080371-6c5f60b67f36?q=80&w=800&auto=format&fit=crop',
-                    ],
-                    [
-                        'name'  => 'Americano',
-                        'price' => 20000,
-                        'image' => 'https://images.unsplash.com/photo-1521302080371-6c5f60b67f36?q=80&w=800&auto=format&fit=crop',
-                    ],
-                ],
-            ],
-            [
-                'category' => 'Snack',
-                'items' => [
-                    [
-                        'name'  => 'Croissant',
-                        'price' => 15000,
-                        'image' => 'https://images.unsplash.com/photo-1606755962773-d324e0a13058?q=80&w=800&auto=format&fit=crop',
-                    ],
-                    [
-                        'name'  => 'Muffin',
-                        'price' => 14000,
-                        'image' => 'https://images.unsplash.com/photo-1605478371319-4c5d9a5e9a1b?q=80&w=800&auto=format&fit=crop',
-                    ],
-                    [
-                        'name'  => 'Donut',
-                        'price' => 13000,
-                        'image' => 'https://images.unsplash.com/photo-1606312619070-2049f3a6f3ee?q=80&w=800&auto=format&fit=crop',
-                    ],
-                    [
-                        'name'  => 'Cheese Cake',
-                        'price' => 18000,
-                        'image' => 'https://images.unsplash.com/photo-1605478371319-4c5d9a5e9a1b?q=80&w=800&auto=format&fit=crop',
-                    ],
-                ],
-            ],
-        ];
+        // ← DITAMBAHKAN (TIDAK MENGHAPUS DUMMY)
+        $menus = Menu::all(); // AMBIL DATA DARI DATABASE
 
         return view('order', compact('menus'));
     }
