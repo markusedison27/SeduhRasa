@@ -13,4 +13,10 @@ class Menu extends Model
         'harga',
         'gambar',
     ];
+
+    // Accessor agar bisa pakai $menu->nama (opsional)
+    public function getNamaAttribute()
+    {
+        return $this->nama_menu;
+    }
 }
