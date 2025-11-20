@@ -32,6 +32,7 @@
 
       <div class="bg-white rounded-2xl shadow-md p-8 border border-stone-100">
         <div class="grid md:grid-cols-3 gap-8">
+          {{-- NAMA --}}
           <div class="space-y-2">
             <label class="block text-sm font-semibold text-stone-700">Nama Lengkap</label>
             <input
@@ -42,6 +43,7 @@
             <small class="text-xs text-stone-400">Sesuai dengan identitas atau nama akunmu</small>
           </div>
 
+          {{-- EMAIL --}}
           <div class="space-y-2">
             <label class="block text-sm font-semibold text-stone-700">Email</label>
             <input
@@ -52,6 +54,7 @@
             <small class="text-xs text-stone-400">Digunakan untuk konfirmasi pesanan</small>
           </div>
 
+          {{-- TELEPON --}}
           <div class="space-y-2">
             <label class="block text-sm font-semibold text-stone-700">No. Telepon</label>
             <input
@@ -60,6 +63,28 @@
               placeholder="08xxxxxxxxxx"
               class="w-full bg-stone-50 border border-stone-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 transition duration-200">
             <small class="text-xs text-stone-400">Pastikan nomor aktif untuk kontak pengiriman</small>
+          </div>
+
+          {{-- PILIH MEJA --}}
+          <div class="space-y-2">
+            <label class="block text-sm font-semibold text-stone-700">Pilih Meja</label>
+            <select
+              id="no_meja"
+              class="w-full bg-stone-50 border border-stone-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-amber-400 transition duration-200">
+              <option value="">Pilih meja</option>
+              <option value="1">Meja 1</option>
+              <option value="2">Meja 2</option>
+              <option value="3">Meja 3</option>
+              <option value="4">Meja 4</option>
+              <option value="5">Meja 5</option>
+              <option value="1">Meja 6</option>
+              <option value="2">Meja 7</option>
+              <option value="3">Meja 8</option>
+              <option value="4">Meja 9</option>
+              <option value="5">Meja 10</option>
+              {{-- tambah lagi kalau meja-nya banyak --}}
+            </select>
+            <small class="text-xs text-stone-400">Pilih nomor meja kamu (kalau dine-in).</small>
           </div>
         </div>
 
@@ -74,10 +99,10 @@
     </section>
   </main>
 
-   {{-- FOOTER --}}
+  {{-- FOOTER --}}
   <footer class="w-full bg-[#ff8c00] text-white text-center py-4 text-sm">
     © {{ date('Y') }} SeduhRasa Coffee. All rights reserved.
-</footer>
+  </footer>
 
   <script>
     // saat tombol diklik, simpan data pembeli di localStorage lalu pindah ke /menu
@@ -85,13 +110,20 @@
       const nama    = document.getElementById('nama_pelanggan').value.trim();
       const email   = document.getElementById('email').value.trim();
       const telepon = document.getElementById('telepon').value.trim();
+      const meja    = document.getElementById('no_meja').value.trim();
 
-      if (!nama || !email || !telepon) {
-        alert('Nama, email, dan no. telepon wajib diisi dulu ya 😊');
+      if (!nama || !email || !telepon || !meja) {
+        alert('Nama, email, no. telepon, dan meja wajib diisi dulu ya 😊');
         return;
       }
 
-      const buyer = { nama_pelanggan: nama, email: email, telepon: telepon };
+      const buyer = {
+        nama_pelanggan: nama,
+        email: email,
+        telepon: telepon,
+        no_meja: meja, // <-- simpan nomor meja juga
+      };
+
       localStorage.setItem('sr_buyer', JSON.stringify(buyer));
 
       // pindah ke halaman pilih menu

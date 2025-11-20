@@ -9,11 +9,27 @@ class OrderController extends Controller
 {
     /*
     |--------------------------------------------------------------------------
-    | PUBLIC (checkout dari halaman menu)    */
+    | PUBLIC (checkout dari halaman menu)
+    |--------------------------------------------------------------------------
+    */
+
+    // GET /order -> route('order')
+    // Tampilkan halaman form "Data Pembeli" (kalau kamu pakai view order.blade.php)
+    public function create()
+    {
+        return view('order');
+    }
 
     // POST /orders  -> route('orders.store')
     public function store(Request $request)
     {
+        // Validasi ringan (no_meja optional)
+        $request->validate([
+            'nama_pelanggan'    => 'nullable|string|max:255',
+            'metode_pembayaran' => 'nullable|string|max:50',
+            'no_meja'           => 'nullable|string|max:10',
+        ]);
+
         // items dikirim dari JS (menu.blade.php) sebagai JSON string
         $raw   = $request->input('items');
         $items = json_decode($raw, true);
@@ -52,6 +68,9 @@ class OrderController extends Controller
         // metode pembayaran: "cod" atau "transfer"
         $metodePembayaran = $request->input('metode_pembayaran', 'cod');
 
+        // nomor meja (boleh kosong)
+        $noMeja = $request->input('no_meja');
+
         $menuDipesan = implode(', ', $listMenu);
 
         // Simpan ke tabel orders sesuai struktur DB kamu
@@ -62,6 +81,7 @@ class OrderController extends Controller
             'total_harga'       => $totalHarga,
             'status'            => 'pending',          // awalnya pending
             'metode_pembayaran' => $metodePembayaran,
+            'no_meja'           => $noMeja,            // <-- simpan nomor meja
         ]);
 
         // Redirect ke halaman detail pesanan (pembeli)

@@ -286,7 +286,6 @@
 
             <div>
                 <div class="nav-title">Navigasi</div>
-                {{-- ini yang tadi error, sudah diganti ke staff.dashboard --}}
                 <a href="{{ route('staff.dashboard') }}" class="nav-link active">
                     <span class="icon"></span>
                     <span>Dashboard</span>
@@ -383,6 +382,7 @@
                     <tr>
                         <th>Tanggal</th>
                         <th>Deskripsi</th>
+                        <th>Meja</th> {{-- kolom meja --}}
                         <th>Status</th>
                         <th>Jumlah</th>
                     </tr>
@@ -392,6 +392,16 @@
                         <tr>
                             <td>{{ $order->created_at->format('Y-m-d H:i') }}</td>
                             <td>{{ $order->menu_dipesan }}</td>
+
+                            {{-- MEJA --}}
+                            <td>
+                                @if($order->no_meja)
+                                    Meja {{ $order->no_meja }}
+                                @else
+                                    -
+                                @endif
+                            </td>
+
                             <td>
                                 @php $status = strtolower($order->status); @endphp
                                 @if ($status === 'selesai')
@@ -408,7 +418,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" style="text-align:center;color:var(--muted);padding:.8rem 0;">
+                            <td colspan="5" style="text-align:center;color:var(--muted);padding:.8rem 0;">
                                 Belum ada pesanan.
                             </td>
                         </tr>

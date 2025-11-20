@@ -9,16 +9,14 @@ class Order extends Model
 {
     use HasFactory;
 
-    // Nama tabel
-
-
     // Kolom yang boleh diisi mass assignment
- protected $fillable = [
-    'nama_pelanggan',
-    'menu_dipesan',
-    'jumlah',
-    'total_harga',
-    'status',
-    'metode_pembayaran',   // <---
-];
+    protected $fillable = [
+        'nama_pelanggan',
+        'menu_dipesan',
+        'jumlah',
+        'total_harga',
+        'status',
+        'metode_pembayaran',
+        'no_meja',          // <--- kolom meja
+    ];
 }

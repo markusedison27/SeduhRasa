@@ -31,7 +31,12 @@ Route::post('/contact', function (Request $request) {
     return back()->with('success', 'Pesan berhasil dikirim!');
 })->name('contact.submit');
 
-Route::view('/order', 'order')->name('order');
+/*
+ | Halaman form Data Pembeli (ada pilihan meja)
+ | GET /order -> OrderController@create, return view('order')
+*/
+Route::get('/order', [OrderController::class, 'create'])->name('order');
+
 Route::get('/menu', [MenuController::class, 'publicMenu'])->name('menu');
 
 /*

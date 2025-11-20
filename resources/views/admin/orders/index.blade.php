@@ -41,6 +41,21 @@
         .order-meta{
             font-size: .78rem;
         }
+        /* tambahan untuk tampilan nomor meja */
+        .meja-pill{
+            border-radius: 999px;
+            padding: .15rem .6rem;
+            font-size: .72rem;
+            font-weight: 600;
+            background: #fff7ed;
+            color: #ea580c;
+            border: 1px solid #fed7aa;
+        }
+        .meja-pill-empty{
+            background: #f3f4f6;
+            color: #6b7280;
+            border-color: #e5e7eb;
+        }
     </style>
 
     <div class="container-fluid py-4 orders-wrapper-bg">
@@ -62,11 +77,11 @@
                     @php
                         $status = strtolower($order->status);
                         $statusClass = match ($status) {
-                            'pending'      => 'bg-warning-subtle text-warning-emphasis',
-                            'proses'       => 'bg-info-subtle text-info-emphasis',
+                            'pending'        => 'bg-warning-subtle text-warning-emphasis',
+                            'proses'         => 'bg-info-subtle text-info-emphasis',
                             'selesai','paid' => 'bg-success-subtle text-success-emphasis',
                             'batal','cancel' => 'bg-danger-subtle text-danger-emphasis',
-                            default        => 'bg-secondary-subtle text-secondary-emphasis',
+                            default          => 'bg-secondary-subtle text-secondary-emphasis',
                         };
 
                         $metode = strtolower($order->metode_pembayaran ?? 'cod');
@@ -92,8 +107,16 @@
                                 <div class="fw-semibold">
                                     {{ $order->nama_pelanggan }}
                                 </div>
-                                <div class="order-meta text-muted">
-                                    {{ Str::limit($order->menu_dipesan, 60) }}
+                                <div class="d-flex flex-wrap align-items-center gap-2">
+                                    <div class="order-meta text-muted">
+                                        {{ Str::limit($order->menu_dipesan, 60) }}
+                                    </div>
+                                    {{-- TAMPILKAN NOMOR MEJA --}}
+                                    @if($order->no_meja)
+                                        <span class="meja-pill">Meja {{ $order->no_meja }}</span>
+                                    @else
+                                        <span class="meja-pill meja-pill-empty">Belum pilih meja</span>
+                                    @endif
                                 </div>
                             </div>
 
@@ -118,6 +141,34 @@
                                 </div>
                             </div>
 
+                            {{-- FORM UBAH NOMOR MEJA UNTUK KASIR --}}
+                            <div class="mb-3">
+                                <form action="{{ route('admin.orders.updateStatus', $order) }}"
+                                      method="POST"
+                                      class="d-flex flex-wrap align-items-center gap-2">
+                                    @csrf
+                                    @method('PATCH')
+
+                                    {{-- pakai status yang sekarang supaya cuma ganti meja --}}
+                                    <input type="hidden" name="status" value="{{ $order->status }}">
+
+                                    <label class="small text-muted mb-0 me-1">Meja:</label>
+                                    <select name="no_meja" class="form-select form-select-sm w-auto">
+                                        <option value="">- pilih -</option>
+                                        @for ($i = 1; $i <= 10; $i++)
+                                            <option value="{{ $i }}" {{ $order->no_meja == $i ? 'selected' : '' }}>
+                                                Meja {{ $i }}
+                                            </option>
+                                        @endfor
+                                    </select>
+
+                                    <button type="submit" class="btn btn-sm btn-outline-primary">
+                                        Simpan
+                                    </button>
+                                </form>
+                            </div>
+
+                            {{-- TOMBOL UBAH STATUS --}}
                             <div class="mb-3">
                                 @if ($status === 'pending')
                                     <form action="{{ route('admin.orders.updateStatus', $order) }}"
@@ -126,6 +177,8 @@
                                         @csrf
                                         @method('PATCH')
                                         <input type="hidden" name="status" value="proses">
+                                        {{-- kirim juga meja yang sudah terpilih supaya tidak hilang --}}
+                                        <input type="hidden" name="no_meja" value="{{ $order->no_meja }}">
                                         <button type="submit"
                                                 class="btn btn-sm btn-warning">
                                             Terima / Proses
@@ -138,6 +191,7 @@
                                         @csrf
                                         @method('PATCH')
                                         <input type="hidden" name="status" value="selesai">
+                                        <input type="hidden" name="no_meja" value="{{ $order->no_meja }}">
                                         <button type="submit"
                                                 class="btn btn-sm btn-success">
                                             Tandai Selesai
