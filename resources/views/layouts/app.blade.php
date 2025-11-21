@@ -6,6 +6,9 @@
   <meta name="csrf-token" content="{{ csrf_token() }}">
 
   <title>@yield('title', 'SeduhRasa Panel')</title>
+
+    <link rel="icon" type="image/png" href="{{ asset('LOGO2.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('LOGO2.png') }}">
   @vite(['resources/css/app.css', 'resources/js/app.js'])
   
   <style>

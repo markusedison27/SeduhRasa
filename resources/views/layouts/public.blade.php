@@ -6,6 +6,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@yield('title', 'SeduhRasa Coffee')</title>
+
+        {{-- Favicon --}}
+    <link rel="icon" type="image/png" href="{{ asset('LOGO2.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('LOGO2.png') }}">
+    
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     {{-- Font cursive untuk judul --}}
@@ -21,10 +26,10 @@
     <header class="fixed inset-x-0 top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between text-sm bg-stone-900/90 backdrop-blur-sm">
             <div class="flex items-center gap-6">
-                <div class="flex items-center gap-2 font-bold text-white">
-                    <img src="https://cdn-icons-png.flaticon.com/512/2965/2965567.png" class="w-6 h-6" alt="logo">
+                <a href="{{ route('home') }}" class="flex items-center gap-2 font-bold text-white hover:opacity-90 transition">
+                    <img src="{{ asset('LOGO2.png') }}" class="h-8 w-auto" alt="SeduhRasa Coffee Logo">
                     <span>Seduh<span class="text-amber-500">Rasa</span></span>
-                </div>
+                </a>
                 <nav class="hidden md:flex items-center gap-5 text-white/90">
                     {{-- Navigasi menggunakan route name --}}
                     <a href="{{ route('home') }}" 
