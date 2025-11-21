@@ -1,243 +1,183 @@
 @extends('layouts.app')
 
 @section('title', 'Manajemen Order')
+@section('page-title', 'Manajemen Order')
 
 @section('content')
-    <style>
-        .orders-wrapper-bg{
-            background: radial-gradient(circle at top left, rgba(255,193,7,.06), transparent 55%);
-        }
-        .order-card{
-            border-radius: 16px;
-            border: 1px solid #f1f5f9;
-            box-shadow: 0 10px 30px rgba(15,23,42,.05);
-            transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
-        }
-        .order-card:hover{
-            transform: translateY(-2px);
-            border-color: #e5e7eb;
-            box-shadow: 0 14px 40px rgba(15,23,42,.08);
-        }
-        .order-id-pill{
-            border-radius: 999px;
-            padding: .20rem .7rem;
-            background: #eef2ff;
-            color: #4f46e5;
-            font-size: .75rem;
-            font-weight: 600;
-        }
-        .badge-status{
-            border-radius: 999px;
-            font-size: .7rem;
-            padding: .25rem .7rem;
-        }
-        .pill-method{
-            border-radius: 999px;
-            font-size: .7rem;
-            padding: .18rem .65rem;
-            background: #f3f4f6;
-            color: #6b7280;
-        }
-        .order-meta{
-            font-size: .78rem;
-        }
-        /* tambahan untuk tampilan nomor meja */
-        .meja-pill{
-            border-radius: 999px;
-            padding: .15rem .6rem;
-            font-size: .72rem;
-            font-weight: 600;
-            background: #fff7ed;
-            color: #ea580c;
-            border: 1px solid #fed7aa;
-        }
-        .meja-pill-empty{
-            background: #f3f4f6;
-            color: #6b7280;
-            border-color: #e5e7eb;
-        }
-    </style>
+    <div class="max-w-5xl mx-auto space-y-6">
 
-    <div class="container-fluid py-4 orders-wrapper-bg">
-        <div class="d-flex flex-wrap justify-content-between align-items-start mb-4">
-            <div class="mb-2">
-                <h4 class="mb-1 fw-semibold">Daftar Order Masuk</h4>
-                <p class="text-muted small mb-0">
+        {{-- Header --}}
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div>
+                <h2 class="text-xl font-semibold text-stone-900">Daftar Order Masuk</h2>
+                <p class="text-sm text-stone-500">
                     Pantau semua pesanan pelanggan SeduhRasa dalam bentuk kartu.
                 </p>
             </div>
-            <div class="text-end small text-muted">
-                Total order: <span class="fw-semibold">{{ $orders->total() }}</span>
+
+            <div class="flex items-center gap-2 text-sm">
+                <span class="text-stone-500">Total order:</span>
+                <span class="inline-flex items-center px-3 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-100 font-semibold">
+                    {{ $orders->total() ?? $orders->count() }}
+                </span>
             </div>
         </div>
 
-        @if ($orders->count())
-            <div class="row g-3 g-md-4">
-                @foreach ($orders as $order)
+        @if($orders->count())
+            {{-- List Kartu Order --}}
+            <div class="space-y-4">
+                @foreach($orders as $o)
                     @php
-                        $status = strtolower($order->status);
-                        $statusClass = match ($status) {
-                            'pending'        => 'bg-warning-subtle text-warning-emphasis',
-                            'proses'         => 'bg-info-subtle text-info-emphasis',
-                            'selesai','paid' => 'bg-success-subtle text-success-emphasis',
-                            'batal','cancel' => 'bg-danger-subtle text-danger-emphasis',
-                            default          => 'bg-secondary-subtle text-secondary-emphasis',
-                        };
-
-                        $metode = strtolower($order->metode_pembayaran ?? 'cod');
-                        $metodeLabel = $metode === 'transfer' ? 'Transfer / VA' : 'Bayar di Tempat';
+                        $status = strtolower($o->status);
+                        $statusConfig = [
+                            'pending' => [
+                                'label' => 'Pending',
+                                'bg'    => 'bg-amber-50',
+                                'pill'  => 'bg-amber-100 text-amber-800 border border-amber-200',
+                                'dot'   => 'bg-amber-500',
+                                'desc'  => 'Menunggu diproses kasir.'
+                            ],
+                            'proses' => [
+                                'label' => 'Proses',
+                                'bg'    => 'bg-sky-50',
+                                'pill'  => 'bg-sky-100 text-sky-800 border border-sky-200',
+                                'dot'   => 'bg-sky-500',
+                                'desc'  => 'Sedang dikerjakan barista.'
+                            ],
+                            'selesai' => [
+                                'label' => 'Selesai',
+                                'bg'    => 'bg-emerald-50',
+                                'pill'  => 'bg-emerald-100 text-emerald-800 border border-emerald-200',
+                                'dot'   => 'bg-emerald-500',
+                                'desc'  => 'Pesanan sudah selesai.'
+                            ],
+                            'batal' => [
+                                'label' => 'Batal',
+                                'bg'    => 'bg-rose-50',
+                                'pill'  => 'bg-rose-100 text-rose-800 border border-rose-200',
+                                'dot'   => 'bg-rose-500',
+                                'desc'  => 'Pesanan dibatalkan.'
+                            ],
+                        ];
+                        $cfg = $statusConfig[$status] ?? $statusConfig['pending'];
                     @endphp
 
-                    <div class="col-12 col-md-6 col-xl-4">
-                        <div class="order-card h-100 p-3 p-md-3">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <div class="d-flex flex-column gap-1">
-                                    <span class="order-id-pill">#{{ $order->id }}</span>
-                                    <span class="order-meta text-muted">
-                                        {{ $order->created_at->format('d M Y') }} •
-                                        {{ $order->created_at->format('H:i') }} WIB
+                    <div class="rounded-2xl border border-stone-200/70 bg-white shadow-sm overflow-hidden hover:shadow-md transition">
+                        <div class="h-1 w-full {{ $status === 'selesai' ? 'bg-emerald-400' : ($status === 'proses' ? 'bg-sky-400' : ($status === 'batal' ? 'bg-rose-400' : 'bg-amber-400')) }}"></div>
+
+                        <div class="p-4 sm:p-5 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+
+                            {{-- Kiri: info utama --}}
+                            <div class="space-y-2">
+                                <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-stone-500">
+                                    <span class="font-semibold text-stone-800">
+                                        #{{ $o->id }}
+                                    </span>
+                                    <span>•</span>
+                                    <span>{{ $o->created_at->format('d M Y • H:i') }} WIB</span>
+                                </div>
+
+                                <div>
+                                    <p class="text-base font-semibold text-stone-900">
+                                        {{ $o->nama_pelanggan ?? 'Umum' }}
+                                    </p>
+                                    <p class="text-sm text-stone-500">
+                                        {{ \Illuminate\Support\Str::limit($o->menu_dipesan, 70) }}
+                                    </p>
+                                </div>
+
+                                <div class="flex flex-wrap items-center gap-2 text-xs text-stone-500">
+                                    @if($o->no_meja)
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-100">
+                                            Meja {{ $o->no_meja }}
+                                        </span>
+                                    @endif
+
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full bg-stone-50 text-stone-600 border border-stone-100">
+                                        {{ $o->metode_pembayaran === 'cod' ? 'Bayar di Tempat (Cash)' : 'Non-tunai / Transfer' }}
+                                    </span>
+
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full bg-stone-50 text-stone-600 border border-stone-100">
+                                        {{ $o->jumlah }} item
                                     </span>
                                 </div>
-                                <span class="badge badge-status {{ $statusClass }}">
-                                    {{ ucfirst($order->status) }}
-                                </span>
                             </div>
 
-                            <div class="mb-2">
-                                <div class="fw-semibold">
-                                    {{ $order->nama_pelanggan }}
-                                </div>
-                                <div class="d-flex flex-wrap align-items-center gap-2">
-                                    <div class="order-meta text-muted">
-                                        {{ Str::limit($order->menu_dipesan, 60) }}
+                            {{-- Kanan: status + total + aksi --}}
+                            <div class="flex flex-col items-end gap-3 text-right min-w-[11rem]">
+                                {{-- Status --}}
+                                <div class="space-y-1">
+                                    <div class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold {{ $cfg['pill'] }}">
+                                        <span class="w-2 h-2 rounded-full {{ $cfg['dot'] }} mr-2"></span>
+                                        {{ $cfg['label'] }}
                                     </div>
-                                    {{-- TAMPILKAN NOMOR MEJA --}}
-                                    @if($order->no_meja)
-                                        <span class="meja-pill">Meja {{ $order->no_meja }}</span>
-                                    @else
-                                        <span class="meja-pill meja-pill-empty">Belum pilih meja</span>
+                                    <p class="text-xs text-stone-500">
+                                        {{ $cfg['desc'] }}
+                                    </p>
+                                </div>
+
+                                {{-- Total --}}
+                                <div>
+                                    <p class="text-[11px] uppercase tracking-[0.16em] text-stone-400">
+                                        Total
+                                    </p>
+                                    <p class="text-lg font-semibold text-emerald-700">
+                                        Rp {{ number_format($o->total_harga, 0, ',', '.') }}
+                                    </p>
+                                </div>
+
+                                {{-- Aksi --}}
+                                <div class="flex flex-wrap justify-end gap-2 text-sm">
+                                    <a href="{{ route('admin.orders.show', $o->id) }}"
+                                       class="inline-flex items-center px-3 py-1.5 rounded-xl border border-amber-200 text-amber-700 bg-amber-50 hover:bg-amber-100 transition">
+                                        Detail &amp; Cetak
+                                    </a>
+
+                                    @if($status === 'pending')
+                                        <form action="{{ route('admin.orders.updateStatus', $o->id) }}"
+                                              method="POST">
+                                            @csrf
+                                            @method('PATCH')
+                                            <input type="hidden" name="status" value="proses">
+                                            <button type="submit"
+                                                    class="inline-flex items-center px-3 py-1.5 rounded-xl bg-sky-500 text-white hover:bg-sky-600 transition">
+                                                Jadikan Proses
+                                            </button>
+                                        </form>
+                                    @elseif($status === 'proses')
+                                        <form action="{{ route('admin.orders.updateStatus', $o->id) }}"
+                                              method="POST">
+                                            @csrf
+                                            @method('PATCH')
+                                            <input type="hidden" name="status" value="selesai">
+                                            <button type="submit"
+                                                    class="inline-flex items-center px-3 py-1.5 rounded-xl bg-emerald-500 text-white hover:bg-emerald-600 transition">
+                                                Tandai Selesai
+                                            </button>
+                                        </form>
                                     @endif
                                 </div>
-                            </div>
-
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <div class="order-meta text-muted">
-                                    {{ $order->jumlah }} item<br>
-                                    <span class="fw-semibold text-dark">
-                                        Rp {{ number_format($order->total_harga, 0, ',', '.') }}
-                                    </span>
-                                </div>
-                                <div class="text-end">
-                                    <div class="pill-method mb-1">
-                                        {{ $metodeLabel }}
-                                    </div>
-                                    <div class="order-meta text-muted">
-                                        @if(in_array($status, ['paid','selesai']))
-                                            Lunas
-                                        @else
-                                            Menunggu pembayaran
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-
-                            {{-- FORM UBAH NOMOR MEJA UNTUK KASIR --}}
-                            <div class="mb-3">
-                                <form action="{{ route('admin.orders.updateStatus', $order) }}"
-                                      method="POST"
-                                      class="d-flex flex-wrap align-items-center gap-2">
-                                    @csrf
-                                    @method('PATCH')
-
-                                    {{-- pakai status yang sekarang supaya cuma ganti meja --}}
-                                    <input type="hidden" name="status" value="{{ $order->status }}">
-
-                                    <label class="small text-muted mb-0 me-1">Meja:</label>
-                                    <select name="no_meja" class="form-select form-select-sm w-auto">
-                                        <option value="">- pilih -</option>
-                                        @for ($i = 1; $i <= 10; $i++)
-                                            <option value="{{ $i }}" {{ $order->no_meja == $i ? 'selected' : '' }}>
-                                                Meja {{ $i }}
-                                            </option>
-                                        @endfor
-                                    </select>
-
-                                    <button type="submit" class="btn btn-sm btn-outline-primary">
-                                        Simpan
-                                    </button>
-                                </form>
-                            </div>
-
-                            {{-- TOMBOL UBAH STATUS --}}
-                            <div class="mb-3">
-                                @if ($status === 'pending')
-                                    <form action="{{ route('admin.orders.updateStatus', $order) }}"
-                                          method="POST"
-                                          class="d-inline">
-                                        @csrf
-                                        @method('PATCH')
-                                        <input type="hidden" name="status" value="proses">
-                                        {{-- kirim juga meja yang sudah terpilih supaya tidak hilang --}}
-                                        <input type="hidden" name="no_meja" value="{{ $order->no_meja }}">
-                                        <button type="submit"
-                                                class="btn btn-sm btn-warning">
-                                            Terima / Proses
-                                        </button>
-                                    </form>
-                                @elseif ($status === 'proses')
-                                    <form action="{{ route('admin.orders.updateStatus', $order) }}"
-                                          method="POST"
-                                          class="d-inline">
-                                        @csrf
-                                        @method('PATCH')
-                                        <input type="hidden" name="status" value="selesai">
-                                        <input type="hidden" name="no_meja" value="{{ $order->no_meja }}">
-                                        <button type="submit"
-                                                class="btn btn-sm btn-success">
-                                            Tandai Selesai
-                                        </button>
-                                    </form>
-                                @endif
-                            </div>
-
-                            <div class="d-flex justify-content-between align-items-center">
-                                <a href="{{ route('admin.orders.show', $order) }}"
-                                   class="btn btn-sm btn-outline-secondary">
-                                    Detail
-                                </a>
-
-                                <form action="{{ route('admin.orders.destroy', $order) }}"
-                                      method="POST"
-                                      onsubmit="return confirm('Hapus order #{{ $order->id }} ?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit"
-                                            class="btn btn-sm btn-outline-danger">
-                                        Hapus
-                                    </button>
-                                </form>
                             </div>
                         </div>
                     </div>
                 @endforeach
             </div>
 
+            {{-- Pagination --}}
             @if ($orders->hasPages())
-                <div class="mt-4 d-flex flex-wrap justify-content-between align-items-center gap-2">
-                    <div class="small text-muted">
-                        Menampilkan {{ $orders->firstItem() }}–{{ $orders->lastItem() }}
-                        dari {{ $orders->total() }} order
-                    </div>
-                    <div>
-                        {{ $orders->links() }}
-                    </div>
+                <div class="pt-4 border-t border-stone-200">
+                    {{ $orders->links() }}
                 </div>
             @endif
         @else
-            <div class="text-center py-5">
-                <h6 class="fw-semibold mb-1">Belum ada order masuk</h6>
-                <p class="text-muted small mb-2">
-                    Pesanan yang dibuat pelanggan akan muncul di sini dalam bentuk kartu.
+            {{-- Empty state --}}
+            <div class="mt-10 flex flex-col items-center justify-center text-center gap-3">
+                <div class="w-14 h-14 rounded-full bg-amber-50 border border-amber-100 flex items-center justify-center text-2xl">
+                    ☕
+                </div>
+                <p class="text-sm font-medium text-stone-700">Belum ada order yang tercatat.</p>
+                <p class="text-xs text-stone-500 max-w-xs">
+                    Pesanan baru yang masuk akan tampil di sini secara otomatis.
                 </p>
             </div>
         @endif

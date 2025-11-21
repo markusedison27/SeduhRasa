@@ -4,56 +4,139 @@
 @section('page-title','Tambah Menu')
 
 @section('content')
-<div class="max-w-3xl">
-  <section class="bg-white rounded-2xl shadow-soft border border-neutral-200">
-    <div class="p-6 border-b border-neutral-100">
-      <h2 class="text-lg font-semibold">Form Menu</h2>
-      <p class="text-sm text-neutral-500 mt-1">Lengkapi detail menu baru untuk menambah ke daftar.</p>
+<div class="max-w-4xl mx-auto">
+  {{-- HEADER HALAMAN --}}
+  <div class="mb-6 flex items-center justify-between gap-4">
+    <div>
+      <h2 class="text-xl font-semibold text-neutral-800">Tambah Menu Baru</h2>
+      <p class="text-sm text-neutral-500 mt-1">
+        Lengkapi detail menu untuk menambahkannya ke daftar menu kedai kopi kamu.
+      </p>
     </div>
 
-    <form class="p-6 space-y-5" action="{{ route('admin.menus.store') }}" method="POST" enctype="multipart/form-data">
+    <a href="{{ route('admin.menus.index') }}"
+       class="hidden sm:inline-flex items-center rounded-full border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50">
+      Kembali ke daftar
+    </a>
+  </div>
+
+  {{-- CARD FORM --}}
+  <section class="bg-white rounded-2xl shadow-soft border border-neutral-200">
+    <div class="px-6 py-4 border-b border-neutral-100">
+      <h3 class="text-base font-semibold text-neutral-800">Form Menu</h3>
+      <p class="text-xs sm:text-sm text-neutral-500 mt-1">
+        Pastikan informasi yang diisi sudah benar sebelum disimpan.
+      </p>
+    </div>
+
+    <form class="p-6 space-y-6" action="{{ route('admin.menus.store') }}" method="POST" enctype="multipart/form-data">
       @csrf
 
-      {{-- Nama Menu --}}
-      <div>
-        <label class="block text-sm font-medium text-neutral-700 mb-2">Nama Menu</label>
-        <input type="text" name="nama_menu" placeholder="Contoh: Es Kopi Susu"
-               class="w-full rounded-xl border-neutral-300 focus:border-brand-500 focus:ring-brand-500 placeholder:text-neutral-400"/>
-      </div>
+      {{-- GRID 2 KOLOM DI DESKTOP --}}
+      <div class="grid md:grid-cols-2 md:gap-6 gap-5">
+        {{-- Nama Menu --}}
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium text-neutral-700 mb-2">
+            Nama Menu <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            name="nama_menu"
+            value="{{ old('nama_menu') }}"
+            placeholder="Contoh: Es Kopi Susu Gula Aren"
+            class="w-full rounded-xl border border-neutral-300 focus:border-amber-500 focus:ring-amber-500 placeholder:text-neutral-400 text-sm px-3 py-2.5"
+          />
+          @error('nama_menu')
+            <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+          @enderror
+        </div>
 
-      {{-- Harga --}}
-      <div>
-        <label class="block text-sm font-medium text-neutral-700 mb-2">Harga</label>
-        <div class="relative">
-          <span class="absolute inset-y-0 left-0 grid place-items-center pl-4 pr-2 text-neutral-500">Rp</span>
-          <input type="number" name="harga" min="0" step="1000" placeholder="25000"
-                 class="w-full rounded-xl border-neutral-300 focus:border-brand-500 focus:ring-brand-500 pl-12 placeholder:text-neutral-400"/>
+        {{-- Harga --}}
+        <div>
+          <label class="block text-sm font-medium text-neutral-700 mb-2">
+            Harga <span class="text-red-500">*</span>
+          </label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 grid place-items-center pl-3 pr-1 text-neutral-500 text-sm">Rp</span>
+            <input
+              type="number"
+              name="harga"
+              min="0"
+              step="1000"
+              value="{{ old('harga') }}"
+              placeholder="15000"
+              class="w-full rounded-xl border border-neutral-300 focus:border-amber-500 focus:ring-amber-500 pl-10 placeholder:text-neutral-400 text-sm px-3 py-2.5"
+            />
+          </div>
+          @error('harga')
+            <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+          @enderror
+        </div>
+
+        {{-- Kategori --}}
+        <div>
+          <label class="block text-sm font-medium text-neutral-700 mb-2">
+            Kategori
+          </label>
+          <input
+            type="text"
+            name="kategori"
+            value="{{ old('kategori') }}"
+            placeholder="Coffee / Non Coffee / Snack"
+            class="w-full rounded-xl border border-neutral-300 focus:border-amber-500 focus:ring-amber-500 placeholder:text-neutral-400 text-sm px-3 py-2.5"
+          />
+          @error('kategori')
+            <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+          @enderror
+        </div>
+
+        {{-- Suhu --}}
+        <div>
+          <label class="block text-sm font-medium text-neutral-700 mb-2">
+            Suhu
+          </label>
+          <input
+            type="text"
+            name="suhu"
+            value="{{ old('suhu') }}"
+            placeholder="Hot / Ice"
+            class="w-full rounded-xl border border-neutral-300 focus:border-amber-500 focus:ring-amber-500 placeholder:text-neutral-400 text-sm px-3 py-2.5"
+          />
+          @error('suhu')
+            <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+          @enderror
         </div>
       </div>
 
-      {{-- Kategori --}}
+      {{-- Gambar --}}
       <div>
-        <label class="block text-sm font-medium text-neutral-700 mb-2">Kategori</label>
-        <input type="text" name="kategori" placeholder="Coffee / Non Coffee / Snack"
-               class="w-full rounded-xl border-neutral-300 focus:border-brand-500 focus:ring-brand-500 placeholder:text-neutral-400"/>
+        <label class="block text-sm font-medium text-neutral-700 mb-2">
+          Gambar Menu
+        </label>
+        <div class="flex items-center gap-3">
+          <label class="inline-flex items-center justify-center px-4 py-2.5 rounded-xl border border-neutral-300 text-sm font-medium text-neutral-700 bg-neutral-50 hover:bg-neutral-100 cursor-pointer">
+            Pilih File
+            <input type="file" name="gambar" class="hidden" />
+          </label>
+          <span class="text-xs text-neutral-400">
+            Format: JPG/PNG, sebaiknya rasio 1:1
+          </span>
+        </div>
+        @error('gambar')
+          <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+        @enderror
       </div>
 
-      {{-- Suhu --}}
-      <div>
-        <label class="block text-sm font-medium text-neutral-700 mb-2">Suhu</label>
-        <input type="text" name="suhu" placeholder="Hot / Ice"
-               class="w-full rounded-xl border-neutral-300 focus:border-brand-500 focus:ring-brand-500 placeholder:text-neutral-400"/>
-      </div>
-
-      {{-- Upload Gambar --}}
-      <div>
-        <label class="block text-sm font-medium text-neutral-700 mb-2">Gambar</label>
-        <input type="file" name="gambar" class="w-full"/>
-      </div>
-
+      {{-- TOMBOL --}}
       <div class="pt-2 flex flex-wrap gap-3">
-        <button type="submit" class="inline-flex items-center justify-center rounded-xl bg-brand-600 hover:bg-brand-700 text-white px-5 py-2.5 font-medium">Simpan</button>
-        <a href="{{ route('admin.menus.index') }}" class="inline-flex items-center justify-center rounded-xl border border-neutral-300 hover:bg-neutral-50 px-5 py-2.5 font-medium">Batal</a>
+        <button type="submit"
+          class="inline-flex items-center justify-center rounded-xl bg-amber-600 hover:bg-amber-700 text-white px-5 py-2.5 text-sm font-medium shadow-sm transition">
+          Simpan
+        </button>
+        <a href="{{ route('admin.menus.index') }}"
+          class="inline-flex items-center justify-center rounded-xl border border-neutral-300 hover:bg-neutral-50 px-5 py-2.5 text-sm font-medium text-neutral-700">
+          Batal
+        </a>
       </div>
     </form>
   </section>

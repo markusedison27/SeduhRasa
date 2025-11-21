@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
 use App\Http\Controllers\MenuController;
@@ -10,15 +9,13 @@ use App\Http\Controllers\PelangganController;
 use App\Http\Controllers\KaryawanController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\DashboardController;
-
-// controller baru untuk multi role
 use App\Http\Controllers\SuperAdminController;
 use App\Http\Controllers\OwnerController;
 use App\Http\Controllers\Auth\LoginController;
 
 /*
 |--------------------------------------------------------------------------
-| Public pages (tanpa login)
+| PUBLIC PAGES (TANPA LOGIN)
 |--------------------------------------------------------------------------
 */
 
@@ -32,22 +29,33 @@ Route::post('/contact', function (Request $request) {
 })->name('contact.submit');
 
 /*
- | Halaman form Data Pembeli (ada pilihan meja)
- | GET /order -> OrderController@create, return view('order')
+|--------------------------------------------------------------------------
+| MENU & ORDER PUBLIK (HALAMAN PELANGGAN)
+|--------------------------------------------------------------------------
+| /order   -> form data pelanggan (nama, no hp, email)
+| /menu    -> halaman menu (keranjang + checkout)
+| /orders  -> simpan order dari /menu + detail order
 */
-Route::get('/order', [OrderController::class, 'create'])->name('order');
 
+# 1. FORM DATA PELANGGAN (SEBELUM MASUK MENU)
+Route::get('/order', [OrderController::class, 'create'])->name('order');
+Route::post('/order', [OrderController::class, 'storeCustomerInfo'])->name('order.storeInfo');
+
+# 2. HALAMAN MENU UNTUK PELANGGAN
 Route::get('/menu', [MenuController::class, 'publicMenu'])->name('menu');
 
-/*
-|--------------------------------------------------------------------------
-| Public Orders (checkout dari halaman menu)
-|--------------------------------------------------------------------------
-*/
-
-Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+# 3. ORDER (DARI MENU)
+Route::get('/orders', [OrderController::class, 'index'])->name('orders.index'); // list riwayat (kalau dipakai)
 Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
 Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+
+# 4. CEK STATUS ORDER (UNTUK NOTIF PELANGGAN VIA AJAX)
+Route::get('/orders/{order}/status-json', [OrderController::class, 'statusJson'])
+    ->name('orders.statusJson');
+
+# 5. HALAMAN SUKSES UNTUK PEMBELI (TAMPILAN "PESANAN BERHASIL")
+Route::get('/pesanan/{order}/berhasil', [OrderController::class, 'showCustomer'])
+    ->name('customer.orders.show');
 
 /*
 |--------------------------------------------------------------------------
@@ -55,13 +63,9 @@ Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.sh
 |--------------------------------------------------------------------------
 */
 
-// tampilkan form login
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-
-// proses login
 Route::post('/login', [LoginController::class, 'login'])->name('login.post');
 
-// logout
 Route::post('/logout', [LoginController::class, 'logout'])
     ->middleware('auth')
     ->name('logout');
@@ -71,7 +75,9 @@ Route::post('/logout', [LoginController::class, 'logout'])
 | SUPER ADMIN
 |--------------------------------------------------------------------------
 */
+
 Route::middleware(['auth', 'role:super_admin'])->group(function () {
+
     Route::get('/super-admin/dashboard', [SuperAdminController::class, 'index'])
         ->name('super.dashboard');
 
@@ -79,7 +85,7 @@ Route::middleware(['auth', 'role:super_admin'])->group(function () {
     Route::get('/super-admin/owners', [SuperAdminController::class, 'ownersIndex'])
         ->name('super.owners.index');
 
-    // TIDAK pakai halaman create terpisah, redirect balik ke index
+    // tidak pakai halaman create terpisah, redirect balik ke index
     Route::get('/super-admin/owners/create', function () {
         return redirect()->route('super.owners.index');
     })->name('super.owners.create');
@@ -93,12 +99,12 @@ Route::middleware(['auth', 'role:super_admin'])->group(function () {
 | OWNER
 |--------------------------------------------------------------------------
 */
+
 Route::middleware(['auth', 'role:owner'])->group(function () {
-    // dashboard owner
+
     Route::get('/owner/dashboard', [OwnerController::class, 'index'])
         ->name('owner.dashboard');
 
-    // halaman keuangan (pemasukan & pengeluaran)
     Route::get('/owner/finance', [OwnerController::class, 'finance'])
         ->name('owner.finance');
 
@@ -115,9 +121,10 @@ Route::middleware(['auth', 'role:owner'])->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| STAFF / KARYAWAN
+| STAFF / KARYAWAN (KASIR)
 |--------------------------------------------------------------------------
 */
+
 Route::middleware(['auth', 'role:staff'])->group(function () {
 
     // dashboard kasir/staff
@@ -126,12 +133,16 @@ Route::middleware(['auth', 'role:staff'])->group(function () {
 
     // area admin untuk kasir
     Route::prefix('admin')->name('admin.')->group(function () {
+
         Route::resource('menus', MenuController::class);
         Route::resource('transaksi', TransaksiController::class);
         Route::resource('pelanggan', PelangganController::class);
         Route::resource('karyawan', KaryawanController::class);
-        Route::resource('orders', OrderController::class);
 
+        // admin.orders.*  (index, show, destroy)
+        Route::resource('orders', OrderController::class)->only(['index', 'show', 'destroy']);
+
+        // ubah status order (Pending / Proses / Selesai / Batal)
         Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus'])
             ->name('orders.updateStatus');
     });
@@ -142,4 +153,5 @@ Route::middleware(['auth', 'role:staff'])->group(function () {
 | UTILITIES
 |--------------------------------------------------------------------------
 */
+
 Route::get('/ping', fn () => 'PONG from ' . base_path());

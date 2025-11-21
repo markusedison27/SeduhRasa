@@ -9,18 +9,50 @@ class OrderController extends Controller
 {
     /*
     |--------------------------------------------------------------------------
-    | PUBLIC (checkout dari halaman menu)
+    | FLOW SEBELUM MASUK MENU
     |--------------------------------------------------------------------------
+    | /order (GET & POST)
     */
 
-    // GET /order -> route('order')
-    // Tampilkan halaman form "Data Pembeli" (kalau kamu pakai view order.blade.php)
+    // GET /order -> form data pelanggan
     public function create()
     {
-        return view('order');
+        // SELALU kosong (supaya tiap pesan ulang harus isi lagi)
+        $customer = [
+            'name'  => null,
+            'phone' => null,
+            'email' => null,
+        ];
+
+        return view('order', compact('customer'));
     }
 
-    // POST /orders  -> route('orders.store')
+    // POST /order -> simpan data pelanggan ke session lalu redirect ke /menu
+    public function storeCustomerInfo(Request $request)
+    {
+        $data = $request->validate([
+            'name'  => 'required|string|max:100',
+            'phone' => 'required|string|max:30',
+            'email' => 'nullable|email|max:100',
+        ]);
+
+        // disimpan untuk dipakai di /menu saat checkout
+        session([
+            'customer.name'  => $data['name'],
+            'customer.phone' => $data['phone'],
+            'customer.email' => $data['email'] ?? null,
+        ]);
+
+        return redirect()->route('menu');
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | PUBLIC (checkout dari halaman menu)
+    |--------------------------------------------------------------------------
+    | POST /orders -> route('orders.store')
+    */
+
     public function store(Request $request)
     {
         // Validasi ringan (no_meja optional)
@@ -30,12 +62,31 @@ class OrderController extends Controller
             'no_meja'           => 'nullable|string|max:10',
         ]);
 
-        // items dikirim dari JS (menu.blade.php) sebagai JSON string
-        $raw   = $request->input('items');
-        $items = json_decode($raw, true);
+        /*
+         * AMBIL ITEMS
+         * Bisa datang dalam 2 bentuk:
+         * 1) String JSON: "[{...},{...}]"
+         * 2) Langsung array: [{...},{...}]
+         */
+        $rawItems = $request->input('items');
+
+        if (is_array($rawItems)) {
+            $items = $rawItems;
+        } else {
+            // anggap string JSON
+            $items = json_decode($rawItems, true);
+        }
 
         if (!$items || !is_array($items) || count($items) === 0) {
-            return back()->with('error', 'Keranjang masih kosong.')->withInput();
+
+            $msg = 'Keranjang masih kosong atau data item tidak valid.';
+
+            // kalau request dari fetch() (JSON), balas JSON biar kelihatan errornya
+            if ($request->wantsJson()) {
+                return response()->json(['message' => $msg], 422);
+            }
+
+            return back()->with('error', $msg)->withInput();
         }
 
         $totalQty   = 0;
@@ -44,7 +95,7 @@ class OrderController extends Controller
 
         foreach ($items as $item) {
             $name  = $item['name']  ?? null;
-            $qty   = (int)($item['qty'] ?? 1);
+            $qty   = (int)($item['qty']   ?? 1);
             $price = (int)($item['price'] ?? 0);
 
             if (!$name || $qty <= 0 || $price < 0) {
@@ -54,18 +105,26 @@ class OrderController extends Controller
             $totalQty   += $qty;
             $totalHarga += $qty * $price;
 
-            // contoh format: "Americano x2"
+            // contoh: "Americano x2"
             $listMenu[] = $name . ' x' . $qty;
         }
 
         if ($totalQty === 0 || $totalHarga <= 0) {
-            return back()->with('error', 'Keranjang tidak valid.')->withInput();
+
+            $msg = 'Keranjang tidak valid.';
+
+            if ($request->wantsJson()) {
+                return response()->json(['message' => $msg], 422);
+            }
+
+            return back()->with('error', $msg)->withInput();
         }
 
-        // nama_pelanggan dikirim dari menu.blade (bukan customer_name lagi)
-        $namaPelanggan = $request->input('nama_pelanggan') ?: 'Umum';
+        // nama_pelanggan dikirim dari menu.blade atau fallback dari session
+        $namaPelanggan = $request->input('nama_pelanggan')
+            ?: session('customer.name', 'Umum');
 
-        // metode pembayaran: "cod" atau "transfer"
+        // metode pembayaran: "cod" / "dana" / "transfer"
         $metodePembayaran = $request->input('metode_pembayaran', 'cod');
 
         // nomor meja (boleh kosong)
@@ -73,7 +132,7 @@ class OrderController extends Controller
 
         $menuDipesan = implode(', ', $listMenu);
 
-        // Simpan ke tabel orders sesuai struktur DB kamu
+        // Simpan ke tabel orders
         $order = Order::create([
             'nama_pelanggan'    => $namaPelanggan,
             'menu_dipesan'      => $menuDipesan,
@@ -81,20 +140,45 @@ class OrderController extends Controller
             'total_harga'       => $totalHarga,
             'status'            => 'pending',          // awalnya pending
             'metode_pembayaran' => $metodePembayaran,
-            'no_meja'           => $noMeja,            // <-- simpan nomor meja
+            'no_meja'           => $noMeja,
         ]);
 
-        // Redirect ke halaman detail pesanan (pembeli)
+        // Kalau dari fetch() (JSON), balas JSON berisi id order
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'Pesanan berhasil dibuat.',
+                'order_id' => $order->id,
+                'redirect_url' => route('customer.orders.show', $order->id),
+            ], 201);
+        }
+
+        // Kalau request biasa (form), redirect ke halaman sukses
         return redirect()
-            ->route('orders.show', $order->id)
-            ->with('success', 'Pesanan berhasil dibuat! Kami akan segera memproses pesanan kamu.');
+            ->route('customer.orders.show', $order->id)
+            ->with('success', 'Pesanan berhasil dibuat! Simpan nomor pesanan Anda.');
     }
 
-    // GET /orders/{order}  -> route('orders.show') (HALAMAN PEMBELI)
+    // GET /orders/{order}
     public function show(Order $order)
     {
         return view('orders.show', [
             'order' => $order,
+        ]);
+    }
+
+    // GET /pesanan/{order}/berhasil
+    public function showCustomer(Order $order)
+    {
+        return view('frontend.order-success', [
+            'order' => $order,
+        ]);
+    }
+
+    // GET /orders/{order}/status-json
+    public function statusJson(Order $order)
+    {
+        return response()->json([
+            'status' => $order->status,
         ]);
     }
 
@@ -104,7 +188,6 @@ class OrderController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    // GET /admin/orders  -> admin.orders.index
     public function index()
     {
         $orders = Order::latest()->paginate(15);
@@ -116,7 +199,6 @@ class OrderController extends Controller
         return view('orders.index', compact('orders'));
     }
 
-    // GET /admin/orders/{order} -> admin.orders.show
     public function adminShow(Order $order)
     {
         if (view()->exists('admin.orders.show')) {
@@ -126,22 +208,24 @@ class OrderController extends Controller
         return view('orders.show', compact('order'));
     }
 
-    // PATCH /admin/orders/{order}/status -> admin.orders.updateStatus
     public function updateStatus(Request $request, Order $order)
     {
-        // status yang diizinkan
-        $request->validate([
-            'status' => 'required|in:pending,proses,selesai,batal',
+        $data = $request->validate([
+            'status'  => 'required|in:pending,proses,selesai,batal',
+            'no_meja' => 'nullable|string|max:10',
         ]);
 
-        $order->update([
-            'status' => $request->status,
-        ]);
+        $order->status = $data['status'];
+
+        if (array_key_exists('no_meja', $data)) {
+            $order->no_meja = $data['no_meja'];
+        }
+
+        $order->save();
 
         return back()->with('success', 'Status order berhasil diperbarui.');
     }
 
-    // DELETE /admin/orders/{order} -> admin.orders.destroy
     public function destroy(Order $order)
     {
         $order->delete();

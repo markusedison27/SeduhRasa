@@ -1,439 +1,230 @@
-{{-- resources/views/dashboard.blade.php --}}
-<!DOCTYPE html>
-<html lang="id">
+@extends('layouts.app')
 
-<head>
-    <meta charset="UTF-8">
-    <title>Dashboard Kedai Kopi • SeduhRasa</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <p style="margin-top: 4px; font-size: 14px; color:#6b7280;">
-        Pesanan yang belum diproses:
-        <strong style="color:#b45309;">{{ $pendingCount }} order</strong>
-    </p>
+@section('title', 'Dashboard Kedai Kopi • SeduhRasa')
+@section('page-title', 'Dashboard Kedai Kopi')
 
-    {{-- kalau di layout lain kamu pakai Vite/Tailwind, boleh aktifkan ini --}}
-    {{-- @vite(['resources/css/app.css', 'resources/js/app.js']) --}}
+@push('styles')
+<style>
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes scaleIn {
+        from { transform: scale(0.95); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+    }
+    
+    .stat-card { 
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+        animation: scaleIn 0.4s ease-out;
+    }
+    .stat-card:hover { 
+        transform: translateY(-4px); 
+        box-shadow: 0 20px 40px rgba(123, 63, 0, 0.15); 
+    }
+    .stat-card:nth-child(2) { animation-delay: 0.1s; }
+    .stat-card:nth-child(3) { animation-delay: 0.2s; }
 
-    <style>
-        :root {
-            --bg: #f5f3f0;
-            --card: #ffffff;
-            --accent: #fbbf24;
-            --accent-soft: #fef3c7;
-            --green: #16a34a;
-            --red: #ef4444;
-            --text: #111827;
-            --muted: #6b7280;
-            --border: #e5e7eb;
-            --espresso: #3b2f2f;
-        }
+    .animate-fade-in-up { 
+        animation: fadeInUp 0.6s ease-out; 
+    }
+</style>
+@endpush
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0
-        }
-
-        body {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-            display: flex;
-        }
-
-        .sidebar {
-            width: 230px;
-            background: #fff;
-            border-right: 1px solid var(--border);
-            padding: 1.5rem 1.25rem;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: .6rem;
-            margin-bottom: 1.75rem;
-        }
-
-        .brand-logo {
-            width: 34px;
-            height: 34px;
-            border-radius: 999px;
-            background: #f97316;
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: .95rem;
-        }
-
-        .nav-title {
-            font-size: .75rem;
-            text-transform: uppercase;
-            color: var(--muted);
-            letter-spacing: .08em;
-            margin: .9rem 0 .3rem;
-        }
-
-        .nav-link {
-            display: flex;
-            align-items: center;
-            gap: .6rem;
-            padding: .55rem .75rem;
-            border-radius: 999px;
-            font-size: .9rem;
-            color: var(--muted);
-            text-decoration: none;
-            margin-bottom: .1rem;
-        }
-
-        .nav-link.active {
-            background: #fef3c7;
-            color: var(--espresso);
-            font-weight: 600;
-        }
-
-        .nav-link span.icon {
-            width: 16px;
-            height: 16px;
-            border-radius: 4px;
-            border: 1px solid #facc15;
-        }
-
-        .main {
-            flex: 1;
-            padding: 1.5rem 2rem 2.25rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        .main-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .cards {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 1rem;
-        }
-
-        .card {
-            background: var(--card);
-            border-radius: 18px;
-            padding: 1.2rem 1.4rem;
-            box-shadow: 0 10px 25px rgba(15, 23, 42, .08);
-            border: 1px solid rgba(0, 0, 0, .02);
-        }
-
-        .card-label {
-            font-size: .78rem;
-            font-weight: 600;
-            color: var(--muted);
-            text-transform: uppercase;
-            letter-spacing: .08em;
-        }
-
-        .card-value {
-            font-size: 1.7rem;
-            margin: .3rem 0;
-        }
-
-        .card-note {
-            font-size: .78rem;
-            color: var(--muted);
-        }
-
-        .card-value.red {
-            color: var(--red);
-        }
-
-        .table-card {
-            background: var(--card);
-            border-radius: 18px;
-            padding: 1.5rem 1.4rem;
-            box-shadow: 0 10px 25px rgba(15, 23, 42, .06);
-            border: 1px solid rgba(0, 0, 0, .02);
-        }
-
-        .table-head {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: .8rem;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: .86rem;
-        }
-
-        th,
-        td {
-            padding: .55rem .4rem;
-            text-align: left;
-            border-bottom: 1px solid var(--border);
-        }
-
-        th {
-            font-size: .75rem;
-            text-transform: uppercase;
-            letter-spacing: .06em;
-            color: var(--muted);
-        }
-
-        .badge-type {
-            display: inline-flex;
-            padding: .15rem .6rem;
-            border-radius: 999px;
-            font-size: .75rem;
-        }
-
-        .badge-penjualan {
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        .badge-pengeluaran {
-            background: #fee2e2;
-            color: #b91c1c;
-        }
-
-        .amount-green {
-            color: var(--green);
-            font-weight: 600;
-        }
-
-        .amount-red {
-            color: var(--red);
-            font-weight: 600;
-        }
-
-        .status-pill {
-            display: inline-flex;
-            padding: .1rem .55rem;
-            border-radius: 999px;
-            font-size: .75rem;
-        }
-
-        .status-pending {
-            background: #fef3c7;
-            color: #92400e;
-        }
-
-        .status-selesai {
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        .status-batal {
-            background: #fee2e2;
-            color: #b91c1c;
-        }
-
-        .logout-btn {
-            margin-top: auto;
-            padding: .5rem .75rem;
-            border-radius: 999px;
-            border: 1px solid #fecaca;
-            color: #b91c1c;
-            background: #fef2f2;
-            text-align: center;
-            font-size: .9rem;
-            text-decoration: none;
-        }
-
-        @media(max-width:960px) {
-            body {
-                flex-direction: column;
-            }
-
-            .sidebar {
-                width: 100%;
-                flex-direction: row;
-                align-items: center;
-                justify-content: space-between;
-            }
-
-            .main {
-                padding: 1rem;
-            }
-
-            .cards {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
-</head>
-
-<body>
-    {{-- SIDEBAR --}}
-    <aside class="sidebar">
-        <div>
-            <div class="brand">
-                <div class="brand-logo">SR</div>
-                <div>
-                    <div style="font-weight:700;font-size:.95rem;">SeduhRasa</div>
-                    <div style="font-size:.78rem;color:var(--muted);">Panel Kasir</div>
+@section('content')
+    <div class="space-y-6">
+        {{-- Alert Banner --}}
+        <div class="animate-fade-in-up bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-4 shadow-sm">
+            <div class="flex items-center gap-3">
+                <div class="flex-shrink-0">
+                    <div class="h-10 w-10 rounded-xl bg-amber-500 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
                 </div>
-            </div>
-
-            <div>
-                <div class="nav-title">Navigasi</div>
-                <a href="{{ route('staff.dashboard') }}" class="nav-link active">
-                    <span class="icon"></span>
-                    <span>Dashboard</span>
-                </a>
-            </div>
-
-            <div>
-                <div class="nav-title">Manajemen Data</div>
-                <a href="{{ route('admin.menus.index') }}" class="nav-link">
-                    <span class="icon"></span>
-                    <span>Menu</span>
-                </a>
-                <a href="{{ route('admin.transaksi.index') }}" class="nav-link">
-                    <span class="icon"></span>
-                    <span>Transaksi</span>
-                </a>
-                <a href="{{ route('admin.pelanggan.index') }}" class="nav-link">
-                    <span class="icon"></span>
-                    <span>Pelanggan</span>
-                </a>
-                <a href="{{ route('admin.karyawan.index') }}" class="nav-link">
-                    <span class="icon"></span>
-                    <span>Karyawan</span>
-                </a>
-                <a href="{{ route('admin.orders.index') }}" class="nav-link">
-                    <span class="icon"></span>
-                    <span>Order</span>
+                <div class="flex-1">
+                    <p class="text-sm font-medium text-amber-900">Pesanan yang belum diproses</p>
+                    <p class="text-xs text-amber-700">Segera proses <strong>{{ $pendingCount }} order</strong> yang sedang pending</p>
+                </div>
+                <a href="{{ route('admin.orders.index') }}" 
+                   class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium rounded-xl transition-colors">
+                    Lihat Sekarang
                 </a>
             </div>
         </div>
 
-        <form method="POST" action="{{ route('logout') }}">
-            @csrf
-            <button type="submit" class="logout-btn">Logout</button>
-        </form>
-    </aside>
-
-    {{-- MAIN --}}
-    <main class="main">
-        <div class="main-header">
-            <div>
-                <h1 style="font-size:1.4rem;font-weight:600;">Dashboard Kedai Kopi</h1>
-                <p style="font-size:.86rem;color:var(--muted);margin-top:.15rem;">
-                    Ringkasan penjualan dan pesanan yang masuk hari ini.
-                </p>
+        {{-- Stats Cards --}}
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {{-- Total Penjualan Hari Ini --}}
+            <div class="stat-card bg-gradient-to-br from-white to-green-50 rounded-2xl p-6 border border-green-100 shadow-lg">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="p-3 bg-green-500 rounded-xl shadow-lg">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <span class="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-lg">
+                        Hari Ini
+                    </span>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-stone-500 mb-1">Total Penjualan Hari Ini</p>
+                    <p class="text-3xl font-bold text-stone-800 mb-2">Rp {{ number_format($totalPenjualanHariIni, 0, ',', '.') }}</p>
+                    <p class="text-xs text-stone-500">Berdasarkan order yang tercatat hari ini</p>
+                </div>
             </div>
-            <div style="font-size:.85rem;color:var(--muted);">
-                {{ now()->format('d M Y') }}
+
+            {{-- Total Pesanan Bulan Ini --}}
+            <div class="stat-card bg-gradient-to-br from-white to-blue-50 rounded-2xl p-6 border border-blue-100 shadow-lg">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="p-3 bg-blue-500 rounded-xl shadow-lg">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                        </svg>
+                    </div>
+                    <span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-lg">
+                        Bulan Ini
+                    </span>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-stone-500 mb-1">Total Pesanan Bulan Ini</p>
+                    <p class="text-3xl font-bold text-stone-800 mb-2">{{ $totalPesananBulanIni }}</p>
+                    <p class="text-xs text-stone-500">Jumlah semua order yang masuk bulan ini</p>
+                </div>
+            </div>
+
+            {{-- Pengeluaran Operasional --}}
+            <div class="stat-card bg-gradient-to-br from-white to-red-50 rounded-2xl p-6 border border-red-100 shadow-lg">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="p-3 bg-red-500 rounded-xl shadow-lg">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"/>
+                        </svg>
+                    </div>
+                    <span class="px-2 py-1 bg-red-100 text-red-700 text-xs font-medium rounded-lg">
+                        Operasional
+                    </span>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-stone-500 mb-1">Pengeluaran Operasional</p>
+                    <p class="text-3xl font-bold text-red-600 mb-2">Rp {{ number_format($pengeluaranOperasional, 0, ',', '.') }}</p>
+                    <p class="text-xs text-stone-500">Termasuk bahan baku & operasional</p>
+                </div>
             </div>
         </div>
 
-        {{-- KARTU RINGKASAN --}}
-        <section class="cards">
-            <div class="card">
-                <div class="card-label">Total Penjualan Hari Ini</div>
-                <div class="card-value">
-                    Rp {{ number_format($totalPenjualanHariIni, 0, ',', '.') }}
-                </div>
-                <div class="card-note">Berdasarkan order yang tercatat hari ini.</div>
-            </div>
-
-            <div class="card">
-                <div class="card-label">Total Pesanan Bulan Ini</div>
-                <div class="card-value">
-                    {{ $totalPesananBulanIni }}
-                </div>
-                <div class="card-note">Jumlah semua order yang masuk bulan ini.</div>
-            </div>
-
-            <div class="card">
-                <div class="card-label">Pengeluaran Operasional</div>
-                <div class="card-value red">
-                    Rp {{ number_format($pengeluaranOperasional, 0, ',', '.') }}
-                </div>
-                <div class="card-note">Termasuk bahan baku & operasional (bisa dihubungkan ke tabel lain).</div>
-            </div>
-        </section>
-
-        {{-- TABEL PESANAN TERBARU --}}
-        <section class="table-card">
-            <div class="table-head">
+        {{-- Recent Orders Table --}}
+        <div class="animate-fade-in-up bg-white rounded-2xl shadow-lg border border-stone-200 overflow-hidden">
+            <div class="px-6 py-5 border-b border-stone-200 flex items-center justify-between">
                 <div>
-                    <div style="font-weight:600;font-size:.95rem;">Pesanan Terbaru</div>
-                    <div style="font-size:.8rem;color:var(--muted);">Order yang terakhir masuk dari halaman menu.</div>
+                    <h3 class="text-lg font-bold text-stone-800 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                        </svg>
+                        Pesanan Terbaru
+                    </h3>
+                    <p class="text-sm text-stone-500">Order yang terakhir masuk dari halaman menu</p>
                 </div>
-                <a href="{{ route('admin.orders.index') }}"
-                    style="font-size:.8rem;color:#f97316;text-decoration:none;">
+                <a href="{{ route('admin.orders.index') }}" 
+                   class="px-4 py-2 bg-[#7B3F00] hover:bg-[#8B4513] text-white text-sm font-medium rounded-xl transition-colors flex items-center gap-2">
                     Lihat Semua
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                    </svg>
                 </a>
             </div>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th>Tanggal</th>
-                        <th>Deskripsi</th>
-                        <th>Meja</th> {{-- kolom meja --}}
-                        <th>Status</th>
-                        <th>Jumlah</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($pesananTerbaru as $order)
+            
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-stone-50">
                         <tr>
-                            <td>{{ $order->created_at->format('Y-m-d H:i') }}</td>
-                            <td>{{ $order->menu_dipesan }}</td>
-
-                            {{-- MEJA --}}
-                            <td>
-                                @if($order->no_meja)
-                                    Meja {{ $order->no_meja }}
-                                @else
-                                    -
-                                @endif
-                            </td>
-
-                            <td>
-                                @php $status = strtolower($order->status); @endphp
-                                @if ($status === 'selesai')
-                                    <span class="status-pill status-selesai">Selesai</span>
-                                @elseif($status === 'batal')
-                                    <span class="status-pill status-batal">Batal</span>
-                                @else
-                                    <span class="status-pill status-pending">Pending</span>
-                                @endif
-                            </td>
-                            <td class="amount-green">
-                                Rp {{ number_format($order->total_harga, 0, ',', '.') }}
-                            </td>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-stone-500 uppercase tracking-wider">Tanggal</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-stone-500 uppercase tracking-wider">Deskripsi</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-stone-500 uppercase tracking-wider">Meja</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-stone-500 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-right text-xs font-semibold text-stone-500 uppercase tracking-wider">Jumlah</th>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="5" style="text-align:center;color:var(--muted);padding:.8rem 0;">
-                                Belum ada pesanan.
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </section>
-    </main>
-    <script>
-        // refresh dashboard tiap 15 detik biar kasir nggak perlu klik reload
-        setInterval(function() {
-            window.location.reload();
-        }, 15000); // 15000 ms = 15 detik
-    </script>
+                    </thead>
+                    <tbody class="divide-y divide-stone-100">
+                        @forelse($pesananTerbaru as $order)
+                            <tr class="hover:bg-stone-50 transition-colors">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-stone-600">
+                                    {{ $order->created_at->format('Y-m-d H:i') }}
+                                </td>
+                                <td class="px-6 py-4 text-sm text-stone-800 font-medium">
+                                    {{ $order->menu_dipesan }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-stone-600">
+                                    @if($order->no_meja)
+                                        <span class="inline-flex items-center gap-1">
+                                            <svg class="w-4 h-4 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21h18M3 10h18M5 6l7-4 7 4M4 10h16v11H4V10z"/>
+                                            </svg>
+                                            Meja {{ $order->no_meja }}
+                                        </span>
+                                    @else
+                                        <span class="text-stone-400">-</span>
+                                    @endif
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    @php $status = strtolower($order->status); @endphp
+                                    
+                                    @if ($status === 'selesai')
+                                        <span class="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
+                                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                            </svg>
+                                            Selesai
+                                        </span>
+                                    @elseif($status === 'batal')
+                                        <span class="inline-flex items-center px-3 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">
+                                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                            </svg>
+                                            Batal
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center px-3 py-1 bg-amber-100 text-amber-800 text-xs font-medium rounded-full">
+                                            <svg class="w-3 h-3 mr-1 animate-spin" fill="none" viewBox="0 0 24 24">
+                                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                            </svg>
+                                            Pending
+                                        </span>
+                                    @endif
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-semibold text-green-600">
+                                    Rp {{ number_format($order->total_harga, 0, ',', '.') }}
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="px-6 py-12 text-center">
+                                    <div class="flex flex-col items-center gap-3">
+                                        <svg class="w-16 h-16 text-stone-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+                                        </svg>
+                                        <div>
+                                            <p class="text-sm font-medium text-stone-600">Belum ada pesanan</p>
+                                            <p class="text-xs text-stone-400">Pesanan akan muncul di sini</p>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+@endsection
 
-</body>
-
-</html>
+@push('scripts')
+<script>
+    // Auto refresh setiap 15 detik
+    setInterval(function () {
+        window.location.reload();
+    }, 15000);
+</script>
+@endpush
