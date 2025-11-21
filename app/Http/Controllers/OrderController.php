@@ -146,8 +146,8 @@ class OrderController extends Controller
         // Kalau dari fetch() (JSON), balas JSON berisi id order
         if ($request->wantsJson()) {
             return response()->json([
-                'message' => 'Pesanan berhasil dibuat.',
-                'order_id' => $order->id,
+                'message'      => 'Pesanan berhasil dibuat.',
+                'order_id'     => $order->id,
                 'redirect_url' => route('customer.orders.show', $order->id),
             ], 201);
         }
@@ -179,6 +179,29 @@ class OrderController extends Controller
     {
         return response()->json([
             'status' => $order->status,
+        ]);
+    }
+
+    // GET /notifications/orders  (dipakai ikon lonceng)
+    public function notificationsJson()
+    {
+        // semua order pending terbaru dijadikan "notifikasi"
+        $orders = Order::where('status', 'pending')
+            ->latest()
+            ->take(10)
+            ->get(['id', 'nama_pelanggan', 'created_at']);
+
+        return response()->json([
+            'count' => $orders->count(),
+            'items' => $orders->map(function ($order) {
+                return [
+                    'id'       => $order->id,
+                    'title'    => 'Pesanan pending #' . $order->id,
+                    'subtitle' => $order->nama_pelanggan ?: 'Pelanggan',
+                    'time'     => $order->created_at->diffForHumans(),
+                    'url'      => route('admin.orders.show', $order->id),
+                ];
+            }),
         ]);
     }
 

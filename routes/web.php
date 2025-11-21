@@ -72,6 +72,16 @@ Route::post('/logout', [LoginController::class, 'logout'])
 
 /*
 |--------------------------------------------------------------------------
+| NOTIFIKASI (UNTUK HEADER LONCENG)
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth'])->group(function () {
+    Route::get('/notifications/orders', [OrderController::class, 'notificationsJson'])
+        ->name('notifications.orders');
+});
+
+/*
+|--------------------------------------------------------------------------
 | SUPER ADMIN
 |--------------------------------------------------------------------------
 */

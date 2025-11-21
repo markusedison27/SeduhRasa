@@ -268,12 +268,56 @@
           </div>
 
           <div class="flex items-center gap-3">
-            <button class="relative p-2 rounded-xl hover:bg-stone-100 transition-colors">
-              <svg class="w-6 h-6 text-stone-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-              </svg>
-              <span class="absolute top-1.5 right-1.5 h-2 w-2 bg-red-500 rounded-full"></span>
-            </button>
+            {{-- Notifikasi Order --}}
+            <div class="relative" id="notif-wrapper">
+              <button
+                  id="notif-button"
+                  type="button"
+                  class="relative p-2 rounded-xl hover:bg-stone-100 transition-colors"
+              >
+                  <svg class="w-6 h-6 text-stone-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                  </svg>
+
+                  {{-- titik merah (kalau ada pending) --}}
+                  <span id="notif-dot"
+                        class="hidden absolute top-1.5 right-1.5 h-2 w-2 bg-red-500 rounded-full"></span>
+              </button>
+
+              {{-- Dropdown notifikasi --}}
+              <div
+                  id="notif-dropdown"
+                  class="hidden absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-stone-200 z-40"
+              >
+                  <div class="px-4 py-3 border-b border-stone-100 flex items-center justify-between">
+                      <div>
+                          <p class="text-sm font-semibold text-stone-800">Notifikasi Pesanan</p>
+                          <p class="text-xs text-stone-500">Order pending terbaru</p>
+                      </div>
+                      <button
+                          type="button"
+                          id="notif-refresh"
+                          class="text-xs text-amber-600 hover:text-amber-700 font-medium"
+                      >
+                          Refresh
+                      </button>
+                  </div>
+
+                  <div id="notif-list" class="max-h-80 overflow-y-auto divide-y divide-stone-100">
+                      <div class="px-4 py-3 text-xs text-stone-500">
+                          Memuat notifikasi...
+                      </div>
+                  </div>
+
+                  <div class="px-4 py-2 border-t border-stone-100 text-center">
+                      <a href="{{ route('admin.orders.index') }}"
+                         class="text-xs text-amber-600 hover:text-amber-700 font-medium">
+                          Lihat semua order
+                      </a>
+                  </div>
+              </div>
+            </div>
             
             <div class="hidden sm:flex items-center gap-3 pl-3 border-l border-stone-200">
               <div class="text-right">
@@ -315,6 +359,109 @@
         backdrop.classList.add('hidden');
       }
     }
+
+    // === Notifikasi lonceng ===
+    document.addEventListener('DOMContentLoaded', () => {
+      const notifWrapper = document.getElementById('notif-wrapper');
+      const notifBtn     = document.getElementById('notif-button');
+      const notifDrop    = document.getElementById('notif-dropdown');
+      const notifDot     = document.getElementById('notif-dot');
+      const notifList    = document.getElementById('notif-list');
+      const notifRefresh = document.getElementById('notif-refresh');
+
+      if (!notifWrapper || !notifBtn || !notifDrop || !notifList) {
+        return;
+      }
+
+      const notifUrl = "{{ route('notifications.orders') }}";
+
+      function toggleDropdown() {
+        notifDrop.classList.toggle('hidden');
+      }
+
+      function closeDropdown() {
+        if (!notifDrop.classList.contains('hidden')) {
+          notifDrop.classList.add('hidden');
+        }
+      }
+
+      notifBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleDropdown();
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!notifWrapper.contains(e.target)) {
+          closeDropdown();
+        }
+      });
+
+      function renderNotifications(data) {
+        // update titik merah
+        if (data.count > 0) {
+          notifDot.classList.remove('hidden');
+        } else {
+          notifDot.classList.add('hidden');
+        }
+
+        if (!data.items || data.items.length === 0) {
+          notifList.innerHTML = `
+            <div class="px-4 py-3 text-xs text-stone-500">
+              Tidak ada order pending.
+            </div>
+          `;
+          return;
+        }
+
+        let html = '';
+        data.items.forEach(item => {
+          html += `
+            <a href="${item.url}"
+               class="block px-4 py-3 hover:bg-stone-50 text-sm">
+              <div class="font-semibold text-stone-800">${item.title}</div>
+              <div class="text-xs text-stone-500">${item.subtitle}</div>
+              <div class="text-[11px] text-stone-400 mt-0.5">${item.time}</div>
+            </a>
+          `;
+        });
+
+        notifList.innerHTML = html;
+      }
+
+      function loadNotifications() {
+        notifList.innerHTML = `
+          <div class="px-4 py-3 text-xs text-stone-500">
+            Memuat notifikasi...
+          </div>
+        `;
+
+        fetch(notifUrl)
+          .then(res => res.json())
+          .then(data => {
+            renderNotifications(data);
+          })
+          .catch(err => {
+            console.error('Gagal load notif:', err);
+            notifList.innerHTML = `
+              <div class="px-4 py-3 text-xs text-red-500">
+                Gagal memuat notifikasi.
+              </div>
+            `;
+          });
+      }
+
+      // load pertama
+      loadNotifications();
+
+      // tombol refresh manual
+      notifRefresh?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        loadNotifications();
+      });
+
+      // auto refresh tiap 20 detik (opsional)
+      setInterval(loadNotifications, 20000);
+    });
   </script>
 </body>
 </html>
