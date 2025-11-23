@@ -13,9 +13,9 @@ class Karyawan extends Model
     
     protected $fillable = [
         'nama',
-        'posisi', // Misalnya: Kasir, Barista, Manajer
-        'tanggal_masuk',
+        'jabatan',  // Manajer, Kasir, Barista
+        'email',
+        'telepon',
         'alamat',
-        'gaji',
     ];
 }

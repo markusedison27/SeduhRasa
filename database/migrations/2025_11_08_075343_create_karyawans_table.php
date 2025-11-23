@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('karyawan', function (Blueprint $table) {
             $table->id(); // Primary key
-            $table->string('nama'); // Nama karyawan
-            $table->string('jabatan')->nullable(); // Jabatan, opsional
-            $table->string('email')->unique()->nullable(); // Email unik (boleh kosong)
-            $table->string('telepon')->nullable(); // Nomor telepon
-            $table->string('alamat')->nullable(); // Alamat karyawan
+            $table->string('nama'); // Nama karyawan (WAJIB)
+            $table->enum('jabatan', ['Manajer', 'Kasir', 'Barista']); // Jabatan (WAJIB, dengan pilihan terbatas)
+            $table->string('email')->unique(); // Email unik (WAJIB)
+            $table->string('telepon', 15)->nullable(); // Nomor telepon (opsional)
+            $table->text('alamat')->nullable(); // Alamat karyawan (opsional)
             $table->timestamps(); // Kolom created_at dan updated_at
         });
     }
