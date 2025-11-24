@@ -1,19 +1,21 @@
 {{-- resources/views/contact.blade.php --}}
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Contact - SeduhRasa Coffee</title>
-  
+
   {{-- Favicon --}}
   <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
   <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}">
   <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicon-16x16.png') }}">
   <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
-  
-  @vite(['resources/css/app.css','resources/js/app.js'])
+
+  @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
+
 <body class="bg-stone-50 text-stone-900 antialiased">
 
   {{-- HEADER --}}
@@ -21,10 +23,16 @@
     <div class="max-w-7xl mx-auto px-4 flex justify-between items-center">
       {{-- Logo --}}
       <a href="{{ route('home') }}" class="flex items-center gap-2 hover:opacity-90 transition">
-        <img src="{{ asset('LOGO2.png') }}" class="h-10 w-auto" alt="SeduhRasa Coffee Logo">
+          <img src="{{ asset('LOGO2.png') }}" class="h-10 w-auto" alt="SeduhRasa Coffee Logo">
+          {{-- Menambahkan teks "SeduhRasa" dengan warna berbeda --}}
+          <span class="text-2xl font-bold tracking-tight">
+            <span class="text-white">Seduh</span><span
+              class="text-amber-400 hover:text-amber-300 transition">Rasa</span>
+          </span>
+        </a>
       </a>
-      
-      <a href="{{ route('home') }}" class="text-amber-400 hover:text-amber-300 transition">← Kembali ke Beranda</a>
+
+      <a href="{{ route('home') }}" class="text-amber-400 hover:text-amber-300 transition">Kembali ke Beranda</a>
     </div>
   </header>
 
@@ -33,13 +41,14 @@
     <div class="text-center mb-14">
       <h2 class="text-4xl font-bold text-stone-800 mb-3">Hubungi Kami</h2>
       <p class="text-stone-600 max-w-2xl mx-auto">
-        Kami senang mendengar dari Anda. Silakan isi formulir di bawah ini atau hubungi kami melalui informasi kontak yang tersedia.
+        Kami senang mendengar dari Anda. Silakan isi formulir di bawah ini atau hubungi kami melalui informasi kontak
+        yang tersedia.
       </p>
     </div>
 
     {{-- GRID WRAPPER --}}
     <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-      
+
       {{-- FORM KONTAK --}}
       <div class="bg-white rounded-2xl shadow-lg p-8 border border-stone-100">
         <h3 class="text-2xl font-semibold mb-6 text-amber-700">Kirim Pesan</h3>
@@ -47,23 +56,23 @@
           @csrf
           <div>
             <label for="name" class="block text-sm font-medium text-stone-700 mb-1">Nama Lengkap</label>
-            <input id="name" type="text" name="name" required 
+            <input id="name" type="text" name="name" required
               class="w-full border border-stone-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500 focus:outline-none">
           </div>
 
           <div>
             <label for="email" class="block text-sm font-medium text-stone-700 mb-1">Email</label>
-            <input id="email" type="email" name="email" required 
+            <input id="email" type="email" name="email" required
               class="w-full border border-stone-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500 focus:outline-none">
           </div>
 
           <div>
             <label for="message" class="block text-sm font-medium text-stone-700 mb-1">Pesan</label>
-            <textarea id="message" name="message" rows="5" required 
+            <textarea id="message" name="message" rows="5" required
               class="w-full border border-stone-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500 focus:outline-none"></textarea>
           </div>
 
-          <button type="submit" 
+          <button type="submit"
             class="w-full bg-amber-500 hover:bg-amber-600 text-stone-900 font-semibold py-2 rounded-lg transition shadow-sm hover:shadow-md">
             Kirim Pesan
           </button>
@@ -96,7 +105,7 @@
 
         {{-- GOOGLE MAPS --}}
         <div class="mt-8 rounded-xl overflow-hidden shadow-md">
-          <iframe 
+          <iframe
             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.285!2d102.103!3d1.482!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31d0b8f36f3a2dfd%3A0xabc123!2sBengkalis!5e0!3m2!1sid!2sid!4v00000000000"
             width="100%" height="250" style="border:0;" allowfullscreen="" loading="lazy">
           </iframe>
@@ -111,4 +120,5 @@
   </footer>
 
 </body>
+
 </html>
