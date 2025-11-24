@@ -102,15 +102,13 @@
         <div class="bean"></div>
         <div class="bean"></div>
 
-        <!-- Logo with steam -->
+        <!-- Logo dengan gambar LOGO2.png + steam -->
         <div class="mb-8 flex items-center gap-2.5 justify-center">
             <div class="relative steam logo-pulse">
                 <span></span>
                 <span></span>
                 <span></span>
-                <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-[#C67C4E] to-[#7B3F00] text-white grid place-items-center text-base font-bold shadow-lg shadow-[#7B3F00]/25">
-                    SR
-                </div>
+                <img src="{{ asset('LOGO2.png') }}" class="h-16 w-16 rounded-xl object-cover shadow-lg shadow-[#7B3F00]/25" alt="SeduhRasa Logo">
             </div>
             <span class="text-xl font-bold tracking-tight bg-gradient-to-r from-[#7B3F00] to-[#C67C4E] bg-clip-text text-transparent">
                 SeduhRasa

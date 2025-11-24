@@ -5,6 +5,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Data Pembeli • SeduhRasa</title>
+  
+  {{-- Favicon --}}
+  <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicon-16x16.png') }}">
+  <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
+  
   @vite(['resources/css/app.css','resources/js/app.js'])
 </head>
 
@@ -12,9 +19,11 @@
 
   <header class="bg-stone-900 text-white py-4 shadow-md">
     <div class="max-w-4xl mx-auto px-4 flex justify-between items-center">
-      <h1 class="text-xl font-bold tracking-wide">
-        Seduh<span class="text-amber-500">Rasa</span>
-      </h1>
+      {{-- Logo --}}
+      <a href="{{ route('home') }}" class="flex items-center gap-2 hover:opacity-90 transition">
+        <img src="{{ asset('LOGO2.png') }}" class="h-10 w-auto" alt="SeduhRasa Coffee Logo">
+      </a>
+      
       <a href="{{ route('home') }}" class="text-amber-400 hover:text-amber-300 transition">
         ← Kembali ke Beranda
       </a>
@@ -24,7 +33,7 @@
   <main class="max-w-4xl mx-auto px-4 py-12">
     <section class="bg-gradient-to-br from-amber-50 to-stone-100 rounded-3xl shadow-inner p-10 border border-stone-200">
       <div class="text-center mb-10">
-        <h2 class="text-3xl font-bold text-stone-800 mb-2">🧍‍♂️ Data Pembeli</h2>
+        <h2 class="text-3xl font-bold text-stone-800 mb-2">🧑‍♂️ Data Pembeli</h2>
         <p class="text-stone-500 max-w-lg mx-auto">
           Lengkapi informasi di bawah ini untuk melanjutkan ke halaman pilih menu.
         </p>

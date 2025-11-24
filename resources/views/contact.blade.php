@@ -5,6 +5,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Contact - SeduhRasa Coffee</title>
+  
+  {{-- Favicon --}}
+  <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicon-16x16.png') }}">
+  <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
+  
   @vite(['resources/css/app.css','resources/js/app.js'])
 </head>
 <body class="bg-stone-50 text-stone-900 antialiased">
@@ -12,9 +19,11 @@
   {{-- HEADER --}}
   <header class="bg-stone-900 text-white py-4 shadow">
     <div class="max-w-7xl mx-auto px-4 flex justify-between items-center">
-      <h1 class="text-xl font-bold tracking-wide">
-        Seduh<span class="text-amber-500">Rasa</span>
-      </h1>
+      {{-- Logo --}}
+      <a href="{{ route('home') }}" class="flex items-center gap-2 hover:opacity-90 transition">
+        <img src="{{ asset('LOGO2.png') }}" class="h-10 w-auto" alt="SeduhRasa Coffee Logo">
+      </a>
+      
       <a href="{{ route('home') }}" class="text-amber-400 hover:text-amber-300 transition">← Kembali ke Beranda</a>
     </div>
   </header>
@@ -79,7 +88,7 @@
               (021) 1234-5678
             </li>
             <li>
-              <span class="font-medium">🕒 Jam Operasional:</span><br>
+              <span class="font-medium">🕐 Jam Operasional:</span><br>
               Setiap hari pukul 08.00 – 22.00 WIB
             </li>
           </ul>
@@ -99,7 +108,7 @@
   {{-- FOOTER --}}
   <footer class="w-full bg-[#ff8c00] text-white text-center py-4 text-sm">
     © {{ date('Y') }} SeduhRasa Coffee. All rights reserved.
-</footer>
+  </footer>
 
 </body>
-</html>  
+</html>

@@ -8,8 +8,8 @@
     <title>@yield('title', 'SeduhRasa Coffee')</title>
 
         {{-- Favicon --}}
-    <link rel="icon" type="image/png" href="{{ asset('LOGO2.png') }}">
-    <link rel="apple-touch-icon" href="{{ asset('LOGO2.png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('LOGO2(512x512).png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('LOGO2(512x512).png') }}">
     
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 

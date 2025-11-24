@@ -7,8 +7,12 @@
 
   <title>@yield('title', 'SeduhRasa Panel')</title>
 
-    <link rel="icon" type="image/png" href="{{ asset('LOGO2.png') }}">
-    <link rel="apple-touch-icon" href="{{ asset('LOGO2.png') }}">
+  {{-- Favicon --}}
+  <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicon-16x16.png') }}">
+  <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
+  
   @vite(['resources/css/app.css', 'resources/js/app.js'])
   
   <style>
@@ -92,20 +96,15 @@
     <aside id="sidebar"
       class="fixed inset-y-0 left-0 z-40 w-72 hidden lg:flex flex-col bg-gradient-to-br from-[#2B1B12] via-[#3D2817] to-[#2B1B12] text-white shadow-2xl">
       
-      {{-- Brand --}}
+      {{-- Brand dengan Logo --}}
       <div class="p-6 border-b border-white/10">
-        <div class="flex items-center gap-3">
-          <div class="relative">
-            <div class="h-12 w-12 rounded-2xl bg-gradient-to-br from-[#C67C4E] to-[#8B5E3C] flex items-center justify-center text-white font-bold text-lg shadow-lg">
-              SR
-            </div>
-            <div class="absolute -top-1 -right-1 h-4 w-4 bg-green-500 rounded-full border-2 border-[#2B1B12] animate-pulse"></div>
-          </div>
+        <a href="{{ route($dashboardRoute) }}" class="flex items-center gap-3 hover:opacity-90 transition">
+          <img src="{{ asset('LOGO2.png') }}" class="h-12 w-12 rounded-2xl object-cover shadow-lg" alt="SeduhRasa Logo">
           <div>
             <div class="text-lg font-bold">SeduhRasa</div>
             <div class="text-xs text-white/60">{{ $role }}</div>
           </div>
-        </div>
+        </a>
       </div>
 
       {{-- Navigation --}}
