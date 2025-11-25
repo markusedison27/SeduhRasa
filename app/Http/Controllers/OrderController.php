@@ -78,15 +78,8 @@ class OrderController extends Controller
         }
 
         if (!$items || !is_array($items) || count($items) === 0) {
-
             $msg = 'Keranjang masih kosong atau data item tidak valid.';
-
-            // kalau request dari fetch() (JSON), balas JSON biar kelihatan errornya
-            if ($request->wantsJson()) {
-                return response()->json(['message' => $msg], 422);
-            }
-
-            return back()->with('error', $msg)->withInput();
+            return response()->json(['success' => false, 'message' => $msg], 422);
         }
 
         $totalQty   = 0;
@@ -110,14 +103,8 @@ class OrderController extends Controller
         }
 
         if ($totalQty === 0 || $totalHarga <= 0) {
-
             $msg = 'Keranjang tidak valid.';
-
-            if ($request->wantsJson()) {
-                return response()->json(['message' => $msg], 422);
-            }
-
-            return back()->with('error', $msg)->withInput();
+            return response()->json(['success' => false, 'message' => $msg], 422);
         }
 
         // nama_pelanggan dikirim dari menu.blade atau fallback dari session
@@ -138,24 +125,18 @@ class OrderController extends Controller
             'menu_dipesan'      => $menuDipesan,
             'jumlah'            => $totalQty,
             'total_harga'       => $totalHarga,
-            'status'            => 'pending',          // awalnya pending
+            'status'            => 'pending',
             'metode_pembayaran' => $metodePembayaran,
             'no_meja'           => $noMeja,
         ]);
 
-        // Kalau dari fetch() (JSON), balas JSON berisi id order
-        if ($request->wantsJson()) {
-            return response()->json([
-                'message'      => 'Pesanan berhasil dibuat.',
-                'order_id'     => $order->id,
-                'redirect_url' => route('customer.orders.show', $order->id),
-            ], 201);
-        }
-
-        // Kalau request biasa (form), redirect ke halaman sukses
-        return redirect()
-            ->route('customer.orders.show', $order->id)
-            ->with('success', 'Pesanan berhasil dibuat! Simpan nomor pesanan Anda.');
+        // SELALU balas JSON untuk fetch() request
+        return response()->json([
+            'success'      => true,
+            'message'      => 'Pesanan berhasil dibuat.',
+            'order_id'     => $order->id,
+            'redirect_url' => route('customer.orders.show', $order->id),
+        ], 201);
     }
 
     // GET /orders/{order}

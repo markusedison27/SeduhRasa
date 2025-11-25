@@ -35,18 +35,26 @@ class LoginController extends Controller
 
             // 3. Tentukan redirect berdasarkan role
             if ($user->role === 'super_admin') {
-                // pakai nama route yg ada di web.php ->name('super.dashboard')
+
                 $fallback = route('super.dashboard');
+
             } elseif ($user->role === 'owner') {
+
                 $fallback = route('owner.dashboard');
-            } elseif ($user->role === 'staff') {
+
+            } elseif ($user->role === 'admin' || $user->role === 'staff') {
+
+                // admin & staff sama-sama pakai dashboard staff (/dashboard)
                 $fallback = route('staff.dashboard');
+
             } else {
+
+                // kalau role tidak dikenal, balikin ke halaman depan
                 $fallback = route('home');
             }
 
-            // intended = kalau sebelumnya akses halaman yang butuh login, balik ke sana
-            return redirect()->intended($fallback);
+            // langsung pakai fallback, jangan intended supaya tidak balik ke home lagi
+            return redirect($fallback);
         }
 
         // 4. Gagal Otentikasi
