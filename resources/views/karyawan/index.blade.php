@@ -136,7 +136,7 @@
 }
 
 .table thead {
-    background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
+    background: linear-gradient(135deg, #b8512b 0%, #F7931E 100%);
 }
 
 .table th {

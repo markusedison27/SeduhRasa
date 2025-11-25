@@ -97,11 +97,11 @@ Route::middleware(['auth', 'role:super_admin'])->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| OWNER
+| OWNER + ADMIN (boleh kelola kasir/karyawan)
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth', 'role:owner'])->group(function () {
+Route::middleware(['auth', 'role:owner,admin'])->group(function () {
 
     Route::get('/owner/dashboard', [OwnerController::class, 'index'])
         ->name('owner.dashboard');
