@@ -32,28 +32,20 @@ Route::post('/contact', function (Request $request) {
 |--------------------------------------------------------------------------
 | MENU & ORDER PUBLIK (HALAMAN PELANGGAN)
 |--------------------------------------------------------------------------
-| /order   -> form data pelanggan (nama, no hp, email)
-| /menu    -> halaman menu (keranjang + checkout)
-| /orders  -> simpan order dari /menu + detail order
 */
 
-# 1. FORM DATA PELANGGAN (SEBELUM MASUK MENU)
 Route::get('/order', [OrderController::class, 'create'])->name('order');
 Route::post('/order', [OrderController::class, 'storeCustomerInfo'])->name('order.storeInfo');
 
-# 2. HALAMAN MENU UNTUK PELANGGAN
 Route::get('/menu', [MenuController::class, 'publicMenu'])->name('menu');
 
-# 3. ORDER (DARI MENU)
-Route::get('/orders', [OrderController::class, 'index'])->name('orders.index'); // list riwayat (kalau dipakai)
+Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
 Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
 Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
 
-# 4. CEK STATUS ORDER (UNTUK NOTIF PELANGGAN VIA AJAX)
 Route::get('/orders/{order}/status-json', [OrderController::class, 'statusJson'])
     ->name('orders.statusJson');
 
-# 5. HALAMAN SUKSES UNTUK PEMBELI (TAMPILAN "PESANAN BERHASIL")
 Route::get('/pesanan/{order}/berhasil', [OrderController::class, 'showCustomer'])
     ->name('customer.orders.show');
 
@@ -72,9 +64,10 @@ Route::post('/logout', [LoginController::class, 'logout'])
 
 /*
 |--------------------------------------------------------------------------
-| NOTIFIKASI (UNTUK HEADER LONCENG)
+| NOTIFIKASI
 |--------------------------------------------------------------------------
 */
+
 Route::middleware(['auth'])->group(function () {
     Route::get('/notifications/orders', [OrderController::class, 'notificationsJson'])
         ->name('notifications.orders');
@@ -91,11 +84,9 @@ Route::middleware(['auth', 'role:super_admin'])->group(function () {
     Route::get('/super-admin/dashboard', [SuperAdminController::class, 'index'])
         ->name('super.dashboard');
 
-    // kelola owner
     Route::get('/super-admin/owners', [SuperAdminController::class, 'ownersIndex'])
         ->name('super.owners.index');
 
-    // tidak pakai halaman create terpisah, redirect balik ke index
     Route::get('/super-admin/owners/create', function () {
         return redirect()->route('super.owners.index');
     })->name('super.owners.create');
@@ -118,7 +109,6 @@ Route::middleware(['auth', 'role:owner'])->group(function () {
     Route::get('/owner/finance', [OwnerController::class, 'finance'])
         ->name('owner.finance');
 
-    // kelola kasir (pakai KaryawanController yang sama, tapi route khusus owner)
     Route::get('/owner/kasir', [KaryawanController::class, 'index'])
         ->name('owner.kasir.index');
 
@@ -131,17 +121,15 @@ Route::middleware(['auth', 'role:owner'])->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| STAFF / KARYAWAN (KASIR)
+| STAFF / KARYAWAN (KASIR) + ADMIN + OWNER
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth', 'role:staff'])->group(function () {
+Route::middleware(['auth', 'role:admin,staff,owner'])->group(function () {
 
-    // dashboard kasir/staff
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->name('staff.dashboard');
 
-    // area admin untuk kasir
     Route::prefix('admin')->name('admin.')->group(function () {
 
         Route::resource('menus', MenuController::class);
@@ -149,10 +137,8 @@ Route::middleware(['auth', 'role:staff'])->group(function () {
         Route::resource('pelanggan', PelangganController::class);
         Route::resource('karyawan', KaryawanController::class);
 
-        // admin.orders.*  (index, show, destroy)
         Route::resource('orders', OrderController::class)->only(['index', 'show', 'destroy']);
 
-        // ubah status order (Pending / Proses / Selesai / Batal)
         Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus'])
             ->name('orders.updateStatus');
     });

@@ -6,7 +6,8 @@
 <div class="main-content">
     <div class="page-header">
         <h1>👥 Daftar Karyawan</h1>
-        <a href="{{ route('admin.karyawan.create') }}" class="btn btn-primary">
+        {{-- tombol di pojok kanan atas --}}
+        <a href="{{ route('owner.kasir.create') }}" class="btn btn-primary">
             ➕ Tambah Karyawan Baru
         </a>
     </div>
@@ -61,7 +62,8 @@
                             <td colspan="6" class="text-center">
                                 <div class="empty-state">
                                     <p>📋 Data Karyawan belum tersedia.</p>
-                                    <a href="{{ route('admin.karyawan.create') }}" class="btn btn-primary btn-sm">
+                                    {{-- tombol di empty state --}}
+                                    <a href="{{ route('owner.kasir.create') }}" class="btn btn-primary btn-sm">
                                         Tambah Karyawan Pertama
                                     </a>
                                 </div>
