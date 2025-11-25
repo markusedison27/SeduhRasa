@@ -1,4 +1,4 @@
-{{-- resources/views/layouts/public.blade.php --}}
+{{-- resources/views/layouts/frontend.blade.php --}}
 <!DOCTYPE html>
 <html lang="id" class="scroll-smooth">
 
@@ -8,8 +8,8 @@
     <title>@yield('title', 'SeduhRasa Coffee')</title>
     
     {{-- Favicon --}}
-    <link rel="icon" type="image/png" href="{{ asset('LOGO2(512x512).png') }}">
-    <link rel="apple-touch-icon" href="{{ asset('LOGO2(512x512).png') }}">
+    <link rel="icon" type="image/png" href="{{ asset('LOGO2.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('LOGO2.png') }}">
     
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -29,7 +29,6 @@
                 {{-- Logo --}}
                 <a href="{{ route('home') }}" class="flex items-center gap-2 font-bold text-white hover:opacity-90 transition">
                     <img src="{{ asset('LOGO2.png') }}" class="h-8 w-auto" alt="SeduhRasa Coffee Logo">
-                    <span>Seduh<span class="text-amber-500">Rasa</span></span>
                 </a>
                 
                 {{-- Navigation Menu --}}
@@ -62,7 +61,7 @@
     </div>
 
     {{-- FOOTER --}}
-    <footer class="w-full bg-[#ff8c00] text-white text-center py-4 text-sm">
+    <footer class="py-8 text-center text-sm text-stone-500 border-t border-stone-200 mt-auto">
         © {{ date('Y') }} SeduhRasa Coffee. All rights reserved.
     </footer>
 

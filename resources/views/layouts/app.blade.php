@@ -8,10 +8,8 @@
   <title>@yield('title', 'SeduhRasa Panel')</title>
 
   {{-- Favicon --}}
-  <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
-  <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}">
-  <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicon-16x16.png') }}">
-  <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
+  <link rel="icon" type="image/png" href="{{ asset('LOGO2.png') }}">
+  <link rel="apple-touch-icon" href="{{ asset('LOGO2.png') }}">
   
   @vite(['resources/css/app.css', 'resources/js/app.js'])
   
@@ -99,7 +97,10 @@
       {{-- Brand dengan Logo --}}
       <div class="p-6 border-b border-white/10">
         <a href="{{ route($dashboardRoute) }}" class="flex items-center gap-3 hover:opacity-90 transition">
-          <img src="{{ asset('LOGO2.png') }}" class="h-12 w-12 rounded-2xl object-cover shadow-lg" alt="SeduhRasa Logo">
+          <div class="relative">
+            <img src="{{ asset('LOGO2.png') }}" class="h-12 w-12 rounded-2xl object-cover shadow-lg" alt="SeduhRasa Logo">
+            <div class="absolute -top-1 -right-1 h-4 w-4 bg-green-500 rounded-full border-2 border-[#2B1B12] animate-pulse"></div>
+          </div>
           <div>
             <div class="text-lg font-bold">SeduhRasa</div>
             <div class="text-xs text-white/60">{{ $role }}</div>
