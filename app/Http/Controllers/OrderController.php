@@ -55,88 +55,105 @@ class OrderController extends Controller
 
     public function store(Request $request)
     {
-        // Validasi ringan (no_meja optional)
-        $request->validate([
-            'nama_pelanggan'    => 'nullable|string|max:255',
-            'metode_pembayaran' => 'nullable|string|max:50',
-            'no_meja'           => 'nullable|string|max:10',
-        ]);
+        try {
+            // Validasi ringan (no_meja optional)
+            $request->validate([
+                'metode_pembayaran' => 'nullable|string|max:50',
+                'no_meja'           => 'nullable|string|max:10',
+            ]);
 
-        /*
-         * AMBIL ITEMS
-         * Bisa datang dalam 2 bentuk:
-         * 1) String JSON: "[{...},{...}]"
-         * 2) Langsung array: [{...},{...}]
-         */
-        $rawItems = $request->input('items');
+            /*
+             * AMBIL ITEMS
+             * Bisa datang dalam 2 bentuk:
+             * 1) String JSON: "[{...},{...}]"
+             * 2) Langsung array: [{...},{...}]
+             */
+            $rawItems = $request->input('items');
 
-        if (is_array($rawItems)) {
-            $items = $rawItems;
-        } else {
-            // anggap string JSON
-            $items = json_decode($rawItems, true);
-        }
-
-        if (!$items || !is_array($items) || count($items) === 0) {
-            $msg = 'Keranjang masih kosong atau data item tidak valid.';
-            return response()->json(['success' => false, 'message' => $msg], 422);
-        }
-
-        $totalQty   = 0;
-        $totalHarga = 0;
-        $listMenu   = [];
-
-        foreach ($items as $item) {
-            $name  = $item['name']  ?? null;
-            $qty   = (int)($item['qty']   ?? 1);
-            $price = (int)($item['price'] ?? 0);
-
-            if (!$name || $qty <= 0 || $price < 0) {
-                continue;
+            if (is_array($rawItems)) {
+                $items = $rawItems;
+            } else {
+                // anggap string JSON
+                $items = json_decode($rawItems, true);
             }
 
-            $totalQty   += $qty;
-            $totalHarga += $qty * $price;
+            if (!$items || !is_array($items) || count($items) === 0) {
+                return response()->json([
+                    'success' => false, 
+                    'message' => 'Keranjang masih kosong atau data item tidak valid.'
+                ], 422);
+            }
 
-            // contoh: "Americano x2"
-            $listMenu[] = $name . ' x' . $qty;
+            $totalQty   = 0;
+            $totalHarga = 0;
+            $listMenu   = [];
+
+            foreach ($items as $item) {
+                $name  = $item['name']  ?? null;
+                $qty   = (int)($item['qty']   ?? 1);
+                $price = (int)($item['price'] ?? 0);
+
+                if (!$name || $qty <= 0 || $price < 0) {
+                    continue;
+                }
+
+                $totalQty   += $qty;
+                $totalHarga += $qty * $price;
+
+                // contoh: "Americano x2"
+                $listMenu[] = $name . ' x' . $qty;
+            }
+
+            if ($totalQty === 0 || $totalHarga <= 0) {
+                return response()->json([
+                    'success' => false, 
+                    'message' => 'Keranjang tidak valid.'
+                ], 422);
+            }
+
+            // nama pelanggan dari session
+            $namaPelanggan = session('customer.name', 'Umum');
+
+            // metode pembayaran: "cod" / "dana"
+            $metodePembayaran = $request->input('metode_pembayaran', 'cod');
+
+            // nomor meja (boleh kosong)
+            $noMeja = $request->input('no_meja');
+
+            // Generate kode order unik
+            $kodeOrder = 'ORD-' . date('Ymd') . '-' . strtoupper(substr(uniqid(), -6));
+
+            $menuDipesan = implode(', ', $listMenu);
+
+            // Simpan ke tabel orders - SESUAIKAN DENGAN STRUKTUR TABEL YANG ADA
+            $order = Order::create([
+                'kode_order'        => $kodeOrder,
+                'customer_name'     => $namaPelanggan,
+                'subtotal'          => $totalHarga,
+                'status'            => 'pending',
+                'metode_pembayaran' => $metodePembayaran,
+                'no_meja'           => $noMeja,
+                'keterangan'        => $menuDipesan, // Menu yang dipesan disimpan di keterangan
+            ]);
+
+            // SELALU balas JSON untuk fetch() request
+            return response()->json([
+                'success'      => true,
+                'message'      => 'Pesanan berhasil dibuat.',
+                'order_id'     => $order->id,
+                'redirect_url' => route('customer.orders.show', $order->id),
+            ], 201);
+
+        } catch (\Exception $e) {
+            // Log error untuk debugging
+            \Log::error('Order Store Error: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat menyimpan pesanan: ' . $e->getMessage()
+            ], 500);
         }
-
-        if ($totalQty === 0 || $totalHarga <= 0) {
-            $msg = 'Keranjang tidak valid.';
-            return response()->json(['success' => false, 'message' => $msg], 422);
-        }
-
-        // nama_pelanggan dikirim dari menu.blade atau fallback dari session
-        $namaPelanggan = $request->input('nama_pelanggan')
-            ?: session('customer.name', 'Umum');
-
-        // metode pembayaran: "cod" / "dana" / "transfer"
-        $metodePembayaran = $request->input('metode_pembayaran', 'cod');
-
-        // nomor meja (boleh kosong)
-        $noMeja = $request->input('no_meja');
-
-        $menuDipesan = implode(', ', $listMenu);
-
-        // Simpan ke tabel orders
-        $order = Order::create([
-            'nama_pelanggan'    => $namaPelanggan,
-            'menu_dipesan'      => $menuDipesan,
-            'jumlah'            => $totalQty,
-            'total_harga'       => $totalHarga,
-            'status'            => 'pending',
-            'metode_pembayaran' => $metodePembayaran,
-            'no_meja'           => $noMeja,
-        ]);
-
-        // SELALU balas JSON untuk fetch() request
-        return response()->json([
-            'success'      => true,
-            'message'      => 'Pesanan berhasil dibuat.',
-            'order_id'     => $order->id,
-            'redirect_url' => route('customer.orders.show', $order->id),
-        ], 201);
     }
 
     // GET /orders/{order}
@@ -170,7 +187,7 @@ class OrderController extends Controller
         $orders = Order::where('status', 'pending')
             ->latest()
             ->take(10)
-            ->get(['id', 'nama_pelanggan', 'created_at']);
+            ->get(['id', 'customer_name', 'created_at']);
 
         return response()->json([
             'count' => $orders->count(),
@@ -178,7 +195,7 @@ class OrderController extends Controller
                 return [
                     'id'       => $order->id,
                     'title'    => 'Pesanan pending #' . $order->id,
-                    'subtitle' => $order->nama_pelanggan ?: 'Pelanggan',
+                    'subtitle' => $order->customer_name ?: 'Pelanggan',
                     'time'     => $order->created_at->diffForHumans(),
                     'url'      => route('admin.orders.show', $order->id),
                 ];
