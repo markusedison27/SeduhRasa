@@ -124,8 +124,8 @@ Route::middleware(['auth', 'role:owner,admin'])->group(function () {
 | STAFF / KARYAWAN (KASIR) + ADMIN + OWNER
 |--------------------------------------------------------------------------
 */
+Route::middleware(['auth', 'role:admin,staff'])->group(function () {
 
-Route::middleware(['auth', 'role:admin,staff,owner'])->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->name('staff.dashboard');

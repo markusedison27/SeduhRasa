@@ -12,6 +12,7 @@ class Menu extends Model
         'suhu',
         'harga',
         'gambar',
+        'group',   // <--- TAMBAHKAN INI
     ];
 
     // Accessor agar bisa pakai $menu->nama (opsional)

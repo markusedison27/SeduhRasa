@@ -15,7 +15,7 @@ class DashboardController extends Controller
         $totalPenjualanHariIni = Order::whereDate('created_at', $today)
             // kalau nanti sudah pakai status 'selesai', bisa aktifkan ini:
             // ->where('status', 'selesai')
-            ->sum('total_harga');
+            ->sum('subtotal'); // <-- ganti dari total_harga ke subtotal
 
         // total pesanan bulan ini
         $bulanIni = now()->month;
