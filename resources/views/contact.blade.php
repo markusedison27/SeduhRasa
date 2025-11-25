@@ -90,7 +90,7 @@
             </li>
             <li>
               <span class="font-medium">📧 Email:</span><br>
-              info@seduhrasa.com
+              seduhrasa1@gmail.com
             </li>
             <li>
               <span class="font-medium">📞 Telepon:</span><br>
