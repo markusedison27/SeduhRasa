@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Pelanggan; // <-- supaya bisa pakai relasi ke Pelanggan
 
 class Order extends Model
 {
@@ -14,6 +15,7 @@ class Order extends Model
      * DISESUAIKAN DENGAN STRUKTUR TABEL YANG ADA
      */
     protected $fillable = [
+        'pelanggan_id',      // <--- foreign key ke tabel pelanggans
         'kode_order',        // varchar(255) - kode unik order
         'customer_name',     // varchar(255) - nama pelanggan
         'subtotal',          // bigint(20) - total harga
@@ -34,6 +36,14 @@ class Order extends Model
         'created_at'   => 'datetime',
         'updated_at'   => 'datetime',
     ];
+
+    /**
+     * RELASI: order ini milik satu pelanggan
+     */
+    public function pelanggan()
+    {
+        return $this->belongsTo(Pelanggan::class, 'pelanggan_id');
+    }
 
     /**
      * Accessor untuk kompatibilitas dengan code lama

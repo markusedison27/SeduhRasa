@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\TransaksiController;
 use App\Http\Controllers\PelangganController;
+ // <-- PENTING: pakai namespace Admin
 use App\Http\Controllers\KaryawanController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\DashboardController;
@@ -25,6 +26,7 @@ Route::view('/services', 'services')->name('services');
 Route::view('/contact', 'contact')->name('contact');
 
 Route::post('/contact', function (Request $request) {
+    // Kalau mau, di sini bisa ditambah logic simpan ke database / kirim email
     return back()->with('success', 'Pesan berhasil dikirim!');
 })->name('contact.submit');
 
@@ -87,6 +89,7 @@ Route::middleware(['auth', 'role:super_admin'])->group(function () {
     Route::get('/super-admin/owners', [SuperAdminController::class, 'ownersIndex'])
         ->name('super.owners.index');
 
+    // tombol "create" diarahkan ke index (form bisa di-modal di halaman index)
     Route::get('/super-admin/owners/create', function () {
         return redirect()->route('super.owners.index');
     })->name('super.owners.create');
@@ -97,7 +100,7 @@ Route::middleware(['auth', 'role:super_admin'])->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| OWNER + ADMIN (boleh kelola kasir/karyawan)
+| OWNER + ADMIN (BOLEH KELOLA KASIR/KARYAWAN)
 |--------------------------------------------------------------------------
 */
 
@@ -123,20 +126,32 @@ Route::middleware(['auth', 'role:owner,admin'])->group(function () {
 |--------------------------------------------------------------------------
 | STAFF / KARYAWAN (KASIR) + ADMIN + OWNER
 |--------------------------------------------------------------------------
+| Semua role ini bisa akses dashboard staff dan halaman admin/*
+|--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'role:admin,staff'])->group(function () {
 
+Route::middleware(['auth', 'role:admin,staff,owner'])->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->name('staff.dashboard');
 
     Route::prefix('admin')->name('admin.')->group(function () {
 
+        // Manajemen menu
         Route::resource('menus', MenuController::class);
+
+        // Transaksi: resource + export
         Route::resource('transaksi', TransaksiController::class);
+        Route::get('transaksi/export', [TransaksiController::class, 'export'])
+            ->name('transaksi.export');
+
+        // Manajemen pelanggan
         Route::resource('pelanggan', PelangganController::class);
+
+        // Manajemen karyawan
         Route::resource('karyawan', KaryawanController::class);
 
+        // Halaman order untuk admin/staff/owner
         Route::resource('orders', OrderController::class)->only(['index', 'show', 'destroy']);
 
         Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus'])

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Models\Pelanggan;   // <-- tambahin ini
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
@@ -27,22 +28,40 @@ class OrderController extends Controller
         return view('order', compact('customer'));
     }
 
-    // POST /order -> simpan data pelanggan ke session lalu redirect ke /menu
+    // POST /order -> simpan data pelanggan ke session + ke tabel pelanggans, lalu redirect ke /menu
     public function storeCustomerInfo(Request $request)
     {
+        // 1. Validasi input form Data Pembeli
         $data = $request->validate([
             'name'  => 'required|string|max:100',
             'phone' => 'required|string|max:30',
             'email' => 'nullable|email|max:100',
         ]);
 
-        // disimpan untuk dipakai di /menu saat checkout
+        // 2. Simpan ke session (logika lama kamu)
         session([
             'customer.name'  => $data['name'],
             'customer.phone' => $data['phone'],
             'customer.email' => $data['email'] ?? null,
         ]);
 
+        // 3. Simpan / update ke tabel pelanggans
+        $pelanggan = Pelanggan::updateOrCreate(
+            [
+                // kunci identitas pelanggan: nomor telepon
+                'telepon' => $data['phone'],
+            ],
+            [
+                'nama'   => $data['name'],
+                'email'  => $data['email'] ?? null,
+                'alamat' => null,
+            ]
+        );
+
+        // Kalau mau dipakai di order nanti:
+        // session(['customer.id' => $pelanggan->id]);
+
+        // 4. Lanjut ke halaman menu seperti biasa
         return redirect()->route('menu');
     }
 
@@ -79,7 +98,7 @@ class OrderController extends Controller
 
             if (!$items || !is_array($items) || count($items) === 0) {
                 return response()->json([
-                    'success' => false, 
+                    'success' => false,
                     'message' => 'Keranjang masih kosong atau data item tidak valid.'
                 ], 422);
             }
@@ -106,7 +125,7 @@ class OrderController extends Controller
 
             if ($totalQty === 0 || $totalHarga <= 0) {
                 return response()->json([
-                    'success' => false, 
+                    'success' => false,
                     'message' => 'Keranjang tidak valid.'
                 ], 422);
             }

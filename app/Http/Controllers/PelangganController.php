@@ -2,80 +2,101 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use App\Models\Pelanggan;
+use Illuminate\Http\Request;
 
 class PelangganController extends Controller
 {
     /**
-     * Tampilkan semua pelanggan.
+     * Tampilkan daftar pelanggan.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $pelanggans = Pelanggan::all();
+        $query = Pelanggan::query();
+
+        // Fitur cari
+        if ($request->filled('q')) {
+            $search = $request->q;
+
+            $query->where(function ($q) use ($search) {
+                $q->where('nama', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('telepon', 'like', "%{$search}%");
+            });
+        }
+
+        $pelanggans = $query->latest()->paginate(10)->withQueryString();
+
+        // VIEW: resources/views/pelanggan/index.blade.php
         return view('pelanggan.index', compact('pelanggans'));
     }
 
     /**
-     * Tampilkan form tambah pelanggan baru.
+     * Form tambah pelanggan.
      */
     public function create()
     {
+        // VIEW: resources/views/pelanggan/create.blade.php
         return view('pelanggan.create');
     }
 
     /**
-     * Simpan data pelanggan baru ke database.
+     * Simpan pelanggan baru.
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'nama' => 'required|string|max:255',
-            'alamat' => 'nullable|string|max:255',
+        $validated = $request->validate([
+            'nama'    => 'required|string|max:255',
+            'email'   => 'nullable|email|unique:pelanggans,email',
             'telepon' => 'nullable|string|max:20',
-            'email' => 'nullable|email|unique:pelanggans,email',
+            'alamat'  => 'nullable|string',
         ]);
 
-        Pelanggan::create($request->all());
+        Pelanggan::create($validated);
 
-        return redirect()->route('pelanggan.index')->with('success', 'Data pelanggan berhasil ditambahkan!');
+        return redirect()
+            ->route('admin.pelanggan.index')
+            ->with('success', 'Pelanggan berhasil ditambahkan.');
     }
 
     /**
-     * Tampilkan form edit pelanggan.
+     * Form edit pelanggan.
      */
-    public function edit($id)
+    public function edit(Pelanggan $pelanggan)
     {
-        $pelanggan = Pelanggan::findOrFail($id);
+        // VIEW: resources/views/pelanggan/edit.blade.php
         return view('pelanggan.edit', compact('pelanggan'));
     }
 
     /**
-     * Update data pelanggan di database.
+     * Update data pelanggan.
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Pelanggan $pelanggan)
     {
-        $request->validate([
-            'nama' => 'required|string|max:255',
-            'alamat' => 'nullable|string|max:255',
+        $validated = $request->validate([
+            'nama'    => 'required|string|max:255',
+            'email'   => 'nullable|email|unique:pelanggans,email,' . $pelanggan->id,
             'telepon' => 'nullable|string|max:20',
-            'email' => 'nullable|email|unique:pelanggans,email,' . $id,
+            'alamat'  => 'nullable|string',
         ]);
 
-        $pelanggan = Pelanggan::findOrFail($id);
-        $pelanggan->update($request->all());
+        $pelanggan->update($validated);
 
-        return redirect()->route('pelanggan.index')->with('success', 'Data pelanggan berhasil diperbarui!');
+        return redirect()
+            ->route('admin.pelanggan.index')
+            ->with('success', 'Pelanggan berhasil diperbarui.');
     }
 
     /**
-     * Hapus pelanggan dari database.
+     * Hapus pelanggan.
      */
-    public function destroy($id)
+    public function destroy(Pelanggan $pelanggan)
     {
-        $pelanggan = Pelanggan::findOrFail($id);
         $pelanggan->delete();
 
-        return redirect()->route('pelanggan.index')->with('success', 'Data pelanggan berhasil dihapus!');
+        return redirect()
+            ->route('admin.pelanggan.index')
+            ->with('success', 'Pelanggan berhasil dihapus.');
     }
 }

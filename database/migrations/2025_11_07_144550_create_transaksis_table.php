@@ -7,25 +7,34 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Jalankan migration.
+     * Run the migrations.
      */
     public function up(): void
     {
-        Schema::create('transaksi', function (Blueprint $table) {
+        Schema::create('transactions', function (Blueprint $table) {
             $table->id();
-            $table->string('kode_transaksi')->unique(); // contoh: TRX001
-            $table->string('nama_pelanggan');           // nama pembeli
-            $table->decimal('total_harga', 10, 2);      // total harga
-            $table->date('tanggal_transaksi');          // tanggal transaksi
-            $table->timestamps();                       // created_at & updated_at
+            $table->foreignId('order_id')->constrained('orders')->onDelete('cascade');
+            $table->string('kode_order');
+            $table->string('customer_name');
+            $table->text('keterangan')->nullable(); // menu yang dipesan
+            $table->bigInteger('subtotal')->default(0);
+            $table->string('metode_pembayaran')->nullable();
+            $table->string('no_meja')->nullable();
+            $table->timestamp('transaction_date')->nullable(); // waktu order selesai
+            $table->timestamps();
+
+            // Index untuk optimasi query
+            $table->index('kode_order');
+            $table->index('transaction_date');
+            $table->index('customer_name');
         });
     }
 
     /**
-     * Kembalikan (hapus tabel jika rollback).
+     * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('transaksi');
+        Schema::dropIfExists('transactions');
     }
 };
