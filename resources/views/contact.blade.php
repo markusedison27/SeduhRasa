@@ -25,7 +25,7 @@
       <a href="{{ route('home') }}" class="flex items-center gap-2 hover:opacity-90 transition">
           <img src="{{ asset('LOGO2.png') }}" class="h-10 w-auto" alt="SeduhRasa Coffee Logo">
           {{-- Menambahkan teks "SeduhRasa" dengan warna berbeda --}}
-          <span class="text-2xl font-bold tracking-tight">
+          <span class="text-1xl font-bold tracking-tight">
             <span class="text-white">Seduh</span><span
               class="text-amber-400 hover:text-amber-300 transition">Rasa</span>
           </span>
