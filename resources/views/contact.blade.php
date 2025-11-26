@@ -86,7 +86,7 @@
           <ul class="space-y-4 text-stone-700">
             <li>
               <span class="font-medium">📍 Alamat:</span><br>
-              Jl. Mawar No. 15, Bengkalis
+              Jalan antara, Bengkalis
             </li>
             <li>
               <span class="font-medium">📧 Email:</span><br>
@@ -94,11 +94,11 @@
             </li>
             <li>
               <span class="font-medium">📞 Telepon:</span><br>
-              (021) 1234-5678
+              +62 812-6823-2687
             </li>
             <li>
               <span class="font-medium">🕐 Jam Operasional:</span><br>
-              Setiap hari pukul 08.00 – 22.00 WIB
+              Setiap hari pukul 15.00 – 23.00 WIB
             </li>
           </ul>
         </div>
