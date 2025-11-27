@@ -1,4 +1,4 @@
-@extends('layouts.frontend') {{-- atau layouts.public / app, sesuaikan --}}
+@extends('layouts.frontend') 
 
 @section('title', 'Data Pembeli')
 

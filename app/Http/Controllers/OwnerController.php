@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Transaksi;
-use App\Models\Pengeluaran;
+use App\Models\Order;        // pemasukan dari penjualan
+use App\Models\Pengeluaran;  // pengeluaran operasional
 
 class OwnerController extends Controller
 {
@@ -15,10 +15,17 @@ class OwnerController extends Controller
     {
         $owner = auth()->user();
 
-        // contoh ringkasan dummy (silakan sambung ke tabelmu kalau mau)
-        $totalTransaksiHariIni = Transaksi::whereDate('created_at', today())->count();
-        $perkiraanPendapatan   = Transaksi::sum('total_harga'); // ganti kolom kalau beda
-        $jumlahStaffAktif      = 0; // nanti bisa diambil dari tabel karyawan
+        // Total transaksi selesai hari ini
+        $totalTransaksiHariIni = Order::where('status', 'selesai')
+            ->whereDate('created_at', today())
+            ->count();
+
+        // Perkiraan pendapatan (dari semua order selesai)
+        $perkiraanPendapatan = Order::where('status', 'selesai')
+            ->sum('subtotal');
+
+        // Sementara dummy, nanti bisa diambil dari tabel karyawan
+        $jumlahStaffAktif = 0;
 
         return view('owner.dashboard', compact(
             'owner',
@@ -29,29 +36,44 @@ class OwnerController extends Controller
     }
 
     /**
-     * Halaman keuangan (pemasukan & pengeluaran)
+     * Halaman keuangan pemilik
+     * Menampilkan ringkasan pemasukan & pengeluaran
      */
     public function finance()
     {
         $owner = auth()->user();
 
-        // --- Pemasukan (dari transaksi) ---
-        // Kalau ada kolom status (paid, selesai, dll) bisa ditambah where-status di sini
-        $totalPemasukan = Transaksi::sum('total_harga'); // ganti ke nama kolom total punyamu
-        $daftarPemasukan = Transaksi::orderByDesc('created_at')
+        // --- PEMASUKAN (dari orders yang sudah selesai) ---
+        $orderQuery = Order::where('status', 'selesai');
+
+        $totalPemasukan = $orderQuery->sum('subtotal');
+
+        // 10 pemasukan terbaru
+        $daftarPemasukan = (clone $orderQuery)
+            ->orderByDesc('created_at')
             ->limit(10)
             ->get();
 
-        // --- Pengeluaran (dari tabel pengeluarans) ---
-        $totalPengeluaran = Pengeluaran::sum('nominal');
-        $daftarPengeluaran = Pengeluaran::orderByDesc('tanggal')
+        // --- PENGELUARAN (dari tabel pengeluarans) ---
+        // pastikan di tabel pengeluarans ada kolom 'nominal' & 'tanggal'
+        $pengeluaranQuery = Pengeluaran::query();
+
+        $totalPengeluaran = $pengeluaranQuery->sum('nominal');
+
+        // 10 pengeluaran terbaru
+        $daftarPengeluaran = $pengeluaranQuery
+            ->orderByDesc('tanggal')
             ->limit(10)
             ->get();
+
+        // --- LABA SEDERHANA ---
+        $labaBersih = $totalPemasukan - $totalPengeluaran;
 
         return view('owner.finance', compact(
             'owner',
             'totalPemasukan',
             'totalPengeluaran',
+            'labaBersih',
             'daftarPemasukan',
             'daftarPengeluaran'
         ));
