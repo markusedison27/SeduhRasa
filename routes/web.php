@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\TransaksiController;
 use App\Http\Controllers\PelangganController;
- // <-- PENTING: pakai namespace Admin
 use App\Http\Controllers\KaryawanController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\DashboardController;
@@ -18,6 +17,8 @@ use App\Http\Controllers\Auth\LoginController;
 |--------------------------------------------------------------------------
 | PUBLIC PAGES (TANPA LOGIN)
 |--------------------------------------------------------------------------
+| View ada di: resources/views/*.blade.php
+|--------------------------------------------------------------------------
 */
 
 Route::view('/', 'home')->name('home');
@@ -26,7 +27,7 @@ Route::view('/services', 'services')->name('services');
 Route::view('/contact', 'contact')->name('contact');
 
 Route::post('/contact', function (Request $request) {
-    // Kalau mau, di sini bisa ditambah logic simpan ke database / kirim email
+    // Di sini kalau mau bisa simpan pesan / kirim email
     return back()->with('success', 'Pesan berhasil dikirim!');
 })->name('contact.submit');
 
@@ -125,8 +126,6 @@ Route::middleware(['auth', 'role:owner,admin'])->group(function () {
 /*
 |--------------------------------------------------------------------------
 | STAFF / KARYAWAN (KASIR) + ADMIN + OWNER
-|--------------------------------------------------------------------------
-| Semua role ini bisa akses dashboard staff dan halaman admin/*
 |--------------------------------------------------------------------------
 */
 
