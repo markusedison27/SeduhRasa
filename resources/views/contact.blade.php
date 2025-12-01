@@ -32,7 +32,9 @@
         </a>
       </a>
 
-      <a href="{{ route('home') }}" class="text-amber-400 hover:text-amber-300 transition">Kembali ke Beranda</a>
+     <a href="{{ route('home') }}" class="text-[#A76B43] hover:text-[#C08A5E] transition">
+    Kembali ke Beranda
+</a>
     </div>
   </header>
 
@@ -51,7 +53,7 @@
 
       {{-- FORM KONTAK --}}
       <div class="bg-white rounded-2xl shadow-lg p-8 border border-stone-100">
-        <h3 class="text-2xl font-semibold mb-6 text-amber-700">Kirim Pesan</h3>
+       <h3 class="text-2xl font-semibold mb-6 text-[#A76B43]">Kirim Pesan</h3>
         <form action="#" method="POST" class="space-y-5">
           @csrf
           <div>
@@ -72,17 +74,18 @@
               class="w-full border border-stone-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-amber-500 focus:outline-none"></textarea>
           </div>
 
-          <button type="submit"
-            class="w-full bg-amber-500 hover:bg-amber-600 text-stone-900 font-semibold py-2 rounded-lg transition shadow-sm hover:shadow-md">
-            Kirim Pesan
-          </button>
+        <button type="submit"
+    class="w-full bg-[#A76B43] hover:bg-[#8B5A35] text-white font-semibold py-2 rounded-lg transition shadow-sm hover:shadow-md">
+    Kirim Pesan
+</button>
+
         </form>
       </div>
 
       {{-- INFO KONTAK --}}
       <div class="bg-white rounded-2xl shadow-lg p-8 border border-stone-100 flex flex-col justify-between">
         <div>
-          <h3 class="text-2xl font-semibold mb-6 text-amber-700">Informasi Kontak</h3>
+          <h3 class="text-2xl font-semibold mb-6 text-[#A76B43]">Informasi Kontak</h3>
           <ul class="space-y-4 text-stone-700">
             <li>
               <span class="font-medium">📍 Alamat:</span><br>
@@ -115,9 +118,14 @@
   </main>
 
   {{-- FOOTER --}}
-  <footer class="w-full bg-[#ff8c00] text-white text-center py-4 text-sm">
+ <footer class="w-full bg-[#4A2E1B] text-white text-center py-4 text-sm">
     © {{ date('Y') }} SeduhRasa Coffee. All rights reserved.
-  </footer>
+</footer>
+
+
+
+
+
 
 </body>
 
