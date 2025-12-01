@@ -1,75 +1,75 @@
 {{-- resources/views/layouts/frontend.blade.php --}}
 <!DOCTYPE html>
-<html lang="id" class="scroll-smooth">
-
+<html lang="id">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'SeduhRasa Coffee')</title>
     
     {{-- Favicon --}}
-    <link rel="icon" type="image/png" href="{{ asset('LOGO2.png') }}">
-    <link rel="apple-touch-icon" href="{{ asset('LOGO2.png') }}">
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
     
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     {{-- Font cursive untuk judul --}}
-    <link href="https://fonts.bunny.net/css?family=playfair-display:700|great-vibes:400" rel="stylesheet" />
-</head>
-
-<body class="bg-stone-50 text-stone-900">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Righteous&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+
+    @stack('styles')
+</head>
+
+<body class="bg-stone-50">
 
     {{-- NAV --}}
-    <header class="fixed inset-x-0 top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between text-sm bg-stone-900/90 backdrop-blur-sm">
-            <div class="flex items-center gap-6">
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-[#2a1810] to-[#3d2817] shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex items-center justify-between h-20">
+
                 {{-- Logo --}}
-                <a href="{{ route('home') }}" class="flex items-center gap-2 font-bold text-white hover:opacity-90 transition">
-                    <img src="{{ asset('LOGO2.png') }}" class="h-8 w-auto" alt="SeduhRasa Coffee Logo">
-                              <span class="text-1xl font-bold tracking-tight">
-            <span class="text-white">Seduh</span><span
-              class="text-amber-400 hover:text-amber-300 transition">Rasa</span>
-          </span>
+                <a href="/" class="flex items-center gap-3 group">
+                    <div class="w-12 h-12 bg-gradient-to-br from-[#8b6f47] to-[#c4905c] rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"/>
+                        </svg>
+                    </div>
+                    <span class="font-['Great_Vibes'] text-3xl text-[#f5e6d3] group-hover:text-[#c4905c] transition-colors duration-300">
+                        SeduhRasa
+                    </span>
                 </a>
                 
                 {{-- Navigation Menu --}}
-                <nav class="hidden md:flex items-center gap-5 text-white/90">
-                    <a href="{{ route('home') }}" 
-                       class="@if(request()->routeIs('home')) text-amber-400 font-semibold @else hover:text-amber-400 @endif transition">Home</a>
-                    <a href="{{ route('about') }}" 
-                       class="@if(request()->routeIs('about')) text-amber-400 font-semibold @else hover:text-amber-400 @endif transition">About Us</a>
-                    <a href="{{ route('services') }}" 
-                       class="@if(request()->routeIs('services')) text-amber-400 font-semibold @else hover:text-amber-400 @endif transition">Services</a>
-                    <a href="{{ route('home') }}#product" class="hover:text-amber-400 transition">Product</a>
-                    <a href="{{ route('contact') }}" 
-                       class="@if(request()->routeIs('contact')) text-amber-400 font-semibold @else hover:text-amber-400 @endif transition">Contact</a>
-                </nav>
-            </div>
-            
-            {{-- Order Button --}}
-            <div class="hidden md:flex items-center gap-2 text-white/90">
-                <a href="{{ route('order') }}"
-                    class="px-3 py-1.5 rounded bg-amber-500 hover:bg-amber-600 text-stone-900 font-medium transition">
-                    Order
-                </a>
+                <div class="hidden md:flex items-center gap-8">
+                    <a href="/" class="text-[#e8d4b8] hover:text-[#c4905c] font-medium transition-colors duration-300">
+                        Home
+                    </a>
+                    <a href="#about" class="text-[#e8d4b8] hover:text-[#c4905c] font-medium transition-colors duration-300">
+                        About Us
+                    </a>
+                    <a href="#services" class="text-[#e8d4b8] hover:text-[#c4905c] font-medium transition-colors duration-300">
+                        Services
+                    </a>
+                    <a href="#product" class="text-[#e8d4b8] hover:text-[#c4905c] font-medium transition-colors duration-300">
+                        Product
+                    </a>
+                    <a href="#contact" class="text-[#e8d4b8] hover:text-[#c4905c] font-medium transition-colors duration-300">
+                        Contact
+                    </a>
+                </div>
             </div>
         </div>
-    </header>
+    </nav>
 
     {{-- MAIN CONTENT --}}
-    <div class="flex-grow">
+    <main class="min-h-screen">
         @yield('content')
-    </div>
+    </main>
 
     {{-- FOOTER --}}
-    <footer class="py-8 text-center text-sm text-stone-500 border-t border-stone-200 mt-auto">
-        © {{ date('Y') }} SeduhRasa Coffee. All rights reserved.
+    <footer class="bg-gradient-to-r from-[#2a1810] to-[#3d2817] text-[#e8d4b8] py-8 text-center border-t border-[#5c3d2e]">
+        <p class="text-sm">© {{ date('Y') }} SeduhRasa Coffee. All rights reserved.</p>
     </footer>
 
     @stack('scripts')
 </body>
-
 </html>
