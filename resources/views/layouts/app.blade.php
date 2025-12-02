@@ -174,7 +174,7 @@
             <span>Kelola Kasir</span>
           </a>
 
-        {{-- STAFF / KASIR --}}
+        {{-- STAFF / KASIR / ADMIN --}}
         @else
           <div class="text-xs font-semibold uppercase tracking-wider text-white/40 px-3 mb-3 mt-6">
             Manajemen Data
@@ -238,6 +238,20 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
             </svg>
             <span>Order</span>
+          </a>
+
+          {{-- 🔹 Tombol baru: Pesan --}}
+          <a href="{{ route('admin.messages.index') }}"
+             @class([
+                 'nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium',
+                 'active bg-white/10 text-white backdrop-blur' => request()->routeIs('admin.messages.*'),
+                 'text-white/70 hover:bg-white/5 hover:text-white' => !request()->routeIs('admin.messages.*'),
+             ])>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M8 10h8M8 14h5M5 5h14a2 2 0 012 2v8a2 2 0 01-2 2h-6l-4 3v-3H5a2 2 0 01-2-2V7a2 2 0 012-2z"/>
+            </svg>
+            <span>Pesan</span>
           </a>
         @endif
       </nav>

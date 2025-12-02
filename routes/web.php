@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Http\Request;
 
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\TransaksiController;
@@ -12,6 +11,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\SuperAdminController;
 use App\Http\Controllers\OwnerController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\ContactController;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,10 +26,9 @@ Route::view('/about', 'about')->name('about');
 Route::view('/services', 'services')->name('services');
 Route::view('/contact', 'contact')->name('contact');
 
-Route::post('/contact', function (Request $request) {
-    // Di sini kalau mau bisa simpan pesan / kirim email
-    return back()->with('success', 'Pesan berhasil dikirim!');
-})->name('contact.submit');
+// proses form contact -> simpan ke database lewat ContactController
+Route::post('/contact', [ContactController::class, 'store'])
+    ->name('contact.store');
 
 /*
 |--------------------------------------------------------------------------
@@ -155,13 +154,12 @@ Route::middleware(['auth', 'role:admin,staff,owner'])->group(function () {
 
         Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus'])
             ->name('orders.updateStatus');
+
+        // 🔹 Halaman pesan dari form Contact
+        Route::get('messages', [ContactController::class, 'index'])
+            ->name('messages.index');
     });
 });
 
-/*
-|--------------------------------------------------------------------------
-| UTILITIES
-|--------------------------------------------------------------------------
-*/
 
 Route::get('/ping', fn () => 'PONG from ' . base_path());

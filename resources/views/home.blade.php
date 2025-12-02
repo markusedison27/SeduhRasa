@@ -41,19 +41,7 @@
                         Discover the Art of Perfect Coffee
                     </p>
 
-                    <div class="flex flex-col sm:flex-row gap-5 justify-center">
-                        {{-- Explore Menu --}}
-                        <a href="#explore"
-                           class="group relative overflow-hidden bg-[#8b6f47] text-white px-12 py-5 rounded-full font-semibold text-lg hover:bg-[#a67c52] transition-all duration-300 shadow-xl hover:shadow-2xl hover:shadow-[#8b6f47]/50 hover:scale-105">
-                            <span class="relative z-10">Explore Menu</span>
-                        </a>
-
-                        {{-- Contact Us --}}
-                        <a href="#contact"
-                           class="group bg-white/10 backdrop-blur-md border-2 border-white/40 text-white px-12 py-5 rounded-full font-semibold text-lg hover:bg-white hover:text-[#5c3d2e] transition-all duration-300 shadow-xl hover:scale-105">
-                            Contact Us
-                        </a>
-
+                    <div class="flex flex-col sm:flex-row gap-5 justify-center">    
                         {{-- Order Sekarang --}}
                         <a href="{{ url('/order') }}"
                            class="group bg-[#a67c52] text-white px-12 py-5 rounded-full font-semibold text-lg hover:bg-[#8b6f47] transition-all duration-300 shadow-xl hover:scale-105">

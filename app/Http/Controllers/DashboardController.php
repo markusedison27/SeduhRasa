@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
-use Illuminate\Http\Request;
+use App\Models\ContactMessage;
 
 class DashboardController extends Controller
 {
@@ -31,11 +31,18 @@ class DashboardController extends Controller
         // JUMLAH PESANAN YANG BELUM DIPROSES (status pending)
         $pendingCount = Order::where('status', 'pending')->count();
 
-        // pesanan terbaru (boleh semua atau khusus pending, di sini kita ambil pending dulu)
+        // pesanan terbaru (pending)
         $pesananTerbaru = Order::where('status', 'pending')
             ->latest()
             ->take(5)
             ->get();
+
+        // 🔹 PESAN DARI HALAMAN CONTACT
+        $latestMessages = ContactMessage::latest()
+            ->take(5)
+            ->get();                     // 5 pesan terbaru
+
+        $totalMessages  = ContactMessage::count(); // total semua pesan
 
         return view('dashboard', [
             'totalPenjualanHariIni'  => $totalPenjualanHariIni,
@@ -43,6 +50,10 @@ class DashboardController extends Controller
             'pengeluaranOperasional' => $pengeluaranOperasional,
             'pesananTerbaru'         => $pesananTerbaru,
             'pendingCount'           => $pendingCount,
+
+            // data untuk bagian Pesan Pengguna di dashboard (kalau mau dipakai)
+            'latestMessages'         => $latestMessages,
+            'totalMessages'          => $totalMessages,
         ]);
     }
 }
