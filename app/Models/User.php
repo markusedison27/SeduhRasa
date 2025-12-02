@@ -21,8 +21,10 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role',      // <— tambahin
-        'owner_id',  // <— tambahin
+        'role',        // role user (owner, staff, dll)
+        'owner_id',    // relasi ke owner
+        'google_id',   // id user dari Google
+        'avatar',      // foto profil dari Google (optional)
     ];
 
     /**

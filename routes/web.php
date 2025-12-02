@@ -12,6 +12,7 @@ use App\Http\Controllers\SuperAdminController;
 use App\Http\Controllers\OwnerController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\GoogleAuthController; // <-- TAMBAHAN INI
 
 /*
 |--------------------------------------------------------------------------
@@ -55,9 +56,18 @@ Route::get('/pesanan/{order}/berhasil', [OrderController::class, 'showCustomer']
 |--------------------------------------------------------------------------
 */
 
+// form login biasa
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login'])->name('login.post');
 
+// LOGIN DENGAN GOOGLE
+Route::get('/oauth/google', [GoogleAuthController::class, 'redirect'])
+    ->name('google.redirect');
+
+Route::get('/oauth/google/callback', [GoogleAuthController::class, 'callback'])
+    ->name('google.callback');
+
+// logout
 Route::post('/logout', [LoginController::class, 'logout'])
     ->middleware('auth')
     ->name('logout');
