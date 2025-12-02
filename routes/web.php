@@ -17,8 +17,6 @@ use App\Http\Controllers\ContactController;
 |--------------------------------------------------------------------------
 | PUBLIC PAGES (TANPA LOGIN)
 |--------------------------------------------------------------------------
-| View ada di: resources/views/*.blade.php
-|--------------------------------------------------------------------------
 */
 
 Route::view('/', 'home')->name('home');
@@ -100,11 +98,11 @@ Route::middleware(['auth', 'role:super_admin'])->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| OWNER + ADMIN (BOLEH KELOLA KASIR/KARYAWAN)
+| OWNER (KHUSUS PEMILIK, BOLEH KELOLA KASIR)
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth', 'role:owner,admin'])->group(function () {
+Route::middleware(['auth', 'role:owner'])->group(function () {
 
     Route::get('/owner/dashboard', [OwnerController::class, 'index'])
         ->name('owner.dashboard');
@@ -112,6 +110,7 @@ Route::middleware(['auth', 'role:owner,admin'])->group(function () {
     Route::get('/owner/finance', [OwnerController::class, 'finance'])
         ->name('owner.finance');
 
+    // Manajemen kasir/karyawan oleh pemilik
     Route::get('/owner/kasir', [KaryawanController::class, 'index'])
         ->name('owner.kasir.index');
 
@@ -125,6 +124,8 @@ Route::middleware(['auth', 'role:owner,admin'])->group(function () {
 /*
 |--------------------------------------------------------------------------
 | STAFF / KARYAWAN (KASIR) + ADMIN + OWNER
+|--------------------------------------------------------------------------
+| Panel kasir / admin menggunakan prefix "admin"
 |--------------------------------------------------------------------------
 */
 
@@ -146,7 +147,7 @@ Route::middleware(['auth', 'role:admin,staff,owner'])->group(function () {
         // Manajemen pelanggan
         Route::resource('pelanggan', PelangganController::class);
 
-        // Manajemen karyawan
+        // Manajemen karyawan (kalau nanti mau dipakai lewat panel admin)
         Route::resource('karyawan', KaryawanController::class);
 
         // Halaman order untuk admin/staff/owner
@@ -155,11 +156,10 @@ Route::middleware(['auth', 'role:admin,staff,owner'])->group(function () {
         Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus'])
             ->name('orders.updateStatus');
 
-        // 🔹 Halaman pesan dari form Contact
+        // Halaman pesan dari form Contact
         Route::get('messages', [ContactController::class, 'index'])
             ->name('messages.index');
     });
 });
-
 
 Route::get('/ping', fn () => 'PONG from ' . base_path());

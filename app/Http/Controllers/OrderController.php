@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
-use App\Models\Pelanggan;   // <-- tambahin ini
+use App\Models\Pelanggan;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
@@ -38,30 +38,41 @@ class OrderController extends Controller
             'email' => 'nullable|email|max:100',
         ]);
 
-        // 2. Simpan ke session (logika lama kamu)
-        session([
-            'customer.name'  => $data['name'],
-            'customer.phone' => $data['phone'],
-            'customer.email' => $data['email'] ?? null,
-        ]);
+        // 2. Simpan / update ke tabel pelanggans
+        //    KUNCI: nomor telepon (supaya kalau orang yang sama pesan lagi, datanya di-update)
+        try {
+            $pelanggan = Pelanggan::updateOrCreate(
+                [
+                    'telepon' => $data['phone'], // <- kolom "telepon" di tabel pelanggans
+                ],
+                [
+                    'nama'   => $data['name'],          // kolom "nama"
+                    'email'  => $data['email'] ?? null, // kolom "email"
+                    'alamat' => null,                   // kalau belum ada alamat, kosongin dulu
+                ]
+            );
 
-        // 3. Simpan / update ke tabel pelanggans
-        $pelanggan = Pelanggan::updateOrCreate(
-            [
-                // kunci identitas pelanggan: nomor telepon
-                'telepon' => $data['phone'],
-            ],
-            [
-                'nama'   => $data['name'],
-                'email'  => $data['email'] ?? null,
-                'alamat' => null,
-            ]
-        );
+            // simpan id pelanggan ke session biar bisa dihubungkan ke tabel orders
+            session([
+                'customer.id'    => $pelanggan->id,
+                'customer.name'  => $data['name'],
+                'customer.phone' => $data['phone'],
+                'customer.email' => $data['email'] ?? null,
+            ]);
+        } catch (\Exception $e) {
+            // kalau gagal simpan pelanggan, jangan bikin user error di layar
+            // cukup log, dan lanjut pakai session aja
+            \Log::error('Gagal simpan pelanggan: ' . $e->getMessage());
 
-        // Kalau mau dipakai di order nanti:
-        // session(['customer.id' => $pelanggan->id]);
+            session([
+                'customer.id'    => null,
+                'customer.name'  => $data['name'],
+                'customer.phone' => $data['phone'],
+                'customer.email' => $data['email'] ?? null,
+            ]);
+        }
 
-        // 4. Lanjut ke halaman menu seperti biasa
+        // 3. Lanjut ke halaman menu seperti biasa
         return redirect()->route('menu');
     }
 
@@ -130,8 +141,9 @@ class OrderController extends Controller
                 ], 422);
             }
 
-            // nama pelanggan dari session
+            // nama & id pelanggan dari session
             $namaPelanggan = session('customer.name', 'Umum');
+            $pelangganId   = session('customer.id'); // boleh null kalau gagal simpan pelanggan tadi
 
             // metode pembayaran: "cod" / "dana"
             $metodePembayaran = $request->input('metode_pembayaran', 'cod');
@@ -144,15 +156,16 @@ class OrderController extends Controller
 
             $menuDipesan = implode(', ', $listMenu);
 
-            // Simpan ke tabel orders - SESUAIKAN DENGAN STRUKTUR TABEL YANG ADA
+            // Simpan ke tabel orders
             $order = Order::create([
+                'pelanggan_id'      => $pelangganId,   // <-- hubungkan ke tabel pelanggans
                 'kode_order'        => $kodeOrder,
                 'customer_name'     => $namaPelanggan,
                 'subtotal'          => $totalHarga,
                 'status'            => 'pending',
                 'metode_pembayaran' => $metodePembayaran,
                 'no_meja'           => $noMeja,
-                'keterangan'        => $menuDipesan, // Menu yang dipesan disimpan di keterangan
+                'keterangan'        => $menuDipesan,
             ]);
 
             // SELALU balas JSON untuk fetch() request

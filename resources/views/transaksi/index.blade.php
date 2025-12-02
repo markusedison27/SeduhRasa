@@ -1,515 +1,734 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container-fluid py-4 transaksi-dashboard">
+<div class="transaksi-page">
+    <div class="container-fluid py-4">
 
-    {{-- ================= HERO COFFEE GRADIENT + STAT RINGKAS ================= --}}
-    <div class="transaksi-hero mb-4 shadow-sm">
-        <div class="row align-items-center gy-3">
-            <div class="col-lg-8">
-                <h4 class="text-white mb-1">Laporan Transaksi</h4>
-                <p class="text-hero-subtitle mb-0">
-                    Pantau performa penjualan dan aktivitas transaksi di SeduhRasa Panel Kasir.
-                </p>
-            </div>
-            <div class="col-lg-4 text-lg-end">
-                <div class="hero-balance">
-                    <span class="hero-balance-label">Total Pendapatan</span>
-                    <div class="hero-balance-value">
-                        Rp {{ number_format($stats['total_revenue'], 0, ',', '.') }}
-                    </div>
+        {{-- Header dengan Gradient Coffee --}}
+        <div class="page-header mb-4">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h2 class="header-title mb-2">
+                        <i class="bi bi-receipt-cutoff me-2"></i>
+                        Laporan Transaksi
+                    </h2>
+                    <p class="header-subtitle mb-0">
+                        Pantau dan kelola seluruh transaksi penjualan coffee shop Anda
+                    </p>
+                </div>
+                <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                    <a href="{{ route('admin.transaksi.export') }}" class="btn btn-export">
+                        <i class="bi bi-file-earmark-excel me-2"></i>
+                        Export Excel
+                    </a>
                 </div>
             </div>
         </div>
 
-        {{-- 4 KARTU STAT DI DALAM HERO --}}
-        <div class="row g-3 mt-3">
-            <div class="col-md-3 col-6">
-                <div class="stat-pill stat-pill-light">
-                    <div class="stat-pill-icon icon-brown">
+        {{-- Stats Cards dengan Coffee Theme --}}
+        <div class="row g-3 mb-4">
+            <div class="col-lg-3 col-md-6">
+                <div class="stats-card revenue-card">
+                    <div class="stats-icon">
+                        <i class="bi bi-wallet2"></i>
+                    </div>
+                    <div class="stats-content">
+                        <div class="stats-label">Total Pendapatan</div>
+                        <div class="stats-value">Rp {{ number_format($stats['total_revenue'], 0, ',', '.') }}</div>
+                    </div>
+                    <div class="stats-bg-icon">
+                        <i class="bi bi-currency-dollar"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <div class="stats-card transaction-card">
+                    <div class="stats-icon">
                         <i class="bi bi-receipt"></i>
                     </div>
-                    <div>
-                        <div class="stat-pill-label">Total Transaksi</div>
-                        <div class="stat-pill-value">
-                            {{ number_format($stats['total_transactions']) }}
-                        </div>
+                    <div class="stats-content">
+                        <div class="stats-label">Total Transaksi</div>
+                        <div class="stats-value">{{ number_format($stats['total_transactions']) }}</div>
+                        <div class="stats-desc">Pesanan selesai</div>
+                    </div>
+                    <div class="stats-bg-icon">
+                        <i class="bi bi-receipt"></i>
                     </div>
                 </div>
             </div>
 
-            <div class="col-md-3 col-6">
-                <div class="stat-pill stat-pill-amber">
-                    <div class="stat-pill-icon icon-amber">
+            <div class="col-lg-3 col-md-6">
+                <div class="stats-card cash-card">
+                    <div class="stats-icon">
                         <i class="bi bi-cash-stack"></i>
                     </div>
-                    <div>
-                        <div class="stat-pill-label">Transaksi Cash</div>
-                        <div class="stat-pill-value">
-                            {{ number_format($stats['cash_count']) }}
-                        </div>
+                    <div class="stats-content">
+                        <div class="stats-label">Pembayaran Cash</div>
+                        <div class="stats-value">{{ number_format($stats['cash_count']) }}</div>
+                        <div class="stats-desc">Transaksi tunai</div>
+                    </div>
+                    <div class="stats-bg-icon">
+                        <i class="bi bi-cash"></i>
                     </div>
                 </div>
             </div>
 
-            <div class="col-md-3 col-6">
-                <div class="stat-pill stat-pill-cream">
-                    <div class="stat-pill-icon icon-cream">
+            <div class="col-lg-3 col-md-6">
+                <div class="stats-card transfer-card">
+                    <div class="stats-icon">
                         <i class="bi bi-credit-card"></i>
                     </div>
-                    <div>
-                        <div class="stat-pill-label">Transaksi Transfer</div>
-                        <div class="stat-pill-value">
-                            {{ number_format($stats['transfer_count']) }}
-                        </div>
+                    <div class="stats-content">
+                        <div class="stats-label">Pembayaran Transfer</div>
+                        <div class="stats-value">{{ number_format($stats['transfer_count']) }}</div>
+                        <div class="stats-desc">Non-tunai</div>
                     </div>
-                </div>
-            </div>
-
-            <div class="col-md-3 col-6">
-                <div class="stat-pill stat-pill-outline">
-                    <div class="stat-pill-icon icon-outline">
-                        <i class="bi bi-bag-check"></i>
-                    </div>
-                    <div>
-                        <div class="stat-pill-label">Rata-rata / Transaksi</div>
-                        <div class="stat-pill-value">
-                            @php
-                                $avg = $stats['total_transactions'] > 0
-                                    ? floor($stats['total_revenue'] / $stats['total_transactions'])
-                                    : 0;
-                            @endphp
-                            Rp {{ number_format($avg, 0, ',', '.') }}
-                        </div>
+                    <div class="stats-bg-icon">
+                        <i class="bi bi-credit-card-2-front"></i>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    {{-- ================= ALERT ================= --}}
-    @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show mb-3" role="alert">
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
+        {{-- Alert Messages --}}
+        @if(session('success'))
+            <div class="alert alert-success alert-dismissible fade show alert-custom" role="alert">
+                <i class="bi bi-check-circle-fill me-2"></i>
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
 
-    @if(session('error'))
-        <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
-            {{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
+        @if(session('error'))
+            <div class="alert alert-danger alert-dismissible fade show alert-custom" role="alert">
+                <i class="bi bi-exclamation-circle-fill me-2"></i>
+                {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
 
-    @if(session('info'))
-        <div class="alert alert-info alert-dismissible fade show mb-3" role="alert">
-            {{ session('info') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
-
-    <div class="row g-4">
-
-        {{-- ================= FILTER CARD ================= --}}
-        <div class="col-12">
-            <div class="card shadow-sm border-0 filter-card mb-3">
-                <div class="card-header bg-transparent border-0 pb-0 d-flex justify-content-between align-items-center flex-wrap gap-2">
-                    <div>
-                        <h6 class="fw-semibold mb-1">
-                            <i class="bi bi-funnel me-1"></i> Filter Laporan
-                        </h6>
-                        <p class="text-muted small mb-0">
-                            Sesuaikan rentang tanggal, metode pembayaran, atau cari nama / kode order.
-                        </p>
-                    </div>
-                    <div>
-                        <a href="{{ route('admin.transaksi.export') }}" class="btn btn-amber">
-                            <i class="bi bi-file-earmark-excel"></i>
-                            <span class="ms-1">Export Excel</span>
-                        </a>
-                    </div>
-                </div>
-                <div class="card-body pt-3">
-                    <form method="GET" action="{{ route('admin.transaksi.index') }}" class="row g-3 align-items-end">
-                        <div class="col-md-3">
-                            <label class="form-label filter-label">Tanggal Mulai</label>
-                            <input
-                                type="date"
-                                name="start_date"
-                                class="form-control"
-                                value="{{ request('start_date') }}"
-                            >
+        {{-- Filter Card --}}
+        <div class="card filter-card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-funnel me-2"></i>Filter & Pencarian
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="GET" action="{{ route('admin.transaksi.index') }}">
+                    <div class="row g-3">
+                        <div class="col-lg-3 col-md-6">
+                            <label class="form-label">
+                                <i class="bi bi-calendar-event me-1"></i>Tanggal Mulai
+                            </label>
+                            <input type="date" name="start_date" class="form-control" value="{{ request('start_date') }}">
                         </div>
-                        <div class="col-md-3">
-                            <label class="form-label filter-label">Tanggal Akhir</label>
-                            <input
-                                type="date"
-                                name="end_date"
-                                class="form-control"
-                                value="{{ request('end_date') }}"
-                            >
+                        <div class="col-lg-3 col-md-6">
+                            <label class="form-label">
+                                <i class="bi bi-calendar-check me-1"></i>Tanggal Akhir
+                            </label>
+                            <input type="date" name="end_date" class="form-control" value="{{ request('end_date') }}">
                         </div>
-                        <div class="col-md-3">
-                            <label class="form-label filter-label">Metode Pembayaran</label>
+                        <div class="col-lg-3 col-md-6">
+                            <label class="form-label">
+                                <i class="bi bi-wallet2 me-1"></i>Metode Pembayaran
+                            </label>
                             <select name="metode_pembayaran" class="form-select">
                                 <option value="">Semua Metode</option>
-                                <option value="cod"  {{ request('metode_pembayaran') == 'cod'  ? 'selected' : '' }}>
-                                    Bayar di Tempat (Cash)
-                                </option>
-                                <option value="dana" {{ request('metode_pembayaran') == 'dana' ? 'selected' : '' }}>
-                                    Non-tunai / Transfer
-                                </option>
+                                <option value="cod" {{ request('metode_pembayaran') == 'cod' ? 'selected' : '' }}>Cash</option>
+                                <option value="dana" {{ request('metode_pembayaran') == 'dana' ? 'selected' : '' }}>Transfer</option>
                             </select>
                         </div>
-                        <div class="col-md-3">
-                            <label class="form-label filter-label">Cari Nama / Kode Order</label>
-                            <input
-                                type="text"
-                                name="search"
-                                class="form-control"
-                                placeholder="Contoh: Markus / ORD-2025..."
-                                value="{{ request('search') }}"
-                            >
+                        <div class="col-lg-3 col-md-6">
+                            <label class="form-label">
+                                <i class="bi bi-search me-1"></i>Cari Transaksi
+                            </label>
+                            <input type="text" name="search" class="form-control" placeholder="Nama / Kode Order" value="{{ request('search') }}">
                         </div>
-
-                        <div class="col-12 d-flex justify-content-end gap-2 mt-1">
-                            <a href="{{ route('admin.transaksi.index') }}" class="btn btn-outline-secondary">
-                                <i class="bi bi-arrow-clockwise"></i>
-                                <span class="ms-1">Reset</span>
-                            </a>
-                            <button type="submit" class="btn btn-brown">
-                                <i class="bi bi-search"></i>
-                                <span class="ms-1">Tampilkan</span>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-coffee me-2">
+                                <i class="bi bi-search me-2"></i>Cari Data
                             </button>
+                            <a href="{{ route('admin.transaksi.index') }}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-clockwise me-2"></i>Reset Filter
+                            </a>
                         </div>
-                    </form>
-                </div>
+                    </div>
+                </form>
             </div>
         </div>
 
-        {{-- ================= TABLE CARD ================= --}}
-        <div class="col-12">
-            <div class="card shadow-sm border-0 table-card">
-                <div class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center flex-wrap gap-2">
-                    <div>
-                        <h6 class="fw-semibold mb-1">
-                            <i class="bi bi-table me-1"></i> Daftar Transaksi
-                        </h6>
-                        @if($transactions->count() > 0)
-                            <p class="text-muted small mb-0">
-                                Menampilkan {{ $transactions->firstItem() }}–{{ $transactions->lastItem() }}
-                                dari {{ $transactions->total() }} transaksi.
-                            </p>
-                        @else
-                            <p class="text-muted small mb-0">
-                                Belum ada transaksi untuk filter yang dipilih.
-                            </p>
-                        @endif
-                    </div>
-                </div>
-
-                <div class="card-body pt-0">
+        {{-- Table Card --}}
+        <div class="card table-card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-table me-2"></i>Daftar Transaksi
+                    </h5>
                     @if($transactions->count() > 0)
-                        <div class="table-responsive">
-                            <table class="table align-middle table-hover mb-0 transaksi-table">
-                                <thead>
-                                    <tr class="text-nowrap">
-                                        <th class="small">#</th>
-                                        <th class="small">Kode Order</th>
-                                        <th class="small">Tanggal & Waktu</th>
-                                        <th class="small">Customer</th>
-                                        <th class="small">Menu</th>
-                                        <th class="small text-end">Total</th>
-                                        <th class="small text-center">Pembayaran</th>
-                                        <th class="small text-center">Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($transactions as $index => $transaction)
-                                        <tr>
-                                            <td class="text-muted small">
-                                                {{ $transactions->firstItem() + $index }}
-                                            </td>
-                                            <td>
-                                                <span class="badge kode-order-badge">
-                                                    {{ $transaction->kode_order }}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <div class="small">
-                                                    <div>{{ $transaction->created_at->format('d M Y') }}</div>
-                                                    <div class="text-muted">
-                                                        {{ $transaction->created_at->format('H:i') }} WIB
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <strong>{{ $transaction->customer_name }}</strong>
+                        <span class="badge bg-coffee">
+                            Menampilkan {{ $transactions->firstItem() }}–{{ $transactions->lastItem() }} dari {{ $transactions->total() }}
+                        </span>
+                    @endif
+                </div>
+            </div>
+            <div class="card-body p-0">
+                @if($transactions->count() > 0)
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th width="50">#</th>
+                                    <th>Kode Order</th>
+                                    <th>Tanggal & Waktu</th>
+                                    <th>Customer</th>
+                                    <th>Menu</th>
+                                    <th class="text-end">Total</th>
+                                    <th class="text-center">Pembayaran</th>
+                                    <th class="text-center" width="120">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($transactions as $index => $transaction)
+                                    <tr>
+                                        <td class="text-muted">{{ $transactions->firstItem() + $index }}</td>
+                                        <td>
+                                            <span class="order-code">{{ $transaction->kode_order }}</span>
+                                        </td>
+                                        <td>
+                                            <div class="date-time">
+                                                <div class="date">{{ $transaction->created_at->format('d M Y') }}</div>
+                                                <div class="time">{{ $transaction->created_at->format('H:i') }} WIB</div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="customer-info">
+                                                <div class="customer-name">{{ $transaction->customer_name }}</div>
                                                 @if($transaction->no_meja)
-                                                    <div class="small text-muted">
-                                                        Meja: {{ $transaction->no_meja }}
+                                                    <div class="customer-table">
+                                                        <i class="bi bi-geo-alt-fill me-1"></i>Meja {{ $transaction->no_meja }}
                                                     </div>
                                                 @endif
-                                            </td>
-                                            <td>
-                                                <small class="text-muted">
-                                                    {{ Str::limit($transaction->keterangan, 60) }}
-                                                </small>
-                                            </td>
-                                            <td class="text-end">
-                                                <strong class="text-success">
-                                                    Rp {{ number_format($transaction->subtotal, 0, ',', '.') }}
-                                                </strong>
-                                            </td>
-                                            <td class="text-center">
-                                                @if($transaction->metode_pembayaran == 'cod')
-                                                    <span class="badge pembayaran-badge cash">
-                                                        <i class="bi bi-cash me-1"></i> Cash
-                                                    </span>
-                                                @else
-                                                    <span class="badge pembayaran-badge transfer">
-                                                        <i class="bi bi-credit-card me-1"></i> Transfer
-                                                    </span>
-                                                @endif
-                                            </td>
-                                            <td class="text-center">
-                                                <a
-                                                    href="{{ route('admin.transaksi.show', $transaction->id) }}"
-                                                    class="btn btn-sm btn-outline-brown me-1"
-                                                    title="Detail"
-                                                >
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="menu-text">{{ Str::limit($transaction->keterangan, 45) }}</span>
+                                        </td>
+                                        <td class="text-end">
+                                            <span class="price-tag">Rp {{ number_format($transaction->subtotal, 0, ',', '.') }}</span>
+                                        </td>
+                                        <td class="text-center">
+                                            @if($transaction->metode_pembayaran == 'cod')
+                                                <span class="payment-badge cash">
+                                                    <i class="bi bi-cash me-1"></i>Cash
+                                                </span>
+                                            @else
+                                                <span class="payment-badge transfer">
+                                                    <i class="bi bi-credit-card me-1"></i>Transfer
+                                                </span>
+                                            @endif
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="btn-group" role="group">
+                                                <a href="{{ route('admin.transaksi.show', $transaction->id) }}" 
+                                                   class="btn btn-sm btn-action btn-view" 
+                                                   title="Detail">
                                                     <i class="bi bi-eye"></i>
                                                 </a>
-                                                <form
-                                                    action="{{ route('admin.transaksi.destroy', $transaction->id) }}"
-                                                    method="POST"
-                                                    class="d-inline"
-                                                    onsubmit="return confirm('Yakin ingin menghapus transaksi ini?')"
-                                                >
+                                                <form action="{{ route('admin.transaksi.destroy', $transaction->id) }}" 
+                                                      method="POST" 
+                                                      class="d-inline"
+                                                      onsubmit="return confirm('Yakin ingin menghapus transaksi ini?')">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Hapus">
+                                                    <button type="submit" class="btn btn-sm btn-action btn-delete" title="Hapus">
                                                         <i class="bi bi-trash"></i>
                                                     </button>
                                                 </form>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                                <tfoot>
-                                    <tr>
-                                        <td colspan="5" class="text-end fw-semibold">
-                                            Total Halaman Ini:
-                                        </td>
-                                        <td colspan="3" class="fw-bold text-success">
-                                            Rp {{ number_format($transactions->sum('subtotal'), 0, ',', '.') }}
+                                            </div>
                                         </td>
                                     </tr>
-                                </tfoot>
-                            </table>
-                        </div>
-
-                        <div class="mt-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
-                            <div class="small text-muted">
-                                Menampilkan {{ $transactions->firstItem() }}–{{ $transactions->lastItem() }}
-                                dari {{ $transactions->total() }} transaksi.
+                                @endforeach
+                            </tbody>
+                            <tfoot>
+                                <tr class="table-footer">
+                                    <td colspan="5" class="text-end fw-bold">Total Halaman Ini:</td>
+                                    <td colspan="3" class="text-start fw-bold text-success">
+                                        Rp {{ number_format($transactions->sum('subtotal'), 0, ',', '.') }}
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    <div class="card-footer">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <div class="pagination-info">
+                                Menampilkan {{ $transactions->firstItem() }}–{{ $transactions->lastItem() }} dari {{ $transactions->total() }} transaksi
                             </div>
                             <div>
                                 {{ $transactions->links() }}
                             </div>
                         </div>
-                    @else
-                        <div class="alert alert-info mb-0">
-                            <i class="bi bi-info-circle me-1"></i>
-                            Belum ada transaksi. Data akan muncul setelah ada order berstatus
-                            <strong>"Selesai"</strong>.
+                    </div>
+                @else
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="bi bi-inbox"></i>
                         </div>
-                    @endif
-                </div>
+                        <h5>Belum Ada Transaksi</h5>
+                        <p class="text-muted">Data transaksi akan muncul setelah ada order yang selesai</p>
+                    </div>
+                @endif
             </div>
         </div>
+
     </div>
 </div>
 @endsection
 
 @push('styles')
 <style>
+    /* Color Variables - Coffee Theme */
     :root {
-        --coffee-dark: #2b1b12;
-        --coffee-brown: #4b2c20;
-        --coffee-amber: #f59e0b;
-        --coffee-cream: #fbf3e7;
-        --coffee-soft: #fff7ec;
+        --coffee-dark: #2B1810;
+        --coffee-brown: #4B2C20;
+        --coffee-medium: #6F4E37;
+        --coffee-light: #8B7355;
+        --coffee-cream: #D4A574;
+        --coffee-bg: #FAF7F4;
+        --coffee-card: #FFFFFF;
     }
 
-    .transaksi-dashboard {
-        background-color: #faf4ec;
+    .transaksi-page {
+        background: linear-gradient(135deg, #FAF7F4 0%, #F5EFE6 100%);
+        min-height: 100vh;
     }
 
-    .transaksi-hero {
-        background: linear-gradient(135deg, var(--coffee-brown), var(--coffee-amber));
-        border-radius: 1.5rem;
-        padding: 1.5rem 1.75rem;
-        color: #fff;
+    /* Page Header */
+    .page-header {
+        background: linear-gradient(135deg, var(--coffee-dark) 0%, var(--coffee-brown) 100%);
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 10px 30px rgba(43, 24, 16, 0.2);
+        position: relative;
+        overflow: hidden;
     }
 
-    .text-hero-subtitle {
-        font-size: 0.9rem;
-        opacity: 0.85;
+    .page-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 400px;
+        height: 400px;
+        background: radial-gradient(circle, rgba(212, 165, 116, 0.15) 0%, transparent 70%);
+        border-radius: 50%;
     }
 
-    .hero-balance-label {
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        opacity: 0.9;
-    }
-
-    .hero-balance-value {
-        font-size: 1.4rem;
+    .header-title {
+        color: #FFFFFF;
         font-weight: 700;
+        font-size: 2rem;
+        margin: 0;
+        position: relative;
+        z-index: 1;
     }
 
-    .stat-pill {
-        background-color: rgba(255, 255, 255, 0.14);
-        border-radius: 1rem;
-        padding: 0.75rem 0.9rem;
+    .header-subtitle {
+        color: rgba(255, 255, 255, 0.85);
+        font-size: 1rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .btn-export {
+        background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+        border: none;
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 12px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-export:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        color: white;
+    }
+
+    /* Stats Cards */
+    .stats-card {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
         display: flex;
         align-items: center;
-        gap: 0.6rem;
-        color: #fff;
-        backdrop-filter: blur(4px);
-        border: 1px solid rgba(255, 255, 255, 0.18);
+        gap: 1rem;
     }
 
-    .stat-pill-label {
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        letter-spacing: 0.06em;
-        opacity: 0.9;
+    .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
     }
 
-    .stat-pill-value {
-        font-weight: 700;
-        font-size: 1rem;
-    }
-
-    .stat-pill-icon {
-        width: 34px;
-        height: 34px;
-        border-radius: 999px;
-        display: inline-flex;
+    .stats-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 14px;
+        display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.05rem;
-        background-color: rgba(255, 255, 255, 0.16);
+        font-size: 1.75rem;
+        flex-shrink: 0;
+        position: relative;
+        z-index: 2;
     }
 
-    .stat-pill-light { background-color: rgba(255, 255, 255, 0.12); }
-    .stat-pill-amber { background-color: rgba(245, 158, 11, 0.18); }
-    .stat-pill-cream { background-color: rgba(251, 243, 231, 0.2); }
-    .stat-pill-outline {
-        background-color: transparent;
-        border-color: rgba(255, 255, 255, 0.6);
+    .stats-content {
+        flex: 1;
+        position: relative;
+        z-index: 2;
     }
 
-    .icon-brown { color: #fef3c7; }
-    .icon-amber { color: #fff; }
-    .icon-cream { color: #4b2c20; }
-    .icon-outline { color: #fff; }
-
-    .filter-card {
-        background: var(--coffee-soft);
-        border-radius: 1.25rem;
-    }
-
-    .filter-label {
-        font-size: 0.78rem;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        color: #6b4d34;
-    }
-
-    .btn-brown {
-        background-color: var(--coffee-brown);
-        border-color: var(--coffee-brown);
-        color: #fff;
-    }
-    .btn-brown:hover {
-        background-color: #3a2218;
-        border-color: #3a2218;
-    }
-
-    .btn-amber {
-        background-color: var(--coffee-amber);
-        border-color: var(--coffee-amber);
-        color: #1f130c;
-    }
-    .btn-amber:hover {
-        background-color: #d97706;
-        border-color: #d97706;
-        color: #1f130c;
-    }
-
-    .table-card {
-        border-radius: 1.25rem;
-    }
-
-    .transaksi-table thead tr {
-        background-color: #f5eee4;
-    }
-
-    .transaksi-table thead th {
-        border-bottom-width: 0;
-        font-size: 0.78rem;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        color: #6b4d34;
-    }
-
-    .transaksi-table tbody tr:nth-child(even) {
-        background-color: #fdf8f1;
-    }
-
-    .kode-order-badge {
-        background-color: #fef3c7;
-        color: #92400e;
-        border-radius: 999px;
-        padding: 0.35rem 0.75rem;
+    .stats-label {
         font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #6B7280;
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+
+    .stats-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #111827;
+        line-height: 1.2;
+    }
+
+    .stats-desc {
+        font-size: 0.8rem;
+        color: #9CA3AF;
+        margin-top: 0.25rem;
+    }
+
+    .stats-bg-icon {
+        position: absolute;
+        right: -20px;
+        bottom: -20px;
+        font-size: 8rem;
+        opacity: 0.05;
+        z-index: 1;
+    }
+
+    /* Stats Card Variants */
+    .revenue-card .stats-icon {
+        background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);
+        color: white;
+    }
+
+    .transaction-card .stats-icon {
+        background: linear-gradient(135deg, #F093FB 0%, #F5576C 100%);
+        color: white;
+    }
+
+    .cash-card .stats-icon {
+        background: linear-gradient(135deg, #4FACFE 0%, #00F2FE 100%);
+        color: white;
+    }
+
+    .transfer-card .stats-icon {
+        background: linear-gradient(135deg, #43E97B 0%, #38F9D7 100%);
+        color: white;
+    }
+
+    /* Cards */
+    .card {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, var(--coffee-brown) 0%, var(--coffee-medium) 100%);
+        border: none;
+        padding: 1.25rem 1.5rem;
+    }
+
+    .card-title {
+        color: white;
+        font-weight: 600;
+        font-size: 1.1rem;
+        margin: 0;
+    }
+
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    .card-footer {
+        background: #F9FAFB;
+        border-top: 1px solid #E5E7EB;
+        padding: 1rem 1.5rem;
+    }
+
+    /* Form Elements */
+    .form-label {
+        font-weight: 600;
+        color: var(--coffee-brown);
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control, .form-select {
+        border: 2px solid #E5E7EB;
+        border-radius: 10px;
+        padding: 0.65rem 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--coffee-medium);
+        box-shadow: 0 0 0 3px rgba(111, 78, 55, 0.1);
+    }
+
+    /* Buttons */
+    .btn-coffee {
+        background: linear-gradient(135deg, var(--coffee-brown) 0%, var(--coffee-medium) 100%);
+        border: none;
+        color: white;
+        padding: 0.65rem 1.5rem;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-coffee:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(75, 44, 32, 0.3);
+        color: white;
+    }
+
+    /* Table */
+    .table {
+        margin: 0;
+    }
+
+    .table thead {
+        background: linear-gradient(to right, #F9FAFB, #F3F4F6);
+    }
+
+    .table thead th {
+        border: none;
+        padding: 1rem 1.25rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+        color: var(--coffee-brown);
+    }
+
+    .table tbody td {
+        padding: 1.25rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #F3F4F6;
+    }
+
+    .table tbody tr {
+        transition: all 0.2s ease;
+    }
+
+    .table tbody tr:hover {
+        background: #FFFBF5;
+        transform: scale(1.01);
+    }
+
+    .table-footer {
+        background: linear-gradient(to right, #FEF3C7, #FDE68A);
+        font-weight: 700;
+    }
+
+    .table-footer td {
+        padding: 1rem 1.25rem;
+    }
+
+    /* Table Elements */
+    .order-code {
+        display: inline-block;
+        background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+        color: #92400E;
+        padding: 0.4rem 0.9rem;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 0.8rem;
+        font-family: 'Courier New', monospace;
+        letter-spacing: 0.5px;
+    }
+
+    .date-time {
+        display: flex;
+        flex-direction: column;
+        gap: 0.15rem;
+    }
+
+    .date-time .date {
+        font-weight: 600;
+        color: #374151;
+        font-size: 0.9rem;
+    }
+
+    .date-time .time {
+        color: #9CA3AF;
+        font-size: 0.8rem;
+    }
+
+    .customer-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .customer-name {
+        font-weight: 600;
+        color: #111827;
+    }
+
+    .customer-table {
+        font-size: 0.8rem;
+        color: #6B7280;
+    }
+
+    .menu-text {
+        color: #6B7280;
+        font-size: 0.9rem;
+        display: block;
+        line-height: 1.4;
+    }
+
+    .price-tag {
+        font-weight: 700;
+        color: #059669;
+        font-size: 1.05rem;
+    }
+
+    .payment-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.4rem 0.8rem;
+        border-radius: 8px;
+        font-size: 0.8rem;
         font-weight: 600;
     }
 
-    .pembayaran-badge {
-        border-radius: 999px;
-        font-size: 0.75rem;
-        padding: 0.3rem 0.7rem;
-    }
-    .pembayaran-badge.cash {
-        background-color: #fef3c7;
-        color: #92400e;
-    }
-    .pembayaran-badge.transfer {
-        background-color: #dbeafe;
-        color: #1d4ed8;
+    .payment-badge.cash {
+        background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+        color: #92400E;
     }
 
-    .btn-outline-brown {
-        border-color: #6b4d34;
-        color: #6b4d34;
-    }
-    .btn-outline-brown:hover {
-        background-color: #6b4d34;
-        color: #fff;
+    .payment-badge.transfer {
+        background: linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 100%);
+        color: #1E40AF;
     }
 
-    @media (max-width: 767.98px) {
-        .transaksi-hero {
-            border-radius: 1.1rem;
+    /* Action Buttons */
+    .btn-action {
+        border: 2px solid;
+        background: white;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        padding: 0;
+    }
+
+    .btn-view {
+        border-color: #3B82F6;
+        color: #3B82F6;
+    }
+
+    .btn-view:hover {
+        background: #3B82F6;
+        color: white;
+        transform: scale(1.1);
+    }
+
+    .btn-delete {
+        border-color: #EF4444;
+        color: #EF4444;
+    }
+
+    .btn-delete:hover {
+        background: #EF4444;
+        color: white;
+        transform: scale(1.1);
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+    }
+
+    .empty-icon {
+        font-size: 5rem;
+        color: #D1D5DB;
+        margin-bottom: 1.5rem;
+    }
+
+    .empty-state h5 {
+        color: #374151;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    /* Badges */
+    .bg-coffee {
+        background: linear-gradient(135deg, var(--coffee-brown) 0%, var(--coffee-medium) 100%);
+    }
+
+    /* Alert Custom */
+    .alert-custom {
+        border-radius: 12px;
+        border: none;
+        padding: 1rem 1.25rem;
+    }
+
+    /* Pagination */
+    .pagination-info {
+        color: #6B7280;
+        font-size: 0.9rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .header-title {
+            font-size: 1.5rem;
         }
-        .stat-pill {
-            padding: 0.65rem 0.75rem;
+        
+        .stats-card {
+            padding: 1.25rem;
+        }
+        
+        .stats-value {
+            font-size: 1.25rem;
+        }
+        
+        .table {
+            font-size: 0.85rem;
+        }
+        
+        .page-header {
+            padding: 1.5rem;
         }
     }
 </style>

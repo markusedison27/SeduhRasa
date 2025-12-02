@@ -65,7 +65,8 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    // ✅ UDAH DIGANTI DARI 'UTC' KE 'Asia/Jakarta'
+    'timezone' => 'Asia/Jakarta',
 
     /*
     |--------------------------------------------------------------------------
