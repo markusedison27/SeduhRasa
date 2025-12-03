@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -213,6 +214,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="header">
@@ -248,17 +250,15 @@
                 </div>
             </div>
             <div class="qr-code-container">
-    {{-- Ganti SVG dengan foto QR code real --}}
-    <img src="{{ asset('images/qr-code-sederhana-coffee.png') }}" 
-         alt="QR Code QRIS" 
-         class="img-fluid"
-         style="max-width: 220px; height: auto;">
-    
-    <p class="qr-instruction mt-3">
-        <strong>Scan kode QR</strong><br>
-        dengan aplikasi e-wallet atau mobile banking
-    </p>
-</div>
+                {{-- Ganti SVG dengan foto QR code real --}}
+                <img src="{{ asset('images/qr-code-sederhana-coffee.png') }}" alt="QR Code QRIS" class="img-fluid"
+                    style="max-width: 220px; height: auto;">
+
+                <p class="qr-instruction mt-3">
+                    <strong>Scan kode QR</strong><br>
+                    dengan aplikasi e-wallet atau mobile banking
+                </p>
+            </div>
             <div class="divider"></div>
 
             <div class="info-section">
@@ -277,37 +277,37 @@
                 <div class="qr-placeholder">
                     <div>
                         <svg width="150" height="150" viewBox="0 0 150 150" fill="none">
-                            <rect x="10" y="10" width="30" height="30" fill="#333"/>
-                            <rect x="50" y="10" width="10" height="10" fill="#333"/>
-                            <rect x="70" y="10" width="10" height="10" fill="#333"/>
-                            <rect x="90" y="10" width="10" height="10" fill="#333"/>
-                            <rect x="110" y="10" width="30" height="30" fill="#333"/>
-                            <rect x="18" y="18" width="14" height="14" fill="#fff"/>
-                            <rect x="118" y="18" width="14" height="14" fill="#fff"/>
-                            <rect x="10" y="50" width="10" height="10" fill="#333"/>
-                            <rect x="30" y="50" width="10" height="10" fill="#333"/>
-                            <rect x="50" y="50" width="10" height="10" fill="#333"/>
-                            <rect x="70" y="50" width="30" height="30" fill="#333"/>
-                            <rect x="110" y="50" width="10" height="10" fill="#333"/>
-                            <rect x="130" y="50" width="10" height="10" fill="#333"/>
-                            <rect x="78" y="58" width="14" height="14" fill="#fff"/>
-                            <rect x="10" y="70" width="10" height="10" fill="#333"/>
-                            <rect x="30" y="70" width="10" height="10" fill="#333"/>
-                            <rect x="110" y="70" width="10" height="10" fill="#333"/>
-                            <rect x="130" y="70" width="10" height="10" fill="#333"/>
-                            <rect x="10" y="90" width="10" height="10" fill="#333"/>
-                            <rect x="50" y="90" width="10" height="10" fill="#333"/>
-                            <rect x="90" y="90" width="10" height="10" fill="#333"/>
-                            <rect x="130" y="90" width="10" height="10" fill="#333"/>
-                            <rect x="10" y="110" width="30" height="30" fill="#333"/>
-                            <rect x="50" y="110" width="10" height="10" fill="#333"/>
-                            <rect x="70" y="110" width="10" height="10" fill="#333"/>
-                            <rect x="90" y="110" width="10" height="10" fill="#333"/>
-                            <rect x="110" y="110" width="10" height="10" fill="#333"/>
-                            <rect x="130" y="110" width="10" height="10" fill="#333"/>
-                            <rect x="18" y="118" width="14" height="14" fill="#fff"/>
-                            <rect x="50" y="130" width="10" height="10" fill="#333"/>
-                            <rect x="90" y="130" width="10" height="10" fill="#333"/>
+                            <rect x="10" y="10" width="30" height="30" fill="#333" />
+                            <rect x="50" y="10" width="10" height="10" fill="#333" />
+                            <rect x="70" y="10" width="10" height="10" fill="#333" />
+                            <rect x="90" y="10" width="10" height="10" fill="#333" />
+                            <rect x="110" y="10" width="30" height="30" fill="#333" />
+                            <rect x="18" y="18" width="14" height="14" fill="#fff" />
+                            <rect x="118" y="18" width="14" height="14" fill="#fff" />
+                            <rect x="10" y="50" width="10" height="10" fill="#333" />
+                            <rect x="30" y="50" width="10" height="10" fill="#333" />
+                            <rect x="50" y="50" width="10" height="10" fill="#333" />
+                            <rect x="70" y="50" width="30" height="30" fill="#333" />
+                            <rect x="110" y="50" width="10" height="10" fill="#333" />
+                            <rect x="130" y="50" width="10" height="10" fill="#333" />
+                            <rect x="78" y="58" width="14" height="14" fill="#fff" />
+                            <rect x="10" y="70" width="10" height="10" fill="#333" />
+                            <rect x="30" y="70" width="10" height="10" fill="#333" />
+                            <rect x="110" y="70" width="10" height="10" fill="#333" />
+                            <rect x="130" y="70" width="10" height="10" fill="#333" />
+                            <rect x="10" y="90" width="10" height="10" fill="#333" />
+                            <rect x="50" y="90" width="10" height="10" fill="#333" />
+                            <rect x="90" y="90" width="10" height="10" fill="#333" />
+                            <rect x="130" y="90" width="10" height="10" fill="#333" />
+                            <rect x="10" y="110" width="30" height="30" fill="#333" />
+                            <rect x="50" y="110" width="10" height="10" fill="#333" />
+                            <rect x="70" y="110" width="10" height="10" fill="#333" />
+                            <rect x="90" y="110" width="10" height="10" fill="#333" />
+                            <rect x="110" y="110" width="10" height="10" fill="#333" />
+                            <rect x="130" y="110" width="10" height="10" fill="#333" />
+                            <rect x="18" y="118" width="14" height="14" fill="#fff" />
+                            <rect x="50" y="130" width="10" height="10" fill="#333" />
+                            <rect x="90" y="130" width="10" height="10" fill="#333" />
                         </svg>
                     </div>
                 </div>
@@ -338,4 +338,5 @@
         </div>
     </div>
 </body>
+
 </html>
