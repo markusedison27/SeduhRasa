@@ -14,14 +14,14 @@ class MenuController extends Controller
 
     public function publicMenu()
     {
-        // Group menu berdasarkan kategori
-        $menuGroups = Menu::select('kategori')
+        // Group menu berdasarkan kategori (group)
+        $menuGroups = Menu::select('group')
             ->distinct()
             ->get()
             ->map(function ($group) {
                 return (object)[
-                    'kategori' => $group->kategori,
-                    'items' => Menu::where('kategori', $group->kategori)->get()
+                    'kategori' => $group->group,
+                    'items' => Menu::where('group', $group->group)->get()
                 ];
             });
 
@@ -49,32 +49,28 @@ class MenuController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nama_menu' => 'required',
-            'kategori'  => 'required',
-            'harga'     => 'required|numeric',
-            'suhu'      => 'nullable',
-            'gambar'    => 'nullable|image|max:2048',
-            // kalau form punya field group, boleh dibuat required
-            'group'     => 'nullable|string',
+            'nama_menu'   => 'required|string|max:255|unique:menus,nama_menu',
+            'group'       => 'required|string',
+            'harga'       => 'required|numeric|min:0',
+            'stok'        => 'required|integer|min:0', // ✅ VALIDASI STOK
+            'image'       => 'nullable|image|max:2048',
+            'description' => 'nullable|string',
         ]);
 
         // Simpan gambar
-        $gambar = null;
-        if ($request->hasFile('gambar')) {
-            $gambar = $request->file('gambar')->store('menu', 'public');
+        $imagePath = null;
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('menu', 'public');
         }
-
-        // kasih default untuk kolom `group` biar gak error
-        $group = $request->input('group') ?? 'General';
 
         // Simpan ke database
         Menu::create([
-            'nama_menu' => $request->nama_menu,
-            'kategori'  => $request->kategori,
-            'harga'     => $request->harga,
-            'suhu'      => $request->suhu,
-            'gambar'    => $gambar,
-            'group'     => $group,
+            'nama_menu'   => $request->nama_menu,
+            'group'       => $request->group,
+            'harga'       => $request->harga,
+            'stok'        => $request->stok, // ✅ SIMPAN STOK
+            'image'       => $imagePath,
+            'description' => $request->description,
         ]);
 
         return redirect()->route('admin.menus.index')
@@ -94,32 +90,30 @@ class MenuController extends Controller
         $menu = Menu::findOrFail($id);
 
         $request->validate([
-            'nama_menu' => 'required',
-            'kategori'  => 'required',
-            'harga'     => 'required|numeric',
-            'suhu'      => 'nullable',
-            'gambar'    => 'nullable|image|max:2048',
-            'group'     => 'nullable|string',
+            'nama_menu'   => 'required|string|max:255|unique:menus,nama_menu,' . $id,
+            'group'       => 'required|string',
+            'harga'       => 'required|numeric|min:0',
+            'stok'        => 'required|integer|min:0', // ✅ VALIDASI STOK
+            'image'       => 'nullable|image|max:2048',
+            'description' => 'nullable|string',
         ]);
 
-        $gambar = $menu->gambar;
-        if ($request->hasFile('gambar')) {
+        $imagePath = $menu->image;
+        if ($request->hasFile('image')) {
             // Hapus gambar lama jika ada
-            if ($gambar && Storage::disk('public')->exists($gambar)) {
-                Storage::disk('public')->delete($gambar);
+            if ($imagePath && Storage::disk('public')->exists($imagePath)) {
+                Storage::disk('public')->delete($imagePath);
             }
-            $gambar = $request->file('gambar')->store('menu', 'public');
+            $imagePath = $request->file('image')->store('menu', 'public');
         }
 
-        $group = $request->input('group') ?? $menu->group ?? 'General';
-
         $menu->update([
-            'nama_menu' => $request->nama_menu,
-            'kategori'  => $request->kategori,
-            'harga'     => $request->harga,
-            'suhu'      => $request->suhu,
-            'gambar'    => $gambar,
-            'group'     => $group,
+            'nama_menu'   => $request->nama_menu,
+            'group'       => $request->group,
+            'harga'       => $request->harga,
+            'stok'        => $request->stok, // ✅ UPDATE STOK
+            'image'       => $imagePath,
+            'description' => $request->description,
         ]);
 
         return redirect()->route('admin.menus.index')
@@ -131,8 +125,8 @@ class MenuController extends Controller
         $menu = Menu::findOrFail($id);
 
         // Hapus gambar jika ada
-        if ($menu->gambar && Storage::disk('public')->exists($menu->gambar)) {
-            Storage::disk('public')->delete($menu->gambar);
+        if ($menu->image && Storage::disk('public')->exists($menu->image)) {
+            Storage::disk('public')->delete($menu->image);
         }
 
         $menu->delete();
