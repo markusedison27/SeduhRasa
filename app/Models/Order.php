@@ -4,54 +4,39 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Pelanggan; // <-- supaya bisa pakai relasi ke Pelanggan
 
 class Order extends Model
 {
     use HasFactory;
 
-    /**
-     * Kolom yang boleh diisi mass assignment
-     * DISESUAIKAN DENGAN STRUKTUR TABEL YANG ADA
-     */
+    protected $table = 'orders';
+    
+    // Sesuaikan dengan struktur database Anda
+    protected $primaryKey = 'id'; // atau 'kode_order' jika itu primary key
+    
+    public $timestamps = true; // Gunakan created_at & updated_at
+
     protected $fillable = [
-        'pelanggan_id',      // <--- foreign key ke tabel pelanggans
-        'kode_order',        // varchar(255) - kode unik order
-        'customer_name',     // varchar(255) - nama pelanggan
-        'subtotal',          // bigint(20) - total harga
-        'status',            // varchar(255) - status: pending/proses/selesai/batal
-        'metode_pembayaran', // varchar(255) - cod/dana
-        'no_meja',           // varchar(255) - nomor meja
-        'meja_nomor',        // varchar(255) - alias untuk no_meja (jika ada)
-        'keterangan',        // text - detail menu yang dipesan
-        'waktu_order',       // datetime - waktu order dibuat (opsional)
+        'kode_order',
+        'status',
+        'metode_pembayaran',
+        'no_meja',
+        'customer_name',
+        'meja_nomor', 
+        'subtotal',
+        'waktu_order',
+        'keterangan',
     ];
 
-    /**
-     * Cast tipe data
-     */
-    protected $casts = [
-        'subtotal'     => 'integer',
-        'waktu_order'  => 'datetime',
-        'created_at'   => 'datetime',
-        'updated_at'   => 'datetime',
-    ];
-
-    /**
-     * RELASI: order ini milik satu pelanggan
-     */
-    public function pelanggan()
-    {
-        return $this->belongsTo(Pelanggan::class, 'pelanggan_id');
-    }
-
-    /**
-     * Accessor untuk kompatibilitas dengan code lama
-     * Agar bisa pakai $order->nama_pelanggan meski kolom aslinya customer_name
-     */
+    // Accessor untuk kompatibilitas dengan kode lama
     public function getNamaPelangganAttribute()
     {
         return $this->customer_name;
+    }
+
+    public function getNoMejaAttribute()
+    {
+        return $this->meja_nomor ?? $this->no_meja;
     }
 
     public function getTotalHargaAttribute()
@@ -59,17 +44,15 @@ class Order extends Model
         return $this->subtotal;
     }
 
-    public function getMenuDipesanAttribute()
-    {
-        return $this->keterangan;
-    }
-
-    /**
-     * Mutator untuk set nilai jika ada code yang masih pakai nama lama
-     */
+    // Mutator untuk menyimpan data
     public function setNamaPelangganAttribute($value)
     {
         $this->attributes['customer_name'] = $value;
+    }
+
+    public function setNoMejaAttribute($value)
+    {
+        $this->attributes['meja_nomor'] = $value;
     }
 
     public function setTotalHargaAttribute($value)
@@ -77,8 +60,23 @@ class Order extends Model
         $this->attributes['subtotal'] = $value;
     }
 
-    public function setMenuDipesanAttribute($value)
+    // Relasi ke order_items (jika ada)
+    public function items()
     {
-        $this->attributes['keterangan'] = $value;
+        return $this->hasMany(OrderItem::class, 'order_id', 'id');
+    }
+
+    // Method untuk mendapatkan menu yang dipesan
+    public function getMenuDipesanAttribute()
+    {
+        // Jika data disimpan di tabel order_items
+        if ($this->items()->count() > 0) {
+            return $this->items->map(function($item) {
+                return "{$item->name} x{$item->qty}";
+            })->implode(', ');
+        }
+        
+        // Jika tidak ada relasi, return string kosong
+        return $this->keterangan ?? '';
     }
 }

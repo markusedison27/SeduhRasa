@@ -120,6 +120,11 @@ Route::middleware(['auth', 'role:owner'])->group(function () {
     Route::get('/owner/finance', [OwnerController::class, 'finance'])
         ->name('owner.finance');
 
+    // --- TAMBAHAN BARU UNTUK QR CODE ---
+    Route::post('/owner/qrcode/upload', [OwnerController::class, 'uploadQrCode'])
+        ->name('owner.qrcode.upload');
+    // -----------------------------------
+
     // Manajemen kasir/karyawan oleh pemilik
     Route::get('/owner/kasir', [KaryawanController::class, 'index'])
         ->name('owner.kasir.index');

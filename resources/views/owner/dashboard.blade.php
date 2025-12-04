@@ -13,7 +13,7 @@
         </div>
     </div>
 
-    {{-- Ringkasan (dummy dulu, nanti bisa diisi data beneran dari database) --}}
+    {{-- Ringkasan --}}
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div>
             <div class="bg-white border rounded-lg shadow-sm">
@@ -22,11 +22,10 @@
                         Total Transaksi Hari Ini
                     </h6>
                     <div class="text-2xl font-semibold mb-1">
-                        {{-- TODO: ganti dengan data asli --}}
-                        0
+                        {{ $totalTransaksiHariIni }}
                     </div>
                     <small class="text-xs text-gray-400">
-                        Belum terhubung ke data transaksi.
+                        Total pesanan selesai hari ini.
                     </small>
                 </div>
             </div>
@@ -39,11 +38,10 @@
                         Perkiraan Pendapatan
                     </h6>
                     <div class="text-2xl font-semibold mb-1">
-                        {{-- TODO: ganti dengan data asli --}}
-                        Rp 0
+                        Rp {{ number_format($perkiraanPendapatan, 0, ',', '.') }}
                     </div>
                     <small class="text-xs text-gray-400">
-                        Silakan integrasikan dengan laporan keuangan.
+                        Total omzet dari transaksi selesai.
                     </small>
                 </div>
             </div>
@@ -56,11 +54,10 @@
                         Jumlah Staff Aktif
                     </h6>
                     <div class="text-2xl font-semibold mb-1">
-                        {{-- TODO: ganti dengan data asli --}}
-                        0
+                        {{ $jumlahStaffAktif }}
                     </div>
                     <small class="text-xs text-gray-400">
-                        Bisa diambil dari tabel karyawan.
+                        Perlu integrasi tabel karyawan.
                     </small>
                 </div>
             </div>
@@ -108,6 +105,56 @@
             </div>
         </div>
     </div>
+
+    {{-- FITUR BARU: Pengaturan QR Code Pembayaran --}}
+    <div class="bg-white border rounded-lg shadow-sm mb-6">
+        <div class="px-4 py-3 border-b">
+            <h5 class="text-lg font-semibold mb-0">📸 Pengaturan QR Code Pembayaran</h5>
+        </div>
+        <div class="p-4">
+            <p class="text-sm text-gray-500 mb-4">
+                Unggah gambar QR Code (misalnya QRIS/Dana) yang akan ditampilkan di halaman konfirmasi pesanan pelanggan.
+            </p>
+            
+            <form action="{{ route('owner.qrcode.upload') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+                @csrf
+                
+                {{-- Tampilkan QR Code yang sudah terupload (Jika ada) --}}
+                @if(isset($qrCodePath) && $qrCodePath)
+                    <div class="mb-4">
+                        <p class="font-medium text-gray-600 mb-2">QR Code Aktif Saat Ini:</p>
+                        {{-- Gunakan asset('storage/') untuk mengakses file yang diupload --}}
+                        <img src="{{ asset('storage/' . $qrCodePath) }}" alt="QR Code Pembayaran Aktif" class="w-32 h-32 object-contain border p-1 rounded-md">
+                        <small class="text-gray-500 block mt-1">Ganti QR Code di bawah jika ada perubahan.</small>
+                    </div>
+                @else
+                    <p class="text-yellow-600 text-sm">Belum ada QR Code yang diunggah. Harap unggah QR Code baru.</p>
+                @endif
+                
+                <div class="space-y-2">
+                    <label for="qrcode_file" class="block text-sm font-medium text-gray-700">
+                        Pilih Gambar QR Code (JPG/PNG, Maks 2MB)
+                    </label>
+                    <input type="file" name="qrcode_file" id="qrcode_file" required
+                           class="block w-full text-sm text-gray-500
+                                  file:mr-4 file:py-2 file:px-4
+                                  file:rounded-full file:border-0
+                                  file:text-sm file:font-semibold
+                                  file:bg-indigo-50 file:text-indigo-700
+                                  hover:file:bg-indigo-100">
+                </div>
+                
+                <div class="flex justify-end">
+                    <button type="submit"
+                            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md
+                                   shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                        <i class="bi bi-upload me-2"></i> Unggah & Simpan QR Code
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {{-- AKHIR FITUR BARU --}}
 
     {{-- Info akun owner --}}
     <div class="bg-white border rounded-lg shadow-sm">

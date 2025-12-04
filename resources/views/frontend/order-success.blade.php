@@ -1,4 +1,4 @@
-{{-- resources/views/frontend/order-success.blade.php (FINAL - Perbaikan) --}}
+{{-- resources/views/frontend/order-success.blade.php (DIPERBAIKI) --}}
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -7,29 +7,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     @php
-        // Pastikan library Carbon tersedia di environment Laravel/Blade
         use Carbon\Carbon;
         
-        // Asumsi variabel $order sudah tersedia dan berisi data pesanan
-        // Contoh data dummy untuk simulasi tampilan gambar:
-        $order = (object)[
-            'id' => 3,
-            'metode_pembayaran' => 'dana_transfer', // Mengubah 'cod' agar jadi digital
-            'nama_pelanggan' => 'arifn ilham',
-            'created_at' => new DateTime('2025-12-03 15:04:00'),
-            'no_meja' => 4,
-            'menu_dipesan' => 'kopi susu x1, americano x1, croisant x2', // Perbaiki agar ada beberapa item
-            'total_harga' => 150000,
-        ];
-        // Perbaikan minor pada nama pelanggan agar sesuai gambar:
-        $order->nama_pelanggan = ucwords(strtolower($order->nama_pelanggan)); 
-        $isDigital = $order->metode_pembayaran !== 'cod';
-        // URL placeholder untuk QR Code - HARUS DIGANTI dengan URL QR Code ASLI
-        $qrCodeUrl = asset('qr.png'); 
+        // Variabel $order dan $qrCodePath HARUS dikirim dari Controller
+        // JANGAN buat query atau data dummy di sini!
+        
+        $isDigital = isset($order->metode_pembayaran) && $order->metode_pembayaran !== 'cod';
+        
+        // QR Code URL - gunakan default jika tidak ada
+        $qrCodeUrl = isset($qrCodePath) && $qrCodePath 
+            ? asset('storage/' . $qrCodePath) 
+            : asset('default-qr.png');
     @endphp
 
     <style>
-        /* CSS yang diperbaiki */
         body{
             margin:0;
             font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -93,7 +84,6 @@
             margin-top:2px;
         }
 
-        /* Grid untuk Nama, Waktu, Meja, Pembayaran */
         .detail-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -120,9 +110,9 @@
             display:flex;
             justify-content:space-between;
             align-items:center;
-            padding-top: 10px; /* Tambahkan sedikit padding atas */
+            padding-top: 10px;
             margin-top: 10px; 
-            border-top: 1px dashed #e5e7eb; /* Tambahkan garis putus-putus pemisah */
+            border-top: 1px dashed #e5e7eb;
             font-size:16px; 
         }
         .total-row span:first-child {
@@ -163,13 +153,12 @@
             cursor: pointer;
             width: 80%; 
             max-width: 300px;
-            transition: background 0.2s; /* Tambahkan transisi hover */
+            transition: background 0.2s;
         }
         .btn:hover{
             background:#ea580c;
         }
 
-        /* box khusus pembayaran digital */
         .pay-box{
             margin-top:20px; 
             padding:16px 12px; 
@@ -199,11 +188,9 @@
             width: 100px; 
             height: auto;
             display: block;
-            border-radius: 4px; /* Tambahkan sedikit border radius pada QR */
+            border-radius: 4px;
         }
-        .btn-download { display: none; } 
 
-        /* Penyesuaian responsif untuk tata letak pay-box */
         @media(max-width:480px){
             .card{border-radius:14px;}
             .card-header{padding:14px 16px;}
@@ -240,7 +227,7 @@
                     <div class="order-id">#{{ $order->id }}</div>
                 </div>
 
-                {{-- Info utama (2x2 grid) --}}
+                {{-- Info utama --}}
                 <div class="detail-grid">
                     <div class="info-box">
                         <p class="label">Nama Pelanggan</p>
@@ -248,7 +235,6 @@
                     </div>
                     <div class="info-box">
                         <p class="label">Waktu</p>
-                        {{-- Menggunakan Carbon untuk pemformatan waktu --}}
                         <p class="value">{{ Carbon::parse($order->created_at)->format('d M Y, H:i') }} WIB</p>
                     </div>
                     @if($order->no_meja)
@@ -283,25 +269,24 @@
                     </div>
                 </div>
 
-                {{-- Box khusus instruksi kalau digital (dengan QR Code) --}}
+                {{-- Instruksi pembayaran digital --}}
                 @if($isDigital)
                     <div class="pay-box">
                         <div class="pay-box-instruction">
                             <div class="pay-box-title">Langkah Pembayaran</div>
                             <ol style="margin:0; padding-left:18px;">
-                                <li>Buka aplikasi **Dana / e-wallet** yang kamu gunakan.</li>
+                                <li>Buka aplikasi Dana / e-wallet yang kamu gunakan.</li>
                                 <li>Scan QR atau transfer ke nomor Dana kasir.</li>
-                                <li>Masukkan nominal sesuai **Total Pembayaran**.</li>
+                                <li>Masukkan nominal sesuai Total Pembayaran.</li>
                                 <li>Simpan bukti transfer dan tunjukkan ke kasir.</li>
                             </ol>
                             <small>Setelah transfer, pesananmu akan diproses oleh kasir.</small>
                         </div>
-                        {{-- QR Code Section --}}
                         <img src="{{ $qrCodeUrl }}" alt="QR Code Pembayaran">
                     </div>
                 @endif
 
-                {{-- Footnote --}}
+                {{-- Footer --}}
                 <div class="footer-text">
                     @if($isDigital)
                         <p>Setelah transfer, tunjukkan halaman ini dan bukti pembayaran kepada kasir untuk konfirmasi.</p>
@@ -313,8 +298,7 @@
 
                 {{-- Tombol --}}
                 <div class="btn-wrap">
-                    {{-- Ganti '#' dengan route('menu') atau URL menu yang sebenarnya --}}
-                    <a href="#" class="btn">Kembali ke Menu</a> 
+                    <a href="{{ route('menu') }}" class="btn">Kembali ke Menu</a>
                 </div>
             </div>
         </div>
