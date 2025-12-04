@@ -11,17 +11,16 @@ class MenuController extends Controller
     // ==========================
     // HALAMAN MENU PUBLIK /menu
     // ==========================
-
     public function publicMenu()
     {
-        // Group menu berdasarkan kategori (group)
+        // Group menu berdasarkan field "group"
         $menuGroups = Menu::select('group')
             ->distinct()
             ->get()
             ->map(function ($group) {
-                return (object)[
+                return (object) [
                     'kategori' => $group->group,
-                    'items' => Menu::where('group', $group->group)->get()
+                    'items'    => Menu::where('group', $group->group)->get(),
                 ];
             });
 
@@ -29,109 +28,113 @@ class MenuController extends Controller
     }
 
     // ==========================
-    // ADMIN MENU (admin.menus.*)
+    // ADMIN MENU
     // ==========================
 
-    // Tampilkan semua menu di halaman admin
     public function index()
     {
         $menus = Menu::all();
         return view('menus.index', compact('menus'));
     }
 
-    // Form tambah menu
     public function create()
     {
         return view('menus.create');
     }
 
-    // Simpan menu baru
     public function store(Request $request)
     {
         $request->validate([
-            'nama_menu'   => 'required|string|max:255|unique:menus,nama_menu',
-            'group'       => 'required|string',
-            'harga'       => 'required|numeric|min:0',
-            'stok'        => 'required|integer|min:0', // ✅ VALIDASI STOK
-            'image'       => 'nullable|image|max:2048',
+            'nama_menu' => 'required|string|max:255|unique:menus,nama_menu',
+            'group'     => 'required|string',
+            'harga'     => 'required|numeric|min:0',
+            'stok'      => 'required|integer|min:0',
+            'kategori'  => 'nullable|string|max:255',
+            'suhu'      => 'nullable|string|max:50',
+            'gambar'    => 'nullable|image|max:2048',
             'description' => 'nullable|string',
         ]);
 
-        // Simpan gambar
-        $imagePath = null;
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('menu', 'public');
+        $menu = new Menu();
+        $menu->nama_menu = $request->nama_menu;
+        $menu->group     = $request->group;
+        $menu->harga     = $request->harga;
+        $menu->stok      = $request->stok;
+        $menu->kategori  = $request->kategori;
+        $menu->suhu      = $request->suhu;
+        $menu->description = $request->description;
+
+        // upload gambar (pakai field "gambar" karena itu yang ada di blade)
+        if ($request->hasFile('gambar')) {
+            $path = $request->file('gambar')->store('menu', 'public');
+            $menu->gambar = $path;
         }
 
-        // Simpan ke database
-        Menu::create([
-            'nama_menu'   => $request->nama_menu,
-            'group'       => $request->group,
-            'harga'       => $request->harga,
-            'stok'        => $request->stok, // ✅ SIMPAN STOK
-            'image'       => $imagePath,
-            'description' => $request->description,
-        ]);
+        $menu->save();
 
-        return redirect()->route('admin.menus.index')
-                         ->with('success', 'Menu berhasil ditambahkan!');
+        return redirect()
+            ->route('admin.menus.index')
+            ->with('success', 'Menu berhasil ditambahkan!');
     }
 
-    // Form edit
     public function edit($id)
     {
         $menu = Menu::findOrFail($id);
         return view('menus.edit', compact('menu'));
     }
 
-    // Update menu
     public function update(Request $request, $id)
     {
         $menu = Menu::findOrFail($id);
 
         $request->validate([
-            'nama_menu'   => 'required|string|max:255|unique:menus,nama_menu,' . $id,
-            'group'       => 'required|string',
-            'harga'       => 'required|numeric|min:0',
-            'stok'        => 'required|integer|min:0', // ✅ VALIDASI STOK
-            'image'       => 'nullable|image|max:2048',
+            'nama_menu' => 'required|string|max:255|unique:menus,nama_menu,' . $id,
+            'harga'     => 'required|numeric|min:0',
+            'stok'      => 'required|integer|min:0',
+            'kategori'  => 'nullable|string|max:255',
+            'suhu'      => 'nullable|string|max:50',
+            'gambar'    => 'nullable|image|max:2048',
             'description' => 'nullable|string',
         ]);
 
-        $imagePath = $menu->image;
-        if ($request->hasFile('image')) {
-            // Hapus gambar lama jika ada
-            if ($imagePath && Storage::disk('public')->exists($imagePath)) {
-                Storage::disk('public')->delete($imagePath);
+        // UPDATE FIELD MANUAL (biar nggak kehalang fillable)
+        $menu->nama_menu   = $request->nama_menu;
+        $menu->harga       = $request->harga;
+        $menu->stok        = $request->stok;        // ⬅️ INI YANG PENTING
+        $menu->kategori    = $request->kategori;
+        $menu->suhu        = $request->suhu;
+        $menu->description = $request->description;
+
+        // handle gambar
+        if ($request->hasFile('gambar')) {
+            // hapus gambar lama jika ada
+            if ($menu->gambar && Storage::disk('public')->exists($menu->gambar)) {
+                Storage::disk('public')->delete($menu->gambar);
             }
-            $imagePath = $request->file('image')->store('menu', 'public');
+
+            $path = $request->file('gambar')->store('menu', 'public');
+            $menu->gambar = $path;
         }
 
-        $menu->update([
-            'nama_menu'   => $request->nama_menu,
-            'group'       => $request->group,
-            'harga'       => $request->harga,
-            'stok'        => $request->stok, // ✅ UPDATE STOK
-            'image'       => $imagePath,
-            'description' => $request->description,
-        ]);
+        $menu->save(); // ⬅️ SIMPAN PERUBAHAN
 
-        return redirect()->route('admin.menus.index')
-                         ->with('success', 'Menu berhasil diperbarui!');
+        return redirect()
+            ->route('admin.menus.index')
+            ->with('success', 'Menu berhasil diperbarui!');
     }
 
     public function destroy($id)
     {
         $menu = Menu::findOrFail($id);
 
-        // Hapus gambar jika ada
-        if ($menu->image && Storage::disk('public')->exists($menu->image)) {
-            Storage::disk('public')->delete($menu->image);
+        if ($menu->gambar && Storage::disk('public')->exists($menu->gambar)) {
+            Storage::disk('public')->delete($menu->gambar);
         }
 
         $menu->delete();
 
-        return redirect()->route('admin.menus.index')
-                         ->with('success', 'Menu berhasil dihapus!');
+        return redirect()
+            ->route('admin.menus.index')
+            ->with('success', 'Menu berhasil dihapus!');
     }
 }

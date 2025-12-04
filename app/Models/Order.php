@@ -10,41 +10,58 @@ class Order extends Model
     use HasFactory;
 
     protected $table = 'orders';
-    
-    // Sesuaikan dengan struktur database Anda
-    protected $primaryKey = 'id'; // atau 'kode_order' jika itu primary key
-    
-    public $timestamps = true; // Gunakan created_at & updated_at
+    protected $primaryKey = 'id';
+    public $timestamps = true;
 
+    // Sesuaikan dengan kolom yang benar-benar ada di tabel orders
     protected $fillable = [
+        'pelanggan_id',
         'kode_order',
         'status',
         'metode_pembayaran',
-        'no_meja',
+        'no_meja',        // kolom utama untuk nomor meja
         'customer_name',
-        'meja_nomor', 
         'subtotal',
         'waktu_order',
         'keterangan',
     ];
 
-    // Accessor untuk kompatibilitas dengan kode lama
+    /*
+    |--------------------------------------------------------------------------
+    | ACCESSORS
+    |--------------------------------------------------------------------------
+    */
+
+    // Alias lama: $order->nama_pelanggan
     public function getNamaPelangganAttribute()
     {
         return $this->customer_name;
     }
 
-    public function getNoMejaAttribute()
+    // Alias lama: $order->no_meja (dengan fallback ke meja_nomor jika ada)
+    public function getNoMejaAttribute($value)
     {
-        return $this->meja_nomor ?? $this->no_meja;
+        // $value adalah nilai dari kolom no_meja (kalau ada di DB)
+        if (!is_null($value)) {
+            return $value;
+        }
+
+        // fallback kalau dulu pernah pakai kolom meja_nomor
+        return $this->attributes['meja_nomor'] ?? null;
     }
 
+    // Alias lama: $order->total_harga
     public function getTotalHargaAttribute()
     {
         return $this->subtotal;
     }
 
-    // Mutator untuk menyimpan data
+    /*
+    |--------------------------------------------------------------------------
+    | MUTATORS
+    |--------------------------------------------------------------------------
+    */
+
     public function setNamaPelangganAttribute($value)
     {
         $this->attributes['customer_name'] = $value;
@@ -52,7 +69,8 @@ class Order extends Model
 
     public function setNoMejaAttribute($value)
     {
-        $this->attributes['meja_nomor'] = $value;
+        // Simpan ke kolom no_meja (kolom utama yang dipakai controller)
+        $this->attributes['no_meja'] = $value;
     }
 
     public function setTotalHargaAttribute($value)
@@ -60,23 +78,36 @@ class Order extends Model
         $this->attributes['subtotal'] = $value;
     }
 
-    // Relasi ke order_items (jika ada)
+    /*
+    |--------------------------------------------------------------------------
+    | RELATIONS
+    |--------------------------------------------------------------------------
+    */
+
     public function items()
     {
         return $this->hasMany(OrderItem::class, 'order_id', 'id');
     }
 
-    // Method untuk mendapatkan menu yang dipesan
+    /*
+    |--------------------------------------------------------------------------
+    | EXTRA ATTRIBUTE
+    |--------------------------------------------------------------------------
+    */
+
+    // $order->menu_dipesan
     public function getMenuDipesanAttribute()
     {
-        // Jika data disimpan di tabel order_items
-        if ($this->items()->count() > 0) {
-            return $this->items->map(function($item) {
-                return "{$item->name} x{$item->qty}";
-            })->implode(', ');
+        // Jika data detail disimpan di tabel order_items
+        if ($this->relationLoaded('items') || $this->items()->exists()) {
+            return $this->items
+                ->map(function ($item) {
+                    return "{$item->name} x{$item->qty}";
+                })
+                ->implode(', ');
         }
-        
-        // Jika tidak ada relasi, return string kosong
+
+        // Kalau tidak ada relasi, pakai keterangan sebagai fallback
         return $this->keterangan ?? '';
     }
 }
