@@ -54,7 +54,7 @@
                 <div class="rounded-2xl border-2 border-[#c4905c]/30 bg-gradient-to-br from-[#f5e6d3]/10 to-[#e8d4b8]/10 backdrop-blur-sm p-6 shadow-xl hover:shadow-2xl transition-all duration-300">
                     <div class="text-xs uppercase tracking-wide text-[#c4905c] font-bold mb-3">Misi</div>
                     <p class="text-[#f5e6d3] text-sm leading-relaxed">
-                        Menyatukan kualitas rasa dan kemudahan layanan—dari barista hingga pelanggan.
+                        Menyatukan kualitas rasa dan kemudahan layanan dari barista hingga pelanggan.
                     </p>
                 </div>
                 {{-- Nilai --}}

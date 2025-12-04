@@ -73,28 +73,47 @@
           @enderror
         </div>
 
-       {{-- Kategori --}}
-<div>
-  <label class="block text-sm font-medium text-neutral-700 mb-2">
-    Kategori
-  </label>
-  <select
-    name="kategori"
-    class="w-full rounded-xl border border-neutral-300 focus:border-amber-500 focus:ring-amber-500 text-sm px-3 py-2.5"
-  >
-    <option value="">-- Pilih Kategori --</option>
-    <option value="Cemilan" {{ old('kategori') == 'Cemilan' ? 'selected' : '' }}>Cemilan</option>
-    <option value="Mocktail & Tea" {{ old('kategori') == 'Mocktail & Tea' ? 'selected' : '' }}>Mocktail & Tea</option>
-    <option value="Coffee" {{ old('kategori') == 'Coffee' ? 'selected' : '' }}>Coffee</option>
-    <option value="Desserts" {{ old('kategori') == 'Desserts' ? 'selected' : '' }}>Desserts</option>
-    <option value="Kitchen Menu" {{ old('kategori') == 'Kitchen Menu' ? 'selected' : '' }}>Kitchen Menu</option>
-    <option value="Dimsum" {{ old('kategori') == 'Dimsum' ? 'selected' : '' }}>Dimsum</option>
-    <option value="Mie" {{ old('kategori') == 'Mie' ? 'selected' : '' }}>Mie</option>
-  </select>
-  @error('kategori')
-    <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
-  @enderror
-</div>
+        {{-- ✅ STOK (BARU) --}}
+        <div>
+          <label class="block text-sm font-medium text-neutral-700 mb-2">
+            Stok <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="number"
+            name="stok"
+            min="0"
+            value="{{ old('stok', 0) }}"
+            placeholder="100"
+            class="w-full rounded-xl border border-neutral-300 focus:border-amber-500 focus:ring-amber-500 placeholder:text-neutral-400 text-sm px-3 py-2.5"
+          />
+          <p class="mt-1 text-xs text-neutral-500">Jumlah stok yang tersedia</p>
+          @error('stok')
+            <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+          @enderror
+        </div>
+
+        {{-- Kategori --}}
+        <div>
+          <label class="block text-sm font-medium text-neutral-700 mb-2">
+            Kategori
+          </label>
+          <select
+            name="kategori"
+            class="w-full rounded-xl border border-neutral-300 focus:border-amber-500 focus:ring-amber-500 text-sm px-3 py-2.5"
+          >
+            <option value="">-- Pilih Kategori --</option>
+            <option value="Cemilan" {{ old('kategori') == 'Cemilan' ? 'selected' : '' }}>Cemilan</option>
+            <option value="Mocktail & Tea" {{ old('kategori') == 'Mocktail & Tea' ? 'selected' : '' }}>Mocktail & Tea</option>
+            <option value="Coffee" {{ old('kategori') == 'Coffee' ? 'selected' : '' }}>Coffee</option>
+            <option value="Desserts" {{ old('kategori') == 'Desserts' ? 'selected' : '' }}>Desserts</option>
+            <option value="Kitchen Menu" {{ old('kategori') == 'Kitchen Menu' ? 'selected' : '' }}>Kitchen Menu</option>
+            <option value="Dimsum" {{ old('kategori') == 'Dimsum' ? 'selected' : '' }}>Dimsum</option>
+            <option value="Mie" {{ old('kategori') == 'Mie' ? 'selected' : '' }}>Mie</option>
+          </select>
+          @error('kategori')
+            <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+          @enderror
+        </div>
 
         {{-- Suhu --}}
         <div>
