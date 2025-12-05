@@ -7,6 +7,8 @@ use App\Models\Menu;
 use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 class OrderController extends Controller
@@ -21,10 +23,9 @@ class OrderController extends Controller
 
         $customer = [
             'name' => session('customer.name'),
-            'id' => session('customer.id'),
+            'id'   => session('customer.id'),
         ];
 
-        // Sesuaikan dengan nama blade kamu untuk form awal customer
         return view('order', compact('menus', 'customer'));
     }
 
@@ -35,15 +36,14 @@ class OrderController extends Controller
     public function storeCustomerInfo(Request $request)
     {
         $data = $request->validate([
-            'name' => 'required|string|max:100',
+            'name'  => 'required|string|max:100',
             'email' => 'nullable|email|max:100',
             'phone' => 'nullable|string|max:20',
         ]);
 
-        // Simpan ke session saja
         session([
-            'customer.name' => $data['name'],
-            'customer.id' => null,
+            'customer.name'  => $data['name'],
+            'customer.id'    => null,
             'customer.email' => $data['email'] ?? null,
             'customer.phone' => $data['phone'] ?? null,
         ]);
@@ -55,16 +55,27 @@ class OrderController extends Controller
 
     /**
      * Simpan pesanan baru dari pelanggan (API / AJAX)
-     * Route: POST /orders
+     * Route: POST /orders  (name: orders.store)
      */
     public function store(Request $request)
     {
         try {
-            // Validasi ringan (no_meja optional)
-            $request->validate([
-                'metode_pembayaran' => 'nullable|string|max:50',
-                'no_meja' => 'nullable|string|max:10',
+            // ✅ VALIDASI INPUT WAJIB: METODE PEMBAYARAN & NO MEJA
+            $validator = Validator::make($request->all(), [
+                'metode_pembayaran' => 'required|string|max:50',
+                'no_meja'           => 'required|string|max:10',
+            ], [
+                'metode_pembayaran.required' => 'Metode pembayaran wajib dipilih.',
+                'no_meja.required'           => 'Nomor meja wajib diisi.',
             ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Data tidak lengkap.',
+                    'errors'  => $validator->errors(),
+                ], 422);
+            }
 
             /*
              * AMBIL ITEMS
@@ -89,13 +100,12 @@ class OrderController extends Controller
             $stockErrors = [];
             foreach ($items as $item) {
                 $menuName = $item['name'] ?? null;
-                $qty = (int) ($item['qty'] ?? 1);
+                $qty      = (int)($item['qty'] ?? 1);
 
                 if (!$menuName || $qty <= 0) {
                     continue;
                 }
 
-                // Cari menu berdasarkan nama
                 $menu = Menu::where('nama_menu', $menuName)->first();
 
                 if (!$menu) {
@@ -103,13 +113,11 @@ class OrderController extends Controller
                     continue;
                 }
 
-                // Cek stok
                 if ($menu->stok < $qty) {
                     $stockErrors[] = "Stok '{$menuName}' tidak mencukupi. Stok tersedia: {$menu->stok}";
                 }
             }
 
-            // Jika ada error stok, kembalikan error
             if (!empty($stockErrors)) {
                 return response()->json([
                     'success' => false,
@@ -117,29 +125,29 @@ class OrderController extends Controller
                 ], 422);
             }
 
-            // ✅ GUNAKAN TRANSACTION UNTUK KEAMANAN DATA
+            // ✅ TRANSACTION UNTUK KEAMANAN DATA
             DB::beginTransaction();
 
-            $totalQty = 0;
+            $totalQty   = 0;
             $totalHarga = 0;
-            $listMenu = [];
+            $listMenu   = [];
 
             foreach ($items as $item) {
-                $menuName = $item['name'] ?? null;
-                $qty = (int) ($item['qty'] ?? 1);
-                $price = (int) ($item['price'] ?? 0);
+                $menuName = $item['name']  ?? null;
+                $qty      = (int)($item['qty']   ?? 1);
+                $price    = (int)($item['price'] ?? 0);
 
                 if (!$menuName || $qty <= 0 || $price < 0) {
                     continue;
                 }
 
-                // ✅ KURANGI STOK MENU
+                // Kurangi stok menu
                 $menu = Menu::where('nama_menu', $menuName)->first();
                 if ($menu) {
                     $menu->decreaseStock($qty);
                 }
 
-                $totalQty += $qty;
+                $totalQty   += $qty;
                 $totalHarga += $qty * $price;
 
                 $listMenu[] = $menuName . ' x' . $qty;
@@ -153,12 +161,12 @@ class OrderController extends Controller
                 ], 422);
             }
 
-            // nama & id pelanggan dari session
+            // Data pelanggan dari session
             $namaPelanggan = session('customer.name', 'Umum');
-            $pelangganId = session('customer.id');
+            $pelangganId   = session('customer.id');
 
             $metodePembayaran = $request->input('metode_pembayaran', 'cod');
-            $noMeja = $request->input('no_meja');
+            $noMeja           = $request->input('no_meja');
 
             // Generate kode order unik
             $kodeOrder = 'ORD-' . date('Ymd') . '-' . Str::upper(Str::random(5));
@@ -167,32 +175,33 @@ class OrderController extends Controller
 
             // Simpan ke tabel orders
             $order = Order::create([
-                'pelanggan_id' => $pelangganId,
-                'kode_order' => $kodeOrder,
-                'customer_name' => $namaPelanggan,
-                'subtotal' => $totalHarga,
-                'status' => 'pending',
+                'pelanggan_id'      => $pelangganId,
+                'kode_order'        => $kodeOrder,
+                'customer_name'     => $namaPelanggan,
+                'subtotal'          => $totalHarga,
+                'status'            => 'pending',
                 'metode_pembayaran' => $metodePembayaran,
-                'no_meja' => $noMeja,
-                'keterangan' => $menuDipesan,
+                'no_meja'           => $noMeja,
+                'keterangan'        => $menuDipesan,
             ]);
 
-            // ✅ COMMIT TRANSACTION
             DB::commit();
 
+            // ✅ DI SINI KALAU MAU TRIGGER REALTIME NOTIF (Pusher/Broadcast) BOLEH DITAMBAH
+            // event(new OrderCreated($order));
+
             return response()->json([
-                'success' => true,
-                'message' => 'Pesanan berhasil dibuat.',
-                'order_id' => $order->id,
+                'success'      => true,
+                'message'      => 'Pesanan berhasil dibuat.',
+                'order_id'     => $order->id,
                 'redirect_url' => route('customer.orders.show', $order->id),
             ], 201);
 
         } catch (\Exception $e) {
-            // ✅ ROLLBACK JIKA ERROR
             DB::rollBack();
 
-            \Log::error('Order Store Error: ' . $e->getMessage());
-            \Log::error('Stack trace: ' . $e->getTraceAsString());
+            Log::error('Order Store Error: ' . $e->getMessage());
+            Log::error('Stack trace: ' . $e->getTraceAsString());
 
             return response()->json([
                 'success' => false,
@@ -207,18 +216,13 @@ class OrderController extends Controller
      */
     public function showCustomer(Order $order)
     {
-        // QR Code untuk pembayaran (kalau ada di tabel settings)
         $qrCodePath = Setting::where('key', 'payment_qr_code_path')->value('value');
 
-        // Ganti 'frontend.order-success' sesuai struktur view kamu
         return view('frontend.order-success', compact('order', 'qrCodePath'));
     }
 
     /**
-     * Daftar order (untuk admin/staff di panel admin)
-     * Route:
-     *  - GET /admin/orders   (name: admin.orders.index)
-     *  - GET /orders         (umum, kalau dipakai)
+     * Daftar order (admin/staff/owner)
      */
     public function index()
     {
@@ -228,7 +232,6 @@ class OrderController extends Controller
 
     /**
      * Detail order (admin)
-     * Route: GET /admin/orders/{order}  & GET /orders/{order}
      */
     public function show(Order $order)
     {
@@ -237,11 +240,9 @@ class OrderController extends Controller
 
     /**
      * Update status order (admin)
-     * Route: PATCH /admin/orders/{order}/status
      */
     public function updateStatus(Request $request, Order $order)
     {
-        // Jangan terlalu ketat dulu, biarkan semua string diterima
         $request->validate([
             'status' => 'required|string|max:50',
         ]);
@@ -252,10 +253,8 @@ class OrderController extends Controller
         return back()->with('success', 'Status pesanan berhasil diperbarui!');
     }
 
-
     /**
      * Hapus order (admin)
-     * Route: DELETE /admin/orders/{order}
      */
     public function destroy(Order $order)
     {
@@ -273,7 +272,7 @@ class OrderController extends Controller
     public function statusJson(Order $order)
     {
         return response()->json([
-            'status' => $order->status,
+            'status'     => $order->status,
             'kode_order' => $order->kode_order,
         ]);
     }
@@ -281,6 +280,7 @@ class OrderController extends Controller
     /**
      * API: notifikasi order baru (JSON)
      * Route: GET /notifications/orders
+     * Dipakai untuk badge notif di kasir/admin (cek order pending 5 menit terakhir)
      */
     public function notificationsJson()
     {

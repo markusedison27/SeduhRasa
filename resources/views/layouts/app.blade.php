@@ -216,8 +216,6 @@
             <span>Pelanggan</span>
           </a>
 
-          {{-- ⚠️ Karyawan DIHAPUS di sini --}}
-
           <a href="{{ route('admin.orders.index') }}"
              @class([
                  'nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium',
@@ -347,6 +345,10 @@
   {{-- Mobile Backdrop --}}
   <div id="backdrop" class="fixed inset-0 bg-black/40 hidden z-30 lg:hidden" onclick="toggleSidebar()"></div>
 
+  {{-- SweetAlert2 untuk popup yang cantik --}}
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  {{-- Script tambahan per halaman (misal: checkout di /menu pakai Swal) --}}
   @stack('scripts')
 
   <script>
@@ -366,6 +368,21 @@
       }
     }
 
+    // Helper toast manis pakai SweetAlert
+    function showToast(icon = 'info', title = '', text = '') {
+      if (!window.Swal) return;
+      Swal.fire({
+        icon,
+        title,
+        text,
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+      });
+    }
+
     // === Notifikasi lonceng ===
     document.addEventListener('DOMContentLoaded', () => {
       const notifWrapper = document.getElementById('notif-wrapper');
@@ -380,6 +397,7 @@
       }
 
       const notifUrl = "{{ route('notifications.orders') }}";
+      let lastCount = 0;
 
       function toggleDropdown() {
         notifDrop.classList.toggle('hidden');
@@ -403,24 +421,37 @@
       });
 
       function renderNotifications(data) {
+        const count = data.count ?? 0;
+        const items = data.items ?? []; // kalau controller belum kirim items, akan jadi []
+
         // update titik merah
-        if (data.count > 0) {
+        if (count > 0) {
           notifDot.classList.remove('hidden');
         } else {
           notifDot.classList.add('hidden');
         }
 
-        if (!data.items || data.items.length === 0) {
-          notifList.innerHTML = `
-            <div class="px-4 py-3 text-xs text-stone-500">
-              Tidak ada order pending.
-            </div>
-          `;
+        if (!items.length) {
+          // fallback: cuma info jumlah
+          if (count > 0) {
+            notifList.innerHTML = `
+              <div class="px-4 py-3 text-xs text-stone-600">
+                Ada <span class="font-semibold">${count}</span> order pending. 
+                Buka halaman <span class="font-semibold">Order</span> untuk melihat detailnya.
+              </div>
+            `;
+          } else {
+            notifList.innerHTML = `
+              <div class="px-4 py-3 text-xs text-stone-500">
+                Tidak ada order pending.
+              </div>
+            `;
+          }
           return;
         }
 
         let html = '';
-        data.items.forEach(item => {
+        items.forEach(item => {
           html += `
             <a href="${item.url}"
                class="block px-4 py-3 hover:bg-stone-50 text-sm">
@@ -434,7 +465,7 @@
         notifList.innerHTML = html;
       }
 
-      function loadNotifications() {
+      function loadNotifications(showToastOnNew = false) {
         notifList.innerHTML = `
           <div class="px-4 py-3 text-xs text-stone-500">
             Memuat notifikasi...
@@ -444,6 +475,13 @@
         fetch(notifUrl)
           .then(res => res.json())
           .then(data => {
+            const count = data.count ?? 0;
+
+            if (showToastOnNew && count > lastCount) {
+              showToast('success', 'Ada pesanan baru ☕', 'Cek di daftar order, ya!');
+            }
+
+            lastCount = count;
             renderNotifications(data);
           })
           .catch(err => {
@@ -457,16 +495,16 @@
       }
 
       // load pertama
-      loadNotifications();
+      loadNotifications(false);
 
       // tombol refresh manual
       notifRefresh?.addEventListener('click', (e) => {
         e.stopPropagation();
-        loadNotifications();
+        loadNotifications(false);
       });
 
-      // auto refresh tiap 20 detik (opsional)
-      setInterval(loadNotifications, 20000);
+      // auto refresh tiap 20 detik + toast kalau ada order baru
+      setInterval(() => loadNotifications(true), 20000);
     });
   </script>
 </body>

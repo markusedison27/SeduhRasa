@@ -12,11 +12,11 @@ use App\Http\Controllers\SuperAdminController;
 use App\Http\Controllers\OwnerController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ContactController;
-use App\Http\Controllers\GoogleAuthController; // <-- TAMBAHAN INI
+use App\Http\Controllers\GoogleAuthController; // <-- LOGIN GOOGLE
 
 /*
 |--------------------------------------------------------------------------
-| PUBLIC PAGES (TANPA LOGIN)
+| HALAMAN UMUM
 |--------------------------------------------------------------------------
 */
 
@@ -35,18 +35,32 @@ Route::post('/contact', [ContactController::class, 'store'])
 |--------------------------------------------------------------------------
 */
 
-Route::get('/order', [OrderController::class, 'create'])->name('order');
-Route::post('/order', [OrderController::class, 'storeCustomerInfo'])->name('order.storeInfo');
+Route::get('/order', [OrderController::class, 'create'])
+    ->name('order');
 
-Route::get('/menu', [MenuController::class, 'publicMenu'])->name('menu');
+Route::post('/order', [OrderController::class, 'storeCustomerInfo'])
+    ->name('order.storeInfo');
 
-Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
-Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
-Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+Route::get('/menu', [MenuController::class, 'publicMenu'])
+    ->name('menu');
 
+// daftar order publik (kalau mau dipakai)
+Route::get('/orders', [OrderController::class, 'index'])
+    ->name('orders.index');
+
+// API checkout (AJAX) – di controller sudah ada validasi no_meja & metode_pembayaran
+Route::post('/orders', [OrderController::class, 'store'])
+    ->name('orders.store');
+
+// detail order publik (kalau perlu)
+Route::get('/orders/{order}', [OrderController::class, 'show'])
+    ->name('orders.show');
+
+// API: cek status order (JSON)
 Route::get('/orders/{order}/status-json', [OrderController::class, 'statusJson'])
     ->name('orders.statusJson');
 
+// halaman sukses order untuk customer
 Route::get('/pesanan/{order}/berhasil', [OrderController::class, 'showCustomer'])
     ->name('customer.orders.show');
 
@@ -57,8 +71,11 @@ Route::get('/pesanan/{order}/berhasil', [OrderController::class, 'showCustomer']
 */
 
 // form login biasa
-Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [LoginController::class, 'login'])->name('login.post');
+Route::get('/login', [LoginController::class, 'showLoginForm'])
+    ->name('login');
+
+Route::post('/login', [LoginController::class, 'login'])
+    ->name('login.post');
 
 // LOGIN DENGAN GOOGLE
 Route::get('/oauth/google', [GoogleAuthController::class, 'redirect'])
@@ -74,7 +91,7 @@ Route::post('/logout', [LoginController::class, 'logout'])
 
 /*
 |--------------------------------------------------------------------------
-| NOTIFIKASI
+| NOTIFIKASI (dipakai untuk badge notif order baru di kasir/admin)
 |--------------------------------------------------------------------------
 */
 
@@ -120,10 +137,9 @@ Route::middleware(['auth', 'role:owner'])->group(function () {
     Route::get('/owner/finance', [OwnerController::class, 'finance'])
         ->name('owner.finance');
 
-    // --- TAMBAHAN BARU UNTUK QR CODE ---
+    // upload QR Code pembayaran
     Route::post('/owner/qrcode/upload', [OwnerController::class, 'uploadQrCode'])
         ->name('owner.qrcode.upload');
-    // -----------------------------------
 
     // Manajemen kasir/karyawan oleh pemilik
     Route::get('/owner/kasir', [KaryawanController::class, 'index'])
@@ -139,7 +155,6 @@ Route::middleware(['auth', 'role:owner'])->group(function () {
 /*
 |--------------------------------------------------------------------------
 | STAFF / KARYAWAN (KASIR) + ADMIN + OWNER
-|--------------------------------------------------------------------------
 | Panel kasir / admin menggunakan prefix "admin"
 |--------------------------------------------------------------------------
 */
@@ -162,7 +177,7 @@ Route::middleware(['auth', 'role:admin,staff,owner'])->group(function () {
         // Manajemen pelanggan
         Route::resource('pelanggan', PelangganController::class);
 
-        // Manajemen karyawan (kalau nanti mau dipakai lewat panel admin)
+        // Manajemen karyawan
         Route::resource('karyawan', KaryawanController::class);
 
         // Halaman order untuk admin/staff/owner
@@ -176,5 +191,11 @@ Route::middleware(['auth', 'role:admin,staff,owner'])->group(function () {
             ->name('messages.index');
     });
 });
+
+/*
+|--------------------------------------------------------------------------
+| TEST ROUTE
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/ping', fn () => 'PONG from ' . base_path());
