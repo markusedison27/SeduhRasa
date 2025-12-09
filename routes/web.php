@@ -2,6 +2,16 @@
 
 use Illuminate\Support\Facades\Route;
 
+// Tambahan untuk fitur lupa sandi pakai OTP
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use Illuminate\Auth\Events\PasswordReset;
+
+use App\Models\User;
+
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\TransaksiController;
 use App\Http\Controllers\PelangganController;
@@ -48,11 +58,11 @@ Route::get('/menu', [MenuController::class, 'publicMenu'])
 Route::get('/orders', [OrderController::class, 'index'])
     ->name('orders.index');
 
-// API checkout (AJAX) – di controller sudah ada validasi no_meja & metode_pembayaran
+// API checkout (AJAX)
 Route::post('/orders', [OrderController::class, 'store'])
     ->name('orders.store');
 
-// detail order publik (kalau perlu)
+// detail order publik
 Route::get('/orders/{order}', [OrderController::class, 'show'])
     ->name('orders.show');
 
@@ -66,7 +76,7 @@ Route::get('/pesanan/{order}/berhasil', [OrderController::class, 'showCustomer']
 
 /*
 |--------------------------------------------------------------------------
-| AUTH (LOGIN + LOGOUT)
+| AUTH (LOGIN + LOGOUT + LUPA SANDI OTP)
 |--------------------------------------------------------------------------
 */
 
@@ -77,7 +87,179 @@ Route::get('/login', [LoginController::class, 'showLoginForm'])
 Route::post('/login', [LoginController::class, 'login'])
     ->name('login.post');
 
-// LOGIN DENGAN GOOGLE
+/*
+|----------------------------------------------------------------------
+| LUPA SANDI PAKAI KODE OTP (BUKAN LINK)
+|----------------------------------------------------------------------
+*/
+
+// FORM lupa password (input email)
+Route::get('/forgot-password', function () {
+    return view('auth.forgot-password');
+})->middleware('guest')->name('password.request');
+
+// HANDLE kirim kode OTP ke email
+Route::post('/forgot-password', function (Request $request) {
+    $request->validate([
+        'email' => ['required', 'email'],
+    ]);
+
+    // cek email ada atau tidak
+    $user = User::where('email', $request->email)->first();
+
+    if (! $user) {
+        return back()->withErrors([
+            'email' => 'Email tidak terdaftar di sistem.',
+        ]);
+    }
+
+    // generate OTP 6 digit
+    $otp = random_int(100000, 999999);
+
+    // simpan / update ke tabel password_reset_tokens
+    DB::table('password_reset_tokens')->updateOrInsert(
+        ['email' => $request->email],
+        [
+            'token'      => $otp,
+            'created_at' => now(),
+        ]
+    );
+
+    // kirim OTP ke email (sekarang dikirim ke mail log / smtp sesuai .env)
+    try {
+        Mail::raw(
+            "Kode OTP reset password Anda adalah: {$otp}\n\nKode ini berlaku selama 10 menit.",
+            function ($message) use ($request) {
+                $message->to($request->email)
+                    ->subject('Kode OTP Reset Password - SeduhRasa');
+            }
+        );
+    } catch (\Throwable $e) {
+        // supaya kalau mailer error, aplikasi tidak 500
+        \Log::error('Gagal mengirim email OTP: ' . $e->getMessage());
+        // Opsional: tampilkan pesan friendly ke user
+        // return back()->withErrors(['email' => 'Terjadi kesalahan saat mengirim email. Coba lagi nanti.']);
+    }
+
+    // simpan email di session biar ga perlu ketik ulang
+    session([
+        'password_reset_email' => $request->email,
+    ]);
+
+    // redirect ke form input OTP
+    return redirect()->route('password.otp.form')
+        ->with('status', 'Kode OTP berhasil dikirim ke email Anda.');
+})->middleware('guest')->name('password.email');
+
+// FORM input OTP
+Route::get('/forgot-password/verify-otp', function () {
+    $email = session('password_reset_email');
+
+    if (! $email) {
+        return redirect()->route('password.request');
+    }
+
+    return view('auth.verify-otp', [
+        'email' => $email,
+    ]);
+})->middleware('guest')->name('password.otp.form');
+
+// HANDLE cek OTP
+Route::post('/forgot-password/verify-otp', function (Request $request) {
+    $request->validate([
+        'email' => ['required', 'email'],
+        'otp'   => ['required', 'digits:6'],
+    ]);
+
+    $record = DB::table('password_reset_tokens')
+        ->where('email', $request->email)
+        ->where('token', $request->otp)
+        ->first();
+
+    if (! $record) {
+        return back()->withErrors([
+            'otp' => 'Kode OTP salah.',
+        ])->withInput();
+    }
+
+    // cek expired (10 menit)
+    $created = \Carbon\Carbon::parse($record->created_at);
+    if ($created->lt(now()->subMinutes(10))) {
+        return back()->withErrors([
+            'otp' => 'Kode OTP sudah kadaluarsa. Silakan kirim ulang.',
+        ]);
+    }
+
+    // OTP valid -> izinkan ganti password
+    session([
+        'password_reset_email_verified' => $request->email,
+    ]);
+
+    return redirect()->route('password.reset.form');
+})->middleware('guest')->name('password.otp.verify');
+
+// FORM reset password setelah OTP benar
+Route::get('/reset-password', function () {
+    $email = session('password_reset_email_verified');
+
+    if (! $email) {
+        return redirect()->route('password.request');
+    }
+
+    return view('auth.reset-password-otp', [
+        'email' => $email,
+    ]);
+})->middleware('guest')->name('password.reset.form');
+
+// HANDLE simpan password baru
+Route::post('/reset-password', function (Request $request) {
+    $request->validate([
+        'email'    => ['required', 'email'],
+        'password' => ['required', 'confirmed', 'min:8'],
+    ]);
+
+    $email = session('password_reset_email_verified');
+
+    if (! $email || $email !== $request->email) {
+        return redirect()->route('password.request')
+            ->withErrors(['email' => 'Sesi reset password tidak valid, silakan ulangi proses.']);
+    }
+
+    $user = User::where('email', $request->email)->first();
+
+    if (! $user) {
+        return redirect()->route('password.request')
+            ->withErrors(['email' => 'Email tidak ditemukan.']);
+    }
+
+    // update password
+    $user->forceFill([
+        'password'       => Hash::make($request->password),
+        'remember_token' => Str::random(60),
+    ])->save();
+
+    // hapus token reset
+    DB::table('password_reset_tokens')
+        ->where('email', $request->email)
+        ->delete();
+
+    // clear session
+    session()->forget(['password_reset_email', 'password_reset_email_verified']);
+
+    event(new PasswordReset($user));
+
+    return redirect()->route('login')
+        ->with('status', 'Password berhasil direset. Silakan login dengan password baru.');
+})->middleware('guest')->name('password.reset.otp');
+// ================== END LUPA SANDI OTP ==================
+
+
+/*
+|--------------------------------------------------------------------------
+| LOGIN DENGAN GOOGLE
+|--------------------------------------------------------------------------
+*/
+
 Route::get('/oauth/google', [GoogleAuthController::class, 'redirect'])
     ->name('google.redirect');
 
@@ -91,7 +273,7 @@ Route::post('/logout', [LoginController::class, 'logout'])
 
 /*
 |--------------------------------------------------------------------------
-| NOTIFIKASI (dipakai untuk badge notif order baru di kasir/admin)
+| NOTIFIKASI
 |--------------------------------------------------------------------------
 */
 
@@ -114,7 +296,6 @@ Route::middleware(['auth', 'role:super_admin'])->group(function () {
     Route::get('/super-admin/owners', [SuperAdminController::class, 'ownersIndex'])
         ->name('super.owners.index');
 
-    // tombol "create" diarahkan ke index (form bisa di-modal di halaman index)
     Route::get('/super-admin/owners/create', function () {
         return redirect()->route('super.owners.index');
     })->name('super.owners.create');
@@ -125,7 +306,7 @@ Route::middleware(['auth', 'role:super_admin'])->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| OWNER (KHUSUS PEMILIK, BOLEH KELOLA KASIR)
+| OWNER
 |--------------------------------------------------------------------------
 */
 
@@ -137,11 +318,9 @@ Route::middleware(['auth', 'role:owner'])->group(function () {
     Route::get('/owner/finance', [OwnerController::class, 'finance'])
         ->name('owner.finance');
 
-    // upload QR Code pembayaran
     Route::post('/owner/qrcode/upload', [OwnerController::class, 'uploadQrCode'])
         ->name('owner.qrcode.upload');
 
-    // Manajemen kasir/karyawan oleh pemilik
     Route::get('/owner/kasir', [KaryawanController::class, 'index'])
         ->name('owner.kasir.index');
 
@@ -155,7 +334,6 @@ Route::middleware(['auth', 'role:owner'])->group(function () {
 /*
 |--------------------------------------------------------------------------
 | STAFF / KARYAWAN (KASIR) + ADMIN + OWNER
-| Panel kasir / admin menggunakan prefix "admin"
 |--------------------------------------------------------------------------
 */
 
@@ -166,27 +344,21 @@ Route::middleware(['auth', 'role:admin,staff,owner'])->group(function () {
 
     Route::prefix('admin')->name('admin.')->group(function () {
 
-        // Manajemen menu
         Route::resource('menus', MenuController::class);
 
-        // Transaksi: resource + export
         Route::resource('transaksi', TransaksiController::class);
         Route::get('transaksi/export', [TransaksiController::class, 'export'])
             ->name('transaksi.export');
 
-        // Manajemen pelanggan
         Route::resource('pelanggan', PelangganController::class);
 
-        // Manajemen karyawan
         Route::resource('karyawan', KaryawanController::class);
 
-        // Halaman order untuk admin/staff/owner
         Route::resource('orders', OrderController::class)->only(['index', 'show', 'destroy']);
 
         Route::patch('/orders/{order}/status', [OrderController::class, 'updateStatus'])
             ->name('orders.updateStatus');
 
-        // Halaman pesan dari form Contact
         Route::get('messages', [ContactController::class, 'index'])
             ->name('messages.index');
     });
