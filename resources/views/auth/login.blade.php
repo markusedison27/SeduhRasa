@@ -5,10 +5,21 @@
     <style>
         /* Coffee steam animation */
         @keyframes steam {
-            0%   { transform: translateY(0) scaleX(1); opacity: 0; }
-            50%  { opacity: 0.15; }
-            100% { transform: translateY(-40px) scaleX(1.5); opacity: 0; }
+            0% {
+                transform: translateY(0) scaleX(1);
+                opacity: 0;
+            }
+
+            50% {
+                opacity: 0.15;
+            }
+
+            100% {
+                transform: translateY(-40px) scaleX(1.5);
+                opacity: 0;
+            }
         }
+
         .steam span {
             position: absolute;
             bottom: 100%;
@@ -20,28 +31,60 @@
             filter: blur(8px);
             animation: steam 3s ease-out infinite;
         }
-        .steam span:nth-child(1) { animation-delay: 0s;   margin-left: -6px; }
-        .steam span:nth-child(2) { animation-delay: 0.7s; margin-left: 2px; }
-        .steam span:nth-child(3) { animation-delay: 1.4s; margin-left: -2px; }
+
+        .steam span:nth-child(1) {
+            animation-delay: 0s;
+            margin-left: -6px;
+        }
+
+        .steam span:nth-child(2) {
+            animation-delay: 0.7s;
+            margin-left: 2px;
+        }
+
+        .steam span:nth-child(3) {
+            animation-delay: 1.4s;
+            margin-left: -2px;
+        }
 
         /* Card entrance animation */
         @keyframes cardIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to   { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-        .card-animate { animation: cardIn 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+
+        .card-animate {
+            animation: cardIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
 
         /* Logo pulse */
         @keyframes logoPulse {
-            0%,100% { transform: scale(1); }
-            50%     { transform: scale(1.05); }
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
         }
-        .logo-pulse { animation: logoPulse 3s ease-in-out infinite; }
+
+        .logo-pulse {
+            animation: logoPulse 3s ease-in-out infinite;
+        }
 
         /* Input focus glow */
         .input-glow:focus {
             box-shadow: 0 0 0 3px rgba(198, 124, 78, 0.1),
-                        0 0 20px rgba(198, 124, 78, 0.15);
+                0 0 20px rgba(198, 124, 78, 0.15);
         }
 
         /* Button press effect */
@@ -56,23 +99,27 @@
         }
 
         /* Card glow effect */
-        .card-glow { position: relative; }
+        .card-glow {
+            position: relative;
+        }
+
         .card-glow::before {
             content: '';
             position: absolute;
             inset: -2px;
-            background: linear-gradient(
-                135deg,
-                rgba(198, 124, 78, 0.2),
-                rgba(123, 63, 0, 0.1)
-            );
+            background: linear-gradient(135deg,
+                    rgba(198, 124, 78, 0.2),
+                    rgba(123, 63, 0, 0.1));
             border-radius: 14px;
             opacity: 0;
             transition: opacity 0.3s ease;
             z-index: -1;
             filter: blur(10px);
         }
-        .card-glow:hover::before { opacity: 1; }
+
+        .card-glow:hover::before {
+            opacity: 1;
+        }
 
         /* Coffee bean decorations */
         .bean {
@@ -84,31 +131,97 @@
             opacity: 0;
             animation: beanFloat 20s ease-in-out infinite;
         }
+
         @keyframes beanFloat {
-            0%,100% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
-            10%     { opacity: 0.6; }
-            50%     { transform: translate(-30px, -100px) rotate(180deg); opacity: 0.3; }
-            90%     { opacity: 0.6; }
+
+            0%,
+            100% {
+                transform: translate(0, 0) rotate(0deg);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 0.6;
+            }
+
+            50% {
+                transform: translate(-30px, -100px) rotate(180deg);
+                opacity: 0.3;
+            }
+
+            90% {
+                opacity: 0.6;
+            }
         }
-        .bean:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
-        .bean:nth-child(2) { top: 60%; left: 15%; animation-delay: 5s; }
-        .bean:nth-child(3) { top: 40%; right: 12%; animation-delay: 10s; }
-        .bean:nth-child(4) { top: 75%; right: 18%; animation-delay: 15s; }
+
+        .bean:nth-child(1) {
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .bean:nth-child(2) {
+            top: 60%;
+            left: 15%;
+            animation-delay: 5s;
+        }
+
+        .bean:nth-child(3) {
+            top: 40%;
+            right: 12%;
+            animation-delay: 10s;
+        }
+
+        .bean:nth-child(4) {
+            top: 75%;
+            right: 18%;
+            animation-delay: 15s;
+        }
 
         /* Shake animation untuk error */
         @keyframes shake {
-            0%,100% { transform: translateX(0); }
-            10%,30%,50%,70%,90% { transform: translateX(-5px); }
-            20%,40%,60%,80%     { transform: translateX(5px); }
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            10%,
+            30%,
+            50%,
+            70%,
+            90% {
+                transform: translateX(-5px);
+            }
+
+            20%,
+            40%,
+            60%,
+            80% {
+                transform: translateX(5px);
+            }
         }
-        .shake { animation: shake 0.5s; }
+
+        .shake {
+            animation: shake 0.5s;
+        }
 
         /* Pulse untuk icon warning */
         @keyframes pulse {
-            0%,100% { opacity: 1; }
-            50%     { opacity: 0.6; }
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.6;
+            }
         }
-        .pulse-icon { animation: pulse 2s ease-in-out infinite; }
+
+        .pulse-icon {
+            animation: pulse 2s ease-in-out infinite;
+        }
     </style>
 
     {{-- Wrapper biar card tetap di tengah --}}
@@ -127,8 +240,7 @@
                     <span></span>
                     <span></span>
                     <img src="{{ asset('LOGO2.png') }}"
-                         class="h-16 w-16 rounded-xl object-cover shadow-lg shadow-[#7B3F00]/25"
-                         alt="SeduhRasa Logo">
+                        class="h-16 w-16 rounded-xl object-cover shadow-lg shadow-[#7B3F00]/25" alt="SeduhRasa Logo">
                 </div>
                 <span
                     class="text-xl font-bold tracking-tight bg-gradient-to-r from-[#7B3F00] to-[#C67C4E] bg-clip-text text-transparent">
@@ -149,54 +261,59 @@
                 @if ($errors->any())
                     @php
                         $errorMessage = $errors->first('email') ?? $errors->first();
-                        $isLocked   = $errorMessage && (str_contains($errorMessage, '🔒') || str_contains($errorMessage, 'terkunci'));
-                        $isWarning  = $errorMessage && (str_contains($errorMessage, '⚠') || str_contains($errorMessage, '⚠️') || str_contains($errorMessage, 'Sisa percobaan'));
-                        $isCritical = $errorMessage && (str_contains($errorMessage, '❌') || str_contains($errorMessage, 'dikunci') || str_contains($errorMessage, 'gagal'));
+                        $isLocked =
+                            $errorMessage &&
+                            (str_contains($errorMessage, '🔒') || str_contains($errorMessage, 'terkunci'));
+                        $isWarning =
+                            $errorMessage &&
+                            (str_contains($errorMessage, '⚠') ||
+                                str_contains($errorMessage, '⚠️') ||
+                                str_contains($errorMessage, 'Sisa percobaan'));
+                        $isCritical =
+                            $errorMessage &&
+                            (str_contains($errorMessage, '❌') ||
+                                str_contains($errorMessage, 'dikunci') ||
+                                str_contains($errorMessage, 'gagal'));
                         $lockSeconds = session('lock_remaining_seconds');
                     @endphp
 
-                    <div class="mb-5 rounded-xl ring-1 px-4 py-3.5 text-sm flex items-start gap-3 card-animate shake
-                        @if($isLocked || $isCritical)
-                            bg-red-50 text-red-800 ring-red-200/70
+                    <div
+                        class="mb-5 rounded-xl ring-1 px-4 py-3.5 text-sm flex items-start gap-3 card-animate shake
+                        @if ($isLocked || $isCritical) bg-red-50 text-red-800 ring-red-200/70
                         @elseif($isWarning)
                             bg-amber-50 text-amber-800 ring-amber-200/70
                         @else
-                            bg-red-50 text-red-700 ring-red-200/50
-                        @endif">
+                            bg-red-50 text-red-700 ring-red-200/50 @endif">
 
                         {{-- Icon berdasarkan tipe error --}}
-                        @if($isLocked)
-                            <svg class="w-5 h-5 flex-shrink-0 mt-0.5 pulse-icon"
-                                 fill="currentColor" viewBox="0 0 20 20">
+                        @if ($isLocked)
+                            <svg class="w-5 h-5 flex-shrink-0 mt-0.5 pulse-icon" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd"
-                                      d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
-                                      clip-rule="evenodd"/>
+                                    d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                                    clip-rule="evenodd" />
                             </svg>
                         @elseif($isWarning)
-                            <svg class="w-5 h-5 flex-shrink-0 mt-0.5 pulse-icon"
-                                 fill="currentColor" viewBox="0 0 20 20">
+                            <svg class="w-5 h-5 flex-shrink-0 mt-0.5 pulse-icon" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd"
-                                      d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                                      clip-rule="evenodd"/>
+                                    d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                                    clip-rule="evenodd" />
                             </svg>
                         @elseif($isCritical)
-                            <svg class="w-5 h-5 flex-shrink-0 mt-0.5 pulse-icon"
-                                 fill="currentColor" viewBox="0 0 20 20">
+                            <svg class="w-5 h-5 flex-shrink-0 mt-0.5 pulse-icon" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd"
-                                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                                      clip-rule="evenodd"/>
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                    clip-rule="evenodd" />
                             </svg>
                         @else
-                            <svg class="w-5 h-5 flex-shrink-0 mt-0.5"
-                                 fill="currentColor" viewBox="0 0 20 20">
+                            <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd"
-                                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                                      clip-rule="evenodd"/>
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                    clip-rule="evenodd" />
                             </svg>
                         @endif
 
                         <div class="flex-1">
-                            @if($isLocked && $lockSeconds)
+                            @if ($isLocked && $lockSeconds)
                                 <p class="font-medium leading-relaxed">
                                     Akun Anda terkunci karena terlalu banyak percobaan login gagal.
                                 </p>
@@ -211,7 +328,7 @@
                             @else
                                 <p class="font-medium leading-relaxed">{{ $errorMessage }}</p>
 
-                                @if($isWarning)
+                                @if ($isWarning)
                                     <p class="text-xs mt-2 opacity-80">
                                         Periksa kembali email dan password Anda dengan teliti.
                                         Hindari percobaan berulang agar akun tidak terkunci.
@@ -229,19 +346,13 @@
 
                     <!-- Email input -->
                     <div class="relative group">
-                        <input
-                            id="email"
-                            name="email"
-                            type="email"
-                            autocomplete="username"
-                            required
+                        <input id="email" name="email" type="email" autocomplete="username" required
                             value="{{ old('email') }}"
                             class="peer w-full px-4 py-3 rounded-xl border-2 border-stone-200 bg-stone-50/50
                                    focus:border-[#C67C4E] focus:bg-white focus:ring-0
                                    placeholder-transparent transition-all duration-200 input-glow"
                             placeholder="Email">
-                        <label
-                            for="email"
+                        <label for="email"
                             class="float-label absolute left-4 top-3.5 px-1 text-stone-500 text-sm pointer-events-none
                                    peer-focus:text-xs peer-focus:-top-2.5 peer-focus:left-3 peer-focus:bg-white peer-focus:text-[#7B3F00] peer-focus:font-medium
                                    peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:-top-2.5 peer-[:not(:placeholder-shown)]:left-3 peer-[:not(:placeholder-shown)]:bg-white peer-[:not(:placeholder-shown)]:font-medium">
@@ -249,28 +360,21 @@
                         </label>
                         <div
                             class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none opacity-0 peer-focus:opacity-100 transition-opacity">
-                            <svg class="w-5 h-5 text-[#C67C4E]"
-                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-5 h-5 text-[#C67C4E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                             </svg>
                         </div>
                     </div>
 
                     <!-- Password input -->
                     <div class="relative group">
-                        <input
-                            id="password"
-                            name="password"
-                            type="password"
-                            autocomplete="current-password"
-                            required
+                        <input id="password" name="password" type="password" autocomplete="current-password" required
                             class="peer w-full px-4 py-3 rounded-xl border-2 border-stone-200 bg-stone-50/50
                                    focus:border-[#C67C4E] focus:bg-white focus:ring-0
                                    placeholder-transparent transition-all duration-200 input-glow"
                             placeholder="Password">
-                        <label
-                            for="password"
+                        <label for="password"
                             class="float-label absolute left-4 top-3.5 px-1 text-stone-500 text-sm pointer-events-none
                                    peer-focus:text-xs peer-focus:-top-2.5 peer-focus:left-3 peer-focus:bg-white peer-focus:text-[#7B3F00] peer-focus:font-medium
                                    peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:-top-2.5 peer-[:not(:placeholder-shown)]:left-3 peer-[:not(:placeholder-shown)]:bg-white peer-[:not(:placeholder-shown)]:font-medium">
@@ -278,10 +382,9 @@
                         </label>
                         <div
                             class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none opacity-0 peer-focus:opacity-100 transition-opacity">
-                            <svg class="w-5 h-5 text-[#C67C4E]"
-                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-5 h-5 text-[#C67C4E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                             </svg>
                         </div>
                     </div>
@@ -289,9 +392,7 @@
                     <!-- Remember & Forgot -->
                     <div class="flex items-center justify-between pt-1">
                         <label class="inline-flex items-center gap-2 text-sm cursor-pointer group/check">
-                            <input
-                                type="checkbox"
-                                name="remember"
+                            <input type="checkbox" name="remember"
                                 class="w-4 h-4 rounded border-stone-300 text-[#7B3F00]
                                        focus:ring-[#C67C4E] focus:ring-offset-0 cursor-pointer transition-all">
                             <span class="text-stone-600 group-hover/check:text-stone-800 transition-colors">
@@ -301,14 +402,13 @@
 
                         {{-- LINK LUPA SANDI PAKAI ROUTE YANG BENAR --}}
                         <a href="{{ route('password.request') }}"
-                           class="text-sm text-[#7B3F00] hover:text-[#C67C4E] font-medium transition-colors">
+                            class="text-sm text-[#7B3F00] hover:text-[#C67C4E] font-medium transition-colors">
                             Lupa kata sandi?
                         </a>
                     </div>
 
                     <!-- Submit button -->
-                    <button
-                        type="submit"
+                    <button type="submit"
                         class="btn-press w-full py-3.5 rounded-xl bg-gradient-to-r from-[#7B3F00] to-[#8B4513] text-white font-semibold
                                shadow-[0_6px_0_0_#5a2b00,0_6px_20px_rgba(123,63,0,0.3)]
                                hover:shadow-[0_6px_0_0_#5a2b00,0_8px_25px_rgba(123,63,0,0.4)]
@@ -317,10 +417,10 @@
                                transition-all duration-150
                                flex items-center justify-center gap-2 group/btn">
                         <span>Masuk ke Dashboard</span>
-                        <svg class="w-5 h-5 group-hover/btn:translate-x-1 transition-transform"
-                             fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                                d="M13 7l5 5m0 0l-5 5m5-5H6" />
                         </svg>
                     </button>
                 </form>
@@ -328,12 +428,12 @@
                 {{-- ====== GOOGLE LOGIN BUTTON ====== --}}
                 <div class="mt-4">
                     <a href="{{ route('google.redirect') }}"
-                       class="w-full inline-flex items-center justify-center gap-3 px-4 py-3.5 rounded-xl border border-stone-200 bg-white/80
+                        class="w-full inline-flex items-center justify-center gap-3 px-4 py-3.5 rounded-xl border border-stone-200 bg-white/80
                               hover:bg-stone-50 hover:border-stone-300 transition-all duration-150 text-sm font-medium text-stone-700">
                         <span
                             class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-white overflow-hidden">
-                            <img src="{{ asset('images/google-icon.png') }}" alt="Google"
-                                 class="w-5 h-5 object-contain">
+                            <img src="{{ asset('https://www.outsystems.com/Forge_CW/_image.aspx/Q8LvY--6WakOw9afDCuuGbSRbewerkJ3wQDZCrCmiSk=/google-login-reactive-2023-01-04%2000-00-00-2025-09-08%2010-56-53') }}"
+                                alt="Google" class="w-5 h-5 object-contain">
                         </span>
                         <span>Masuk dengan Google</span>
                     </a>
@@ -349,7 +449,7 @@
                         <span class="bg-white px-3 text-xs text-stone-400 flex items-center gap-1.5">
                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                 <path
-                                    d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"/>
+                                    d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
                             </svg>
                             SeduhRasa Coffee Management
                         </span>
@@ -359,8 +459,7 @@
                 <!-- Additional info -->
                 <p class="text-center text-xs text-stone-400">
                     Belum punya akses?
-                    <a href="#"
-                       class="text-[#7B3F00] hover:text-[#C67C4E] font-medium transition-colors">
+                    <a href="#" class="text-[#7B3F00] hover:text-[#C67C4E] font-medium transition-colors">
                         Hubungi admin
                     </a>
                 </p>
@@ -370,8 +469,8 @@
             <p class="text-center text-xs text-stone-400 mt-6 flex items-center justify-center gap-1.5">
                 <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z"
-                          clip-rule="evenodd"/>
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z"
+                        clip-rule="evenodd" />
                 </svg>
                 © {{ date('Y') }} SeduhRasa • Crafted with love & coffee
             </p>
@@ -381,7 +480,7 @@
     {{-- Countdown untuk waktu lock akun --}}
     @if (session('lock_remaining_seconds'))
         <script>
-            document.addEventListener('DOMContentLoaded', function () {
+            document.addEventListener('DOMContentLoaded', function() {
                 let remaining = Math.floor({{ session('lock_remaining_seconds') }});
                 const el = document.getElementById('lock-countdown');
                 if (!el) return;
