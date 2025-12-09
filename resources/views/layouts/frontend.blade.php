@@ -1,10 +1,12 @@
-{{-- resources/views/layouts/frontend.blade.php --}}
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'SeduhRasa Coffee')</title>
+
+    {{-- FAVICON --}}
+    <link rel="icon" type="image/png" href="{{ asset('LOGO2.png') }}">
     
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -16,18 +18,17 @@
 </head>
 
 <body class="bg-stone-50">
-
+    
     {{-- NAVBAR --}}
     <nav class="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-[#2a1810] to-[#3d2817] shadow-lg">
         <div class="max-w-7xl mx-auto px-4">
             <div class="flex items-center justify-between h-20">
 
-                {{-- Logo: balik ke HOME --}}
+                {{-- Logo: balik ke HOME (SUDAH DIUBAH MENJADI LOGO2.PNG) --}}
                 <a href="{{ route('home') }}" class="flex items-center gap-3 group">
-                    <div class="w-12 h-12 bg-gradient-to-br from-[#8b6f47] to-[#c4905c] rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"/>
-                        </svg>
+                    {{-- AREA IKON LAMA DIGANTI IMG --}}
+                    <div class="w-12 h-12 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <img src="{{ asset('LOGO2.png') }}" alt="Logo SeduhRasa" class="h-full w-auto object-contain">
                     </div>
                     <span class="font-['Great_Vibes'] text-3xl text-[#f5e6d3] group-hover:text-[#c4905c] transition-colors duration-300">
                         SeduhRasa
@@ -48,7 +49,6 @@
                        class="hover:text-[#c4905c] transition-colors">
                         Services
                     </a>
-                    {{-- Product DIHAPUS --}}
                     <a href="{{ route('contact') }}"
                        class="hover:text-[#c4905c] transition-colors">
                         Contact
