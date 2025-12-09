@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\ContactMessage;
+use App\Models\Pengeluaran; // TAMBAHKAN INI
 
 class DashboardController extends Controller
 {
@@ -25,8 +26,8 @@ class DashboardController extends Controller
             ->whereMonth('created_at', $bulanIni)
             ->count();
 
-        // pengeluaran operasional (sementara 0 dulu)
-        $pengeluaranOperasional = 0;
+        // PENGELUARAN OPERASIONAL - DARI DATABASE PENGELUARAN
+        $pengeluaranOperasional = Pengeluaran::sum('nominal'); // UBAH INI
 
         // JUMLAH PESANAN YANG BELUM DIPROSES (status pending)
         $pendingCount = Order::where('status', 'pending')->count();
