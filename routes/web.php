@@ -23,7 +23,8 @@ use App\Http\Controllers\OwnerController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\GoogleAuthController;
-use App\Http\Controllers\PengeluaranController; // 🆕 TAMBAHAN BARU
+use App\Http\Controllers\PengeluaranController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -36,7 +37,6 @@ Route::view('/about', 'about')->name('about');
 Route::view('/services', 'services')->name('services');
 Route::view('/contact', 'contact')->name('contact');
 
-// proses form contact -> simpan ke database lewat ContactController
 Route::post('/contact', [ContactController::class, 'store'])
     ->name('contact.store');
 
@@ -55,23 +55,18 @@ Route::post('/order', [OrderController::class, 'storeCustomerInfo'])
 Route::get('/menu', [MenuController::class, 'publicMenu'])
     ->name('menu');
 
-// daftar order publik (kalau mau dipakai)
 Route::get('/orders', [OrderController::class, 'index'])
     ->name('orders.index');
 
-// API checkout (AJAX)
 Route::post('/orders', [OrderController::class, 'store'])
     ->name('orders.store');
 
-// detail order publik
 Route::get('/orders/{order}', [OrderController::class, 'show'])
     ->name('orders.show');
 
-// API: cek status order (JSON)
 Route::get('/orders/{order}/status-json', [OrderController::class, 'statusJson'])
     ->name('orders.statusJson');
 
-// halaman sukses order untuk customer
 Route::get('/pesanan/{order}/berhasil', [OrderController::class, 'showCustomer'])
     ->name('customer.orders.show');
 
@@ -81,7 +76,6 @@ Route::get('/pesanan/{order}/berhasil', [OrderController::class, 'showCustomer']
 |--------------------------------------------------------------------------
 */
 
-// form login biasa
 Route::get('/login', [LoginController::class, 'showLoginForm'])
     ->name('login');
 
@@ -89,23 +83,20 @@ Route::post('/login', [LoginController::class, 'login'])
     ->name('login.post');
 
 /*
-|----------------------------------------------------------------------
-| LUPA SANDI PAKAI KODE OTP (BUKAN LINK)
-|----------------------------------------------------------------------
+|--------------------------------------------------------------------------
+| LUPA SANDI PAKAI KODE OTP
+|--------------------------------------------------------------------------
 */
 
-// FORM lupa password (input email)
 Route::get('/forgot-password', function () {
     return view('auth.forgot-password');
 })->middleware('guest')->name('password.request');
 
-// HANDLE kirim kode OTP ke email
 Route::post('/forgot-password', function (Request $request) {
     $request->validate([
         'email' => ['required', 'email'],
     ]);
 
-    // cek email ada atau tidak
     $user = User::where('email', $request->email)->first();
 
     if (! $user) {
@@ -114,10 +105,8 @@ Route::post('/forgot-password', function (Request $request) {
         ]);
     }
 
-    // generate OTP 6 digit
     $otp = random_int(100000, 999999);
 
-    // simpan / update ke tabel password_reset_tokens
     DB::table('password_reset_tokens')->updateOrInsert(
         ['email' => $request->email],
         [
@@ -126,7 +115,6 @@ Route::post('/forgot-password', function (Request $request) {
         ]
     );
 
-    // kirim OTP ke email (sekarang dikirim ke mail log / smtp sesuai .env)
     try {
         Mail::raw(
             "Kode OTP reset password Anda adalah: {$otp}\n\nKode ini berlaku selama 10 menit.",
@@ -136,23 +124,17 @@ Route::post('/forgot-password', function (Request $request) {
             }
         );
     } catch (\Throwable $e) {
-        // supaya kalau mailer error, aplikasi tidak 500
         \Log::error('Gagal mengirim email OTP: ' . $e->getMessage());
-        // Opsional: tampilkan pesan friendly ke user
-        // return back()->withErrors(['email' => 'Terjadi kesalahan saat mengirim email. Coba lagi nanti.']);
     }
 
-    // simpan email di session biar ga perlu ketik ulang
     session([
         'password_reset_email' => $request->email,
     ]);
 
-    // redirect ke form input OTP
     return redirect()->route('password.otp.form')
         ->with('status', 'Kode OTP berhasil dikirim ke email Anda.');
 })->middleware('guest')->name('password.email');
 
-// FORM input OTP
 Route::get('/forgot-password/verify-otp', function () {
     $email = session('password_reset_email');
 
@@ -165,7 +147,6 @@ Route::get('/forgot-password/verify-otp', function () {
     ]);
 })->middleware('guest')->name('password.otp.form');
 
-// HANDLE cek OTP
 Route::post('/forgot-password/verify-otp', function (Request $request) {
     $request->validate([
         'email' => ['required', 'email'],
@@ -183,7 +164,6 @@ Route::post('/forgot-password/verify-otp', function (Request $request) {
         ])->withInput();
     }
 
-    // cek expired (10 menit)
     $created = \Carbon\Carbon::parse($record->created_at);
     if ($created->lt(now()->subMinutes(10))) {
         return back()->withErrors([
@@ -191,7 +171,6 @@ Route::post('/forgot-password/verify-otp', function (Request $request) {
         ]);
     }
 
-    // OTP valid -> izinkan ganti password
     session([
         'password_reset_email_verified' => $request->email,
     ]);
@@ -199,7 +178,6 @@ Route::post('/forgot-password/verify-otp', function (Request $request) {
     return redirect()->route('password.reset.form');
 })->middleware('guest')->name('password.otp.verify');
 
-// FORM reset password setelah OTP benar
 Route::get('/reset-password', function () {
     $email = session('password_reset_email_verified');
 
@@ -212,7 +190,6 @@ Route::get('/reset-password', function () {
     ]);
 })->middleware('guest')->name('password.reset.form');
 
-// HANDLE simpan password baru
 Route::post('/reset-password', function (Request $request) {
     $request->validate([
         'email'    => ['required', 'email'],
@@ -233,18 +210,15 @@ Route::post('/reset-password', function (Request $request) {
             ->withErrors(['email' => 'Email tidak ditemukan.']);
     }
 
-    // update password
     $user->forceFill([
         'password'       => Hash::make($request->password),
         'remember_token' => Str::random(60),
     ])->save();
 
-    // hapus token reset
     DB::table('password_reset_tokens')
         ->where('email', $request->email)
         ->delete();
 
-    // clear session
     session()->forget(['password_reset_email', 'password_reset_email_verified']);
 
     event(new PasswordReset($user));
@@ -355,7 +329,7 @@ Route::middleware(['auth', 'role:admin,staff,owner'])->group(function () {
 
         Route::resource('karyawan', KaryawanController::class);
 
-        // 🆕 ROUTE PENGELUARAN BAHAN BAKU
+        // ✅ ROUTE PENGELUARAN BAHAN BAKU
         Route::resource('pengeluaran', PengeluaranController::class);
 
         Route::resource('orders', OrderController::class)->only(['index', 'show', 'destroy']);

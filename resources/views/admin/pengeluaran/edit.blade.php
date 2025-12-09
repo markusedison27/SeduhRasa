@@ -1,133 +1,53 @@
-@extends('layouts.dashboard')
+@extends('layouts.app')
 
-@section('title', 'Edit Pengeluaran Bahan Baku')
+@section('title', 'Edit Pengeluaran')
 
 @section('content')
-<div class="container-fluid py-4">
-    <div class="row">
-        <div class="col-lg-8 col-md-10 mx-auto">
-            <div class="card">
-                <div class="card-header pb-0">
-                    <div class="d-flex align-items-center">
-                        <a href="{{ route('admin.pengeluaran.index') }}" class="btn btn-outline-secondary btn-sm me-3">
-                            <i class="fas fa-arrow-left"></i> Kembali
-                        </a>
-                        <h5 class="mb-0">Edit Pengeluaran Bahan Baku</h5>
+<div class="container py-4">
+    <div class="col-lg-8 mx-auto">
+
+        <div class="card shadow">
+            <div class="card-header bg-gradient-warning text-white">
+                <h5 class="mb-0">Edit Pengeluaran</h5>
+            </div>
+
+            <div class="card-body">
+                <form action="{{ route('admin.pengeluaran.update', $pengeluaran->id) }}" method="POST">
+                    @csrf
+                    @method('PUT')
+
+                    <div class="mb-3">
+                        <label class="form-label">Tanggal</label>
+                        <input type="date" name="tanggal" class="form-control"
+                               value="{{ $pengeluaran->tanggal->format('Y-m-d') }}" required>
                     </div>
-                </div>
 
-                <div class="card-body">
-                    <form action="{{ route('admin.pengeluaran.update', $pengeluaran->id) }}" method="POST">
-                        @csrf
-                        @method('PUT')
+                    <div class="mb-3">
+                        <label class="form-label">Kategori</label>
+                        <input type="text" class="form-control" value="Bahan Baku" disabled>
+                    </div>
 
-                        <!-- Tanggal -->
-                        <div class="mb-3">
-                            <label for="tanggal" class="form-label">Tanggal <span class="text-danger">*</span></label>
-                            <input type="date" 
-                                   class="form-control @error('tanggal') is-invalid @enderror" 
-                                   id="tanggal" 
-                                   name="tanggal" 
-                                   value="{{ old('tanggal', $pengeluaran->tanggal->format('Y-m-d')) }}"
-                                   required>
-                            @error('tanggal')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
+                    <div class="mb-3">
+                        <label class="form-label">Nama Barang</label>
+                        <input type="text" name="keterangan" class="form-control"
+                               value="{{ $pengeluaran->keterangan }}" required>
+                    </div>
 
-                        <!-- Kategori (Fixed) -->
-                        <div class="mb-3">
-                            <label for="kategori" class="form-label">Kategori</label>
-                            <input type="text" 
-                                   class="form-control" 
-                                   id="kategori" 
-                                   value="Bahan Baku" 
-                                   disabled>
-                            <small class="text-muted">Kategori otomatis: Bahan Baku</small>
-                        </div>
+                    <div class="mb-3">
+                        <label class="form-label">Harga (Rp)</label>
+                        <input type="number" name="nominal" class="form-control"
+                               value="{{ $pengeluaran->nominal }}" required>
+                    </div>
 
-                        <!-- Nama Barang -->
-                        <div class="mb-3">
-                            <label for="keterangan" class="form-label">Nama Barang <span class="text-danger">*</span></label>
-                            <input type="text" 
-                                   class="form-control @error('keterangan') is-invalid @enderror" 
-                                   id="keterangan" 
-                                   name="keterangan" 
-                                   value="{{ old('keterangan', $pengeluaran->keterangan) }}"
-                                   placeholder="Contoh: Kopi Arabica 1kg"
-                                   required>
-                            @error('keterangan')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
+                    <div class="d-flex justify-content-end">
+                        <a href="{{ route('admin.pengeluaran.index') }}" class="btn btn-secondary me-2">Batal</a>
+                        <button class="btn btn-warning text-white">Update</button>
+                    </div>
 
-                        <!-- Harga -->
-                        <div class="mb-3">
-                            <label for="nominal" class="form-label">Harga (Rp) <span class="text-danger">*</span></label>
-                            <input type="number" 
-                                   class="form-control @error('nominal') is-invalid @enderror" 
-                                   id="nominal" 
-                                   name="nominal" 
-                                   value="{{ old('nominal', $pengeluaran->nominal) }}"
-                                   placeholder="Contoh: 150000"
-                                   min="0"
-                                   step="1"
-                                   required>
-                            @error('nominal')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                            <small class="text-muted">Masukkan harga dalam rupiah (tanpa titik/koma)</small>
-                        </div>
-
-                        <!-- Preview Harga -->
-                        <div class="mb-3">
-                            <div class="alert alert-light border">
-                                <small class="text-muted">Preview Harga:</small>
-                                <h6 class="mb-0 text-danger" id="previewHarga">Rp 0</h6>
-                            </div>
-                        </div>
-
-                        <div class="d-flex justify-content-end gap-2">
-                            <a href="{{ route('admin.pengeluaran.index') }}" class="btn btn-secondary">
-                                Batal
-                            </a>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save"></i> Update
-                            </button>
-                        </div>
-                    </form>
-                </div>
+                </form>
             </div>
         </div>
+
     </div>
 </div>
-
-@push('scripts')
-<script>
-    // Format rupiah otomatis saat input
-    const nominalInput = document.getElementById('nominal');
-    const previewHarga = document.getElementById('previewHarga');
-
-    nominalInput.addEventListener('input', function(e) {
-        let value = this.value.replace(/[^0-9]/g, '');
-        
-        if (value === '') {
-            previewHarga.textContent = 'Rp 0';
-            return;
-        }
-
-        let formatted = new Intl.NumberFormat('id-ID', {
-            style: 'currency',
-            currency: 'IDR',
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0
-        }).format(value);
-
-        previewHarga.textContent = formatted;
-    });
-
-    // Trigger saat halaman load untuk menampilkan nilai awal
-    nominalInput.dispatchEvent(new Event('input'));
-</script>
-@endpush
 @endsection
