@@ -22,7 +22,8 @@ use App\Http\Controllers\SuperAdminController;
 use App\Http\Controllers\OwnerController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ContactController;
-use App\Http\Controllers\GoogleAuthController; // <-- LOGIN GOOGLE
+use App\Http\Controllers\GoogleAuthController;
+use App\Http\Controllers\PengeluaranController; // 🆕 TAMBAHAN BARU
 
 /*
 |--------------------------------------------------------------------------
@@ -353,6 +354,9 @@ Route::middleware(['auth', 'role:admin,staff,owner'])->group(function () {
         Route::resource('pelanggan', PelangganController::class);
 
         Route::resource('karyawan', KaryawanController::class);
+
+        // 🆕 ROUTE PENGELUARAN BAHAN BAKU
+        Route::resource('pengeluaran', PengeluaranController::class);
 
         Route::resource('orders', OrderController::class)->only(['index', 'show', 'destroy']);
 
