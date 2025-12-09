@@ -6,7 +6,9 @@ use Illuminate\Http\Request;
 use App\Models\Order;        
 use App\Models\Pengeluaran;  
 use Illuminate\Support\Facades\Storage; 
-use App\Models\Setting; // Pastikan Model Setting di-use
+use Illuminate\Support\Facades\Hash;
+use App\Models\Setting;
+use App\Http\Requests\ProfileUpdateRequest;
 
 class OwnerController extends Controller
 {
@@ -105,5 +107,49 @@ class OwnerController extends Controller
             'daftarPemasukan',
             'daftarPengeluaran'
         ));
+    }
+
+    /**
+     * Menampilkan halaman edit profile
+     */
+    public function editProfile()
+    {
+        $owner = auth()->user();
+        
+        return view('owner.edit-profile', compact('owner'));
+    }
+
+    /**
+     * Update profile owner
+     */
+    public function updateProfile(ProfileUpdateRequest $request)
+    {
+        $owner = auth()->user();
+
+        // Update nama dan email
+        $owner->name = $request->name;
+        $owner->email = $request->email;
+
+        // Handle upload avatar jika ada
+        if ($request->hasFile('avatar')) {
+            // Hapus avatar lama jika bukan dari Google
+            if ($owner->avatar && !str_contains($owner->avatar, 'googleusercontent.com')) {
+                Storage::delete('public/' . $owner->avatar);
+            }
+
+            // Simpan avatar baru
+            $avatarPath = $request->file('avatar')->store('public/avatars');
+            $owner->avatar = str_replace('public/', '', $avatarPath);
+        }
+
+        // Update password jika diisi
+        if ($request->filled('password')) {
+            $owner->password = Hash::make($request->password);
+        }
+
+        $owner->save();
+
+        return redirect()->route('owner.profile.edit')
+            ->with('success', 'Profile berhasil diperbarui!');
     }
 }

@@ -11,6 +11,9 @@
   <link rel="icon" type="image/png" href="{{ asset('LOGO2.png') }}">
   <link rel="apple-touch-icon" href="{{ asset('LOGO2.png') }}">
   
+  {{-- Alpine.js untuk dropdown --}}
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  
   @vite(['resources/css/app.css', 'resources/js/app.js'])
   
   <style>
@@ -69,25 +72,25 @@
 <body class="bg-stone-50 text-stone-800 antialiased">
   <div class="min-h-screen flex">
     @php
-        $user = auth()->user();
+      $user = auth()->user();
 
-        if (!$user) {
-            $dashboardRoute = 'home';
-            $displayName = 'Tamu';
-            $role = 'Guest';
-        } elseif ($user->role === 'super_admin') {
-            $dashboardRoute = 'super.dashboard';
-            $displayName = $user->name;
-            $role = 'Super Admin';
-        } elseif ($user->role === 'owner') {
-            $dashboardRoute = 'owner.dashboard';
-            $displayName = $user->name;
-            $role = 'Owner';
-        } else {
-            $dashboardRoute = 'staff.dashboard';
-            $displayName = $user->name;
-            $role = 'Panel Kasir';
-        }
+      if (!$user) {
+        $dashboardRoute = 'home';
+        $displayName = 'Tamu';
+        $role = 'Guest';
+      } elseif ($user->role === 'super_admin') {
+        $dashboardRoute = 'super.dashboard';
+        $displayName = $user->name;
+        $role = 'Super Admin';
+      } elseif ($user->role === 'owner') {
+        $dashboardRoute = 'owner.dashboard';
+        $displayName = $user->name;
+        $role = 'Owner';
+      } else {
+        $dashboardRoute = 'staff.dashboard';
+        $displayName = $user->name;
+        $role = 'Panel Kasir';
+      }
     @endphp
 
     {{-- Sidebar Desktop --}}
@@ -115,11 +118,11 @@
         </div>
         
         <a href="{{ route($dashboardRoute) }}"
-           @class([
-               'nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium',
-               'active bg-white/10 text-white backdrop-blur' => request()->routeIs($dashboardRoute),
-               'text-white/70 hover:bg-white/5 hover:text-white' => !request()->routeIs($dashboardRoute),
-           ])>
+          @class([
+            'nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium',
+            'active bg-white/10 text-white backdrop-blur' => request()->routeIs($dashboardRoute),
+            'text-white/70 hover:bg-white/5 hover:text-white' => !request()->routeIs($dashboardRoute),
+          ])>
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
           </svg>
@@ -133,11 +136,11 @@
           </div>
           
           <a href="{{ route('super.owners.index') }}"
-             @class([
-                 'nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium',
-                 'active bg-white/10 text-white backdrop-blur' => request()->routeIs('super.owners.*'),
-                 'text-white/70 hover:bg-white/5 hover:text-white' => !request()->routeIs('super.owners.*'),
-             ])>
+            @class([
+              'nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium',
+              'active bg-white/10 text-white backdrop-blur' => request()->routeIs('super.owners.*'),
+              'text-white/70 hover:bg-white/5 hover:text-white' => !request()->routeIs('super.owners.*'),
+            ])>
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
             </svg>
@@ -151,11 +154,11 @@
           </div>
           
           <a href="{{ route('owner.finance') }}"
-             @class([
-                 'nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium',
-                 'active bg-white/10 text-white backdrop-blur' => request()->routeIs('owner.finance'),
-                 'text-white/70 hover:bg-white/5 hover:text-white' => !request()->routeIs('owner.finance'),
-             ])>
+            @class([
+              'nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium',
+              'active bg-white/10 text-white backdrop-blur' => request()->routeIs('owner.finance'),
+              'text-white/70 hover:bg-white/5 hover:text-white' => !request()->routeIs('owner.finance'),
+            ])>
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
@@ -163,11 +166,11 @@
           </a>
           
           <a href="{{ route('owner.kasir.index') }}"
-             @class([
-                 'nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium',
-                 'active bg-white/10 text-white backdrop-blur' => request()->routeIs('owner.kasir.*'),
-                 'text-white/70 hover:bg-white/5 hover:text-white' => !request()->routeIs('owner.kasir.*'),
-             ])>
+            @class([
+              'nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium',
+              'active bg-white/10 text-white backdrop-blur' => request()->routeIs('owner.kasir.*'),
+              'text-white/70 hover:bg-white/5 hover:text-white' => !request()->routeIs('owner.kasir.*'),
+            ])>
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
             </svg>
@@ -181,11 +184,11 @@
           </div>
           
           <a href="{{ route('admin.menus.index') }}"
-             @class([
-                 'nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium',
-                 'active bg-white/10 text-white backdrop-blur' => request()->routeIs('admin.menus.*'),
-                 'text-white/70 hover:bg-white/5 hover:text-white' => !request()->routeIs('admin.menus.*'),
-             ])>
+            @class([
+              'nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium',
+              'active bg-white/10 text-white backdrop-blur' => request()->routeIs('admin.menus.*'),
+              'text-white/70 hover:bg-white/5 hover:text-white' => !request()->routeIs('admin.menus.*'),
+            ])>
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
             </svg>
@@ -193,11 +196,11 @@
           </a>
 
           <a href="{{ route('admin.transaksi.index') }}"
-             @class([
-                 'nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium',
-                 'active bg-white/10 text-white backdrop-blur' => request()->routeIs('admin.transaksi.*'),
-                 'text-white/70 hover:bg-white/5 hover:text-white' => !request()->routeIs('admin.transaksi.*'),
-             ])>
+            @class([
+              'nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium',
+              'active bg-white/10 text-white backdrop-blur' => request()->routeIs('admin.transaksi.*'),
+              'text-white/70 hover:bg-white/5 hover:text-white' => !request()->routeIs('admin.transaksi.*'),
+            ])>
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
             </svg>
@@ -205,11 +208,11 @@
           </a>
 
           <a href="{{ route('admin.pelanggan.index') }}"
-             @class([
-                 'nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium',
-                 'active bg-white/10 text-white backdrop-blur' => request()->routeIs('admin.pelanggan.*'),
-                 'text-white/70 hover:bg-white/5 hover:text-white' => !request()->routeIs('admin.pelanggan.*'),
-             ])>
+            @class([
+              'nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium',
+              'active bg-white/10 text-white backdrop-blur' => request()->routeIs('admin.pelanggan.*'),
+              'text-white/70 hover:bg-white/5 hover:text-white' => !request()->routeIs('admin.pelanggan.*'),
+            ])>
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
             </svg>
@@ -217,11 +220,11 @@
           </a>
 
           <a href="{{ route('admin.orders.index') }}"
-             @class([
-                 'nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium',
-                 'active bg-white/10 text-white backdrop-blur' => request()->routeIs('admin.orders.*'),
-                 'text-white/70 hover:bg-white/5 hover:text-white' => !request()->routeIs('admin.orders.*'),
-             ])>
+            @class([
+              'nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium',
+              'active bg-white/10 text-white backdrop-blur' => request()->routeIs('admin.orders.*'),
+              'text-white/70 hover:bg-white/5 hover:text-white' => !request()->routeIs('admin.orders.*'),
+            ])>
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
             </svg>
@@ -229,11 +232,11 @@
           </a>
 
           <a href="{{ route('admin.messages.index') }}"
-             @class([
-                 'nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium',
-                 'active bg-white/10 text-white backdrop-blur' => request()->routeIs('admin.messages.*'),
-                 'text-white/70 hover:bg-white/5 hover:text-white' => !request()->routeIs('admin.messages.*'),
-             ])>
+            @class([
+              'nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium',
+              'active bg-white/10 text-white backdrop-blur' => request()->routeIs('admin.messages.*'),
+              'text-white/70 hover:bg-white/5 hover:text-white' => !request()->routeIs('admin.messages.*'),
+            ])>
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M8 10h8M8 14h5M5 5h14a2 2 0 012 2v8a2 2 0 01-2 2h-6l-4 3v-3H5a2 2 0 01-2-2V7a2 2 0 012-2z"/>
@@ -275,61 +278,116 @@
             {{-- Notifikasi Order --}}
             <div class="relative" id="notif-wrapper">
               <button
-                  id="notif-button"
-                  type="button"
-                  class="relative p-2 rounded-xl hover:bg-stone-100 transition-colors"
+                id="notif-button"
+                type="button"
+                class="relative p-2 rounded-xl hover:bg-stone-100 transition-colors"
               >
-                  <svg class="w-6 h-6 text-stone-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-                  </svg>
+                <svg class="w-6 h-6 text-stone-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                </svg>
 
-                  {{-- titik merah (kalau ada pending) --}}
-                  <span id="notif-dot"
-                        class="hidden absolute top-1.5 right-1.5 h-2 w-2 bg-red-500 rounded-full"></span>
+                {{-- titik merah (kalau ada pending) --}}
+                <span id="notif-dot"
+                      class="hidden absolute top-1.5 right-1.5 h-2 w-2 bg-red-500 rounded-full"></span>
               </button>
 
               {{-- Dropdown notifikasi --}}
               <div
-                  id="notif-dropdown"
-                  class="hidden absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-stone-200 z-40"
+                id="notif-dropdown"
+                class="hidden absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-stone-200 z-40"
               >
-                  <div class="px-4 py-3 border-b border-stone-100 flex items-center justify-between">
-                      <div>
-                          <p class="text-sm font-semibold text-stone-800">Notifikasi Pesanan</p>
-                          <p class="text-xs text-stone-500">Order pending terbaru</p>
-                      </div>
-                      <button
-                          type="button"
-                          id="notif-refresh"
-                          class="text-xs text-amber-600 hover:text-amber-700 font-medium"
-                      >
-                          Refresh
-                      </button>
+                <div class="px-4 py-3 border-b border-stone-100 flex items-center justify-between">
+                  <div>
+                    <p class="text-sm font-semibold text-stone-800">Notifikasi Pesanan</p>
+                    <p class="text-xs text-stone-500">Order pending terbaru</p>
                   </div>
+                  <button
+                    type="button"
+                    id="notif-refresh"
+                    class="text-xs text-amber-600 hover:text-amber-700 font-medium"
+                  >
+                    Refresh
+                  </button>
+                </div>
 
-                  <div id="notif-list" class="max-h-80 overflow-y-auto divide-y divide-stone-100">
-                      <div class="px-4 py-3 text-xs text-stone-500">
-                          Memuat notifikasi...
-                      </div>
+                <div id="notif-list" class="max-h-80 overflow-y-auto divide-y divide-stone-100">
+                  <div class="px-4 py-3 text-xs text-stone-500">
+                    Memuat notifikasi...
                   </div>
+                </div>
 
-                  <div class="px-4 py-2 border-t border-stone-100 text-center">
-                      <a href="{{ route('admin.orders.index') }}"
-                         class="text-xs text-amber-600 hover:text-amber-700 font-medium">
-                          Lihat semua order
-                      </a>
-                  </div>
+                <div class="px-4 py-2 border-t border-stone-100 text-center">
+                  <a href="{{ route('admin.orders.index') }}"
+                     class="text-xs text-amber-600 hover:text-amber-700 font-medium">
+                    Lihat semua order
+                  </a>
+                </div>
               </div>
             </div>
             
+            {{-- Profile Dropdown --}}
             <div class="hidden sm:flex items-center gap-3 pl-3 border-l border-stone-200">
               <div class="text-right">
                 <div class="text-sm font-medium text-stone-800">{{ $displayName }}</div>
                 <div class="text-xs text-stone-500">{{ $role }}</div>
               </div>
-              <img src="https://ui-avatars.com/api/?name={{ urlencode($displayName) }}&background=C67C4E&color=fff" 
-                   class="w-10 h-10 rounded-full ring-2 ring-amber-200" alt="Avatar">
+              
+              {{-- Dropdown Avatar --}}
+              <div class="relative" x-data="{ open: false }">
+                <button @click="open = !open" 
+                        class="flex items-center focus:outline-none">
+                  @if(auth()->check() && auth()->user()->avatar)
+                    <img src="{{ str_contains(auth()->user()->avatar, 'googleusercontent.com') ? auth()->user()->avatar : asset('storage/' . auth()->user()->avatar) }}" 
+                          class="w-10 h-10 rounded-full ring-2 ring-amber-200 cursor-pointer hover:ring-amber-400 transition-all" 
+                          alt="Avatar">
+                  @else
+                    <img src="https://ui-avatars.com/api/?name={{ urlencode($displayName) }}&background=C67C4E&color=fff" 
+                          class="w-10 h-10 rounded-full ring-2 ring-amber-200 cursor-pointer hover:ring-amber-400 transition-all" 
+                          alt="Avatar">
+                  @endif
+                </button>
+
+                {{-- Dropdown Menu --}}
+                <div x-show="open" 
+                      @click.away="open = false"
+                      x-transition:enter="transition ease-out duration-100"
+                      x-transition:enter-start="opacity-0 scale-95"
+                      x-transition:enter-end="opacity-100 scale-100"
+                      x-transition:leave="transition ease-in duration-75"
+                      x-transition:leave-start="opacity-100 scale-100"
+                      x-transition:leave-end="opacity-0 scale-95"
+                      class="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-stone-200 py-2 z-50">
+                  
+                  {{-- Profile Info --}}
+                  <div class="px-4 py-3 border-b border-stone-100">
+                    <p class="text-sm font-semibold text-stone-800">{{ $displayName }}</p>
+                    <p class="text-xs text-stone-500">{{ auth()->user()->email ?? '' }}</p>
+                  </div>
+
+                  {{-- Menu Items --}}
+                  @if($user && $user->role === 'owner')
+                  <a href="{{ route('owner.profile.edit') }}" 
+                      class="flex items-center gap-3 px-4 py-2.5 text-sm text-stone-700 hover:bg-stone-50 transition-colors">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                      </svg>
+                      Edit Profile
+                  </a>
+                  @endif
+
+                  <form action="{{ route('logout') }}" method="POST">
+                      @csrf
+                      <button type="submit" 
+                              class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                          </svg>
+                          Logout
+                      </button>
+                  </form>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -461,7 +519,6 @@
             </a>
           `;
         });
-
         notifList.innerHTML = html;
       }
 
@@ -471,16 +528,13 @@
             Memuat notifikasi...
           </div>
         `;
-
         fetch(notifUrl)
           .then(res => res.json())
           .then(data => {
             const count = data.count ?? 0;
-
             if (showToastOnNew && count > lastCount) {
               showToast('success', 'Ada pesanan baru ☕', 'Cek di daftar order, ya!');
             }
-
             lastCount = count;
             renderNotifications(data);
           })
@@ -506,6 +560,7 @@
       // auto refresh tiap 20 detik + toast kalau ada order baru
       setInterval(() => loadNotifications(true), 20000);
     });
+
   </script>
 </body>
 </html>
