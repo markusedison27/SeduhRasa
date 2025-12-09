@@ -246,11 +246,11 @@
 
           {{-- PENGELUARAN --}}
           <a href="{{ route('admin.pengeluaran.index') }}"
-             @class([
-                 'nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium',
-                 'active bg-white/10 text-white backdrop-blur' => request()->routeIs('admin.pengeluaran.*'),
-                 'text-white/70 hover:bg-white/5 hover:text-white' => !request()->routeIs('admin.pengeluaran.*'),
-             ])>
+            @class([
+              'nav-link flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium',
+              'active bg-white/10 text-white backdrop-blur' => request()->routeIs('admin.pengeluaran.*'),
+              'text-white/70 hover:bg-white/5 hover:text-white' => !request()->routeIs('admin.pengeluaran.*'),
+            ])>
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
@@ -379,9 +379,23 @@
                     <p class="text-xs text-stone-500">{{ auth()->user()->email ?? '' }}</p>
                   </div>
 
-                  {{-- Menu Items --}}
-                  @if($user && $user->role === 'owner')
-                  <a href="{{ route('owner.profile.edit') }}" 
+                  {{-- Menu Items (LOGIKA DIPERBAIKI) --}}
+                  @php
+                      $user = auth()->user();
+                      $profileRouteName = null;
+                      
+                      // Menentukan route Edit Profile berdasarkan role yang memiliki akses
+                      if ($user->role === 'owner') {
+                          $profileRouteName = 'owner.profile.edit';
+                      } elseif (in_array($user->role, ['staff', 'admin'])) {
+                          // Gunakan route yang baru didaftarkan di grup staff
+                          $profileRouteName = 'staff.profile.edit';
+                      }
+                      // Role 'super_admin' diasumsikan tidak memiliki edit profile di sini.
+                  @endphp
+
+                  @if($profileRouteName && Route::has($profileRouteName))
+                  <a href="{{ route($profileRouteName) }}" 
                       class="flex items-center gap-3 px-4 py-2.5 text-sm text-stone-700 hover:bg-stone-50 transition-colors">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
