@@ -191,14 +191,14 @@
                 <div class="flex items-center gap-8 flex-1">
                     {{-- Logo --}}
                     <a href="{{ route('home') }}" class="flex items-center gap-2 font-bold text-white hover:opacity-90 transition-opacity group logo-shine">
-                        <img src="{{ asset('LOGO2.png') }}" class="h-9 w-auto transition-transform" alt="SeduhRasa Coffee Logo">
+                        <img src="{{ asset('LOGO2.png') }}" class="h-7 w-auto transition-transform" alt="SeduhRasa Coffee Logo">
                         <span class="text-lg logo-text whitespace-nowrap">
                             <span class="logo-seduh">Seduh</span><span class="logo-rasa">Rasa</span>
                         </span>
                     </a>
 
                     {{-- Desktop Navigation --}}
-                    <nav class="hidden md:flex items-center gap-6">
+                    <nav class="hidden md:flex items-center gap-6 ml-auto">
                         <a href="{{ route('home') }}" 
                            class="text-sm font-medium transition-colors relative group whitespace-nowrap @if(request()->routeIs('home')) text-amber-400 @else text-white/80 hover:text-white @endif">
                             Home
