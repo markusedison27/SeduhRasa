@@ -44,7 +44,6 @@
                 opacity: 0;
                 transform: translateX(-20px);
             }
-
             to {
                 opacity: 1;
                 transform: translateX(0);
@@ -143,11 +142,11 @@
                 {{-- Logo: balik ke HOME (LOGO2.PNG) --}}
                 <a href="{{ route('home') }}" class="flex items-center gap-3 group logo-shine">
                     <div
-                        class="w-9 h-9 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        class="w-7 h-7 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                         <img src="{{ asset('LOGO2.png') }}" alt="Logo SeduhRasa" class="h-full w-auto object-contain">
                     </div>
                     <span
-                        class="font-['Great_Vibes'] text-3xl text-[#f5e6d3] group-hover:text-[#c4905c] transition-colors duration-300 logo-text">
+                        class="font-['Great_Vibes'] text-2xl text-[#f5e6d3] group-hover:text-[#c4905c] transition-colors duration-300 logo-text">
                         <span class="logo-seduh">Seduh</span><span class="logo-rasa">Rasa</span>
                     </span>
                 </a>
