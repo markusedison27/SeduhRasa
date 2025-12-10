@@ -75,51 +75,42 @@
             left: 120%;
         }
 
-        /* HAMBURGER: TITIK 3 */
-        .hamburger {
-            width: 28px;
-            height: 28px;
-            position: relative;
-            cursor: pointer;
+        /* TITIK 3 (HAMBURGER) */
+        .hamburger-dots {
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
             gap: 4px;
         }
 
-        .hamburger span {
-            display: block;
-            width: 5px;
-            height: 5px;
-            background: #f5e6d3;
+        .hamburger-dots span {
+            width: 4px;
+            height: 4px;
             border-radius: 999px;
+            background-color: #f5e6d3;
             box-shadow: 0 0 3px rgba(255, 255, 255, 0.4);
-            transition: all 0.3s ease;
+            transition: transform 0.2s ease, opacity 0.2s ease, width 0.2s ease;
         }
 
-        .hamburger.active {
-            gap: 0;
-        }
-
-        .hamburger.active span:nth-child(1) {
-            transform: translateY(3px) rotate(45deg);
-            width: 18px;
+        .hamburger-dots.active span:nth-child(1) {
+            transform: translateY(4px) rotate(45deg);
+            width: 16px;
             height: 3px;
         }
 
-        .hamburger.active span:nth-child(2) {
+        .hamburger-dots.active span:nth-child(2) {
             opacity: 0;
             transform: scale(0);
         }
 
-        .hamburger.active span:nth-child(3) {
-            transform: translateY(-3px) rotate(-45deg);
-            width: 18px;
+        .hamburger-dots.active span:nth-child(3) {
+            transform: translateY(-4px) rotate(-45deg);
+            width: 16px;
             height: 3px;
         }
 
-        /* MOBILE MENU DROPDOWN */
+        /* MENU MOBILE DROPDOWN */
         #mobile-menu {
             background: linear-gradient(to bottom, #2a1810, #3d2817);
             border-top: 1px solid #5c3d2e;
@@ -162,7 +153,7 @@
                 </a>
 
                 <div class="flex items-center gap-4">
-                    {{-- MENU DESKTOP --}}
+                    {{-- MENU DESKTOP (hanya muncul ≥ md) --}}
                     <div class="hidden md:flex items-center gap-8 text-[#f5e6d3] font-medium">
                         <a href="{{ route('home') }}" class="hover:text-[#c4905c] transition-colors">
                             Home
@@ -178,10 +169,10 @@
                         </a>
                     </div>
 
-                    {{-- TITIK 3 / HAMBURGER (MOBILE) --}}
+                    {{-- TITIK 3: MUNCUL HANYA DI MOBILE (< md) --}}
                     <button id="mobile-menu-button"
-                        class="md:hidden p-2 rounded-lg hover:bg-black/20 transition-colors flex items-center justify-center">
-                        <div class="hamburger">
+                        class="block md:hidden p-2 rounded-lg hover:bg-black/20 transition-colors">
+                        <div class="hamburger-dots">
                             <span></span>
                             <span></span>
                             <span></span>
@@ -191,7 +182,7 @@
             </div>
         </div>
 
-        {{-- MENU MOBILE DROPDOWN --}}
+        {{-- MENU MOBILE: hanya < md --}}
         <div id="mobile-menu" class="md:hidden hidden">
             <a href="{{ route('home') }}" class="mobile-link">
                 Home
@@ -224,12 +215,12 @@
         document.addEventListener('DOMContentLoaded', () => {
             const btn = document.getElementById('mobile-menu-button');
             const menu = document.getElementById('mobile-menu');
-            const hamburger = btn?.querySelector('.hamburger');
+            const dots = btn?.querySelector('.hamburger-dots');
 
-            if (btn && menu && hamburger) {
+            if (btn && menu && dots) {
                 btn.addEventListener('click', () => {
                     menu.classList.toggle('hidden');
-                    hamburger.classList.toggle('active');
+                    dots.classList.toggle('active');
                 });
             }
         });
