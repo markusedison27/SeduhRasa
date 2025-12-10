@@ -119,64 +119,117 @@
         .nav-link-mobile.active {
             padding-left: 2.5rem;
         }
+
+        /* Animasi Logo - Cuma tulisan masuk */
+        .logo-text {
+            display: inline-block;
+            position: relative;
+        }
+        
+        .logo-seduh, .logo-rasa {
+            display: inline-block;
+            opacity: 0;
+        }
+
+        /* Animasi fade slide in */
+        .logo-seduh {
+            animation: slideInLeft 0.6s ease-out 0.2s forwards;
+        }
+
+        .logo-rasa {
+            color: #F59E0B;
+            text-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
+            animation: slideInLeft 0.6s ease-out 0.5s forwards;
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Shine effect on hover */
+        .logo-shine {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logo-shine::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(255, 255, 255, 0.3), 
+                transparent
+            );
+            transition: left 0.6s ease;
+        }
+
+        .logo-shine:hover::after {
+            left: 100%;
+        }
     </style>
 </head>
 
 <body class="bg-stone-50 text-stone-900">
 
     {{-- NAV --}}
-    <header class="fixed inset-x-0 top-0 z-50">
+    <header class="fixed inset-x-0 top-0 z-50 bg-gradient-to-r from-stone-900/98 via-stone-800/98 to-stone-900/98 backdrop-blur-md shadow-lg">
         <div class="w-full px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16 bg-gradient-to-r from-stone-900/98 via-stone-800/98 to-stone-900/98 backdrop-blur-md shadow-lg">
+            <div class="flex items-center h-16">
                 
-                {{-- Logo --}}
-                <a href="{{ route('home') }}" class="flex items-center gap-2 font-bold text-white hover:opacity-90 transition-opacity group pl-2">
-                    <img src="{{ asset('LOGO2.png') }}" class="h-9 w-auto group-hover:scale-105 transition-transform" alt="SeduhRasa Coffee Logo">
-                    <span class="text-lg">Seduh<span class="text-amber-500">Rasa</span></span>
-                </a>
-
-                {{-- Desktop Navigation --}}
-                <nav class="hidden md:flex items-center gap-8">
-                    <a href="{{ route('home') }}" 
-                       class="text-sm font-medium transition-colors relative group @if(request()->routeIs('home')) text-amber-400 @else text-white/80 hover:text-white @endif">
-                        Home
-                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-amber-400 transition-all group-hover:w-full @if(request()->routeIs('home')) w-full @endif"></span>
-                    </a>
-                    <a href="{{ route('about') }}" 
-                       class="text-sm font-medium transition-colors relative group @if(request()->routeIs('about')) text-amber-400 @else text-white/80 hover:text-white @endif">
-                        About Us
-                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-amber-400 transition-all group-hover:w-full @if(request()->routeIs('about')) w-full @endif"></span>
-                    </a>
-                    <a href="{{ route('services') }}" 
-                       class="text-sm font-medium transition-colors relative group @if(request()->routeIs('services')) text-amber-400 @else text-white/80 hover:text-white @endif">
-                        Services
-                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-amber-400 transition-all group-hover:w-full @if(request()->routeIs('services')) w-full @endif"></span>
-                    </a>
-                    <a href="{{ route('home') }}#product" 
-                       class="text-sm font-medium text-white/80 hover:text-white transition-colors relative group">
-                        Product
-                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-amber-400 transition-all group-hover:w-full"></span>
-                    </a>
-                    <a href="{{ route('contact') }}" 
-                       class="text-sm font-medium transition-colors relative group @if(request()->routeIs('contact')) text-amber-400 @else text-white/80 hover:text-white @endif">
-                        Contact
-                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-amber-400 transition-all group-hover:w-full @if(request()->routeIs('contact')) w-full @endif"></span>
-                    </a>
-                </nav>
-
-                {{-- Right Side --}}
-                <div class="flex items-center gap-3 pr-2">
-                    {{-- Order Button Desktop --}}
-                    <a href="{{ route('order') }}"
-                        class="hidden md:flex items-center gap-2 px-5 py-2 rounded-full border-2 border-amber-500/50 hover:border-amber-500 text-white text-sm font-semibold transition-all hover:scale-105 hover:bg-amber-500/10">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-                        </svg>
-                        Order
+                {{-- Left side: Logo + Desktop Navigation --}}
+                <div class="flex items-center gap-8 flex-1">
+                    {{-- Logo --}}
+                    <a href="{{ route('home') }}" class="flex items-center gap-2 font-bold text-white hover:opacity-90 transition-opacity group logo-shine">
+                        <img src="{{ asset('LOGO2.png') }}" class="h-9 w-auto transition-transform" alt="SeduhRasa Coffee Logo">
+                        <span class="text-lg logo-text whitespace-nowrap">
+                            <span class="logo-seduh">Seduh</span><span class="logo-rasa">Rasa</span>
+                        </span>
                     </a>
 
-                    {{-- Hamburger Button Mobile - 3 dots minimalis --}}
-                    <button id="mobile-menu-button" class="md:hidden hamburger p-2 hover:bg-white/10 rounded-lg transition-colors" aria-label="Toggle menu">
+                    {{-- Desktop Navigation --}}
+                    <nav class="hidden md:flex items-center gap-6">
+                        <a href="{{ route('home') }}" 
+                           class="text-sm font-medium transition-colors relative group whitespace-nowrap @if(request()->routeIs('home')) text-amber-400 @else text-white/80 hover:text-white @endif">
+                            Home
+                            <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-amber-400 transition-all group-hover:w-full @if(request()->routeIs('home')) w-full @endif"></span>
+                        </a>
+                        <a href="{{ route('about') }}" 
+                           class="text-sm font-medium transition-colors relative group whitespace-nowrap @if(request()->routeIs('about')) text-amber-400 @else text-white/80 hover:text-white @endif">
+                            About Us
+                            <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-amber-400 transition-all group-hover:w-full @if(request()->routeIs('about')) w-full @endif"></span>
+                        </a>
+                        <a href="{{ route('services') }}" 
+                           class="text-sm font-medium transition-colors relative group whitespace-nowrap @if(request()->routeIs('services')) text-amber-400 @else text-white/80 hover:text-white @endif">
+                            Services
+                            <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-amber-400 transition-all group-hover:w-full @if(request()->routeIs('services')) w-full @endif"></span>
+                        </a>
+                        <a href="{{ route('home') }}#product" 
+                           class="text-sm font-medium text-white/80 hover:text-white transition-colors relative group whitespace-nowrap">
+                            Product
+                            <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-amber-400 transition-all group-hover:w-full"></span>
+                        </a>
+                        <a href="{{ route('contact') }}" 
+                           class="text-sm font-medium transition-colors relative group whitespace-nowrap @if(request()->routeIs('contact')) text-amber-400 @else text-white/80 hover:text-white @endif">
+                            Contact
+                            <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-amber-400 transition-all group-hover:w-full @if(request()->routeIs('contact')) w-full @endif"></span>
+                        </a>
+                    </nav>
+                </div>
+
+                {{-- Right side: Hamburger Button (Mobile only) --}}
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="hamburger p-2 hover:bg-white/10 rounded-lg transition-colors" aria-label="Toggle menu">
                         <span></span>
                         <span></span>
                         <span></span>
@@ -231,7 +284,7 @@
         {{-- Order Button Mobile --}}
         <div class="p-6 border-t border-white/10">
             <a href="{{ route('order') }}"
-                class="flex items-center justify-center gap-2 w-full px-6 py-3 rounded-xl border-2 border-amber-500/70 hover:border-amber-400 text-white font-semibold transition-all hover:bg-amber-500/10">
+                class="flex items-center justify-center gap-2 w-full px-6 py-3 rounded-xl bg-[#a67c52] hover:bg-[#8b6f47] text-white font-semibold transition-all">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                 </svg>
