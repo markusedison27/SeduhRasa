@@ -3,7 +3,7 @@
 @section('title', 'SeduhRasa Coffee - Kopi Terbaik')
 
 @section('content')
-    <main class="bg-[#1a1a1a]"> {{-- biar background dasar nggak putih --}}
+    <main class="bg-[#1a1a1a]">
 
         {{-- HERO SECTION - MODERN & PREMIUM --}}
         <section class="relative min-h-screen w-full overflow-hidden">
@@ -33,8 +33,9 @@
                         </span>
                     </div>
 
-                    <h1 class="font-['Great_Vibes'] text-8xl md:text-9xl lg:text-[12rem] text-[#f5e6d3] mb-6 leading-none">
-                        SeduhRasa
+                    {{-- Animated Title --}}
+                    <h1 class="text-7xl md:text-8xl lg:text-[10rem] text-[#f5e6d3] mb-6 leading-none min-h-[8rem] font-serif tracking-tight">
+                        <span id="hero-title" class="inline-block font-light"></span>
                     </h1>
 
                     <p class="text-[#e8d4b8] text-2xl md:text-3xl mb-12 font-light tracking-wide max-w-3xl mx-auto">
@@ -169,11 +170,6 @@
                         Lebih dari sekadar kopi. Kami menciptakan momen dan kenangan yang tak terlupakan
                     </p>
                 </div>
-
-                <div class="grid md:grid-cols-3 gap-8">
-                    {{-- 3 cards sama seperti punyamu tadi --}}
-                    {{-- ... (isi tetap, cuma dirapikan) --}}
-                </div>
             </div>
         </section>
     </main>
@@ -181,6 +177,7 @@
 
 @push('scripts')
     <script>
+        // Background slideshow
         (function () {
             const slides = @json($slides ?? []);
 
@@ -214,6 +211,47 @@
             }
 
             setInterval(tick, 5000);
+        })();
+
+        // Typing Animation for Hero Title - HD Smooth
+        (function() {
+            const titleElement = document.getElementById('hero-title');
+            
+            if (!titleElement) return;
+
+            const text = 'SeduhRasa';
+            let index = 0;
+            let isDeleting = false;
+
+            function typeWriter() {
+                if (!isDeleting && index <= text.length) {
+                    // Typing dengan smooth fade
+                    titleElement.textContent = text.substring(0, index);
+                    titleElement.style.opacity = '1';
+                    index++;
+                    
+                    setTimeout(typeWriter, 150); // Lebih smooth
+                } else if (!isDeleting && index > text.length) {
+                    // Pause sebelum delete
+                    setTimeout(() => {
+                        isDeleting = true;
+                        typeWriter();
+                    }, 3000);
+                } else if (isDeleting && index > 0) {
+                    // Deleting dengan smooth
+                    index--;
+                    titleElement.textContent = text.substring(0, index);
+                    
+                    setTimeout(typeWriter, 80); // Delete lebih cepat tapi smooth
+                } else if (isDeleting && index === 0) {
+                    // Reset
+                    isDeleting = false;
+                    setTimeout(typeWriter, 500);
+                }
+            }
+
+            // Start animation
+            setTimeout(typeWriter, 800);
         })();
 
         // Smooth scroll
