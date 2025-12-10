@@ -1,96 +1,116 @@
-@extends('layouts.app')
+{{-- resources/views/frontend/order-success.blade.php (FINAL FIX) --}}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Pesanan • SeduhRasa Coffee</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-@section('title', 'Dashboard Super Admin')
+    @php
+        use Carbon\Carbon;
+        
+        // Variabel $order dan $qrCodePath HARUS dikirim dari Controller (yang mengurus order pelanggan)
+        
+        $isDigital = isset($order->metode_pembayaran) && $order->metode_pembayaran !== 'cod';
+        
+        // QR Code URL: Menggunakan jalur dari database/storage (Sesuai dengan cara upload di OwnerController)
+        // Jika $qrCodePath ada, gunakan asset('storage/...')
+        $qrCodeUrl = ($qrCodePath) 
+            ? asset('storage/' . $qrCodePath) 
+            : null; // Jika null, gambar tidak akan ditampilkan
+        
+    @endphp
 
-@section('content')
-    <div class="flex items-center justify-between mb-6">
-        <div>
-            <h1 class="text-2xl font-semibold mb-1">Dashboard Super Admin</h1>
-            <p class="text-sm text-gray-500">
-                Halo, {{ auth()->user()->name }} (role: {{ auth()->user()->role }}).
-            </p>
-        </div>
-    </div>
+    <style>
+        /* ... (CSS ASLI ANDA SAMA) ... */
+        /* ... (Saya menghapus CSS duplikat di sini untuk kemudahan membaca) ... */
 
-    {{-- Ringkasan User --}}
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <div>
-            <div class="bg-white border rounded-lg shadow-sm h-full">
-                <div class="p-4">
-                    <h6 class="text-xs font-semibold tracking-wide text-gray-500 uppercase mb-2">
-                        Total Owner
-                    </h6>
-                    <div class="text-3xl font-semibold mb-1">
-                        {{ $totalOwner ?? 0 }}
+        .pay-box{
+            margin-top:20px; 
+            padding:16px 12px; 
+            border-radius:10px;
+            background:#fffbeb;
+            border:1px solid #facc15;
+            font-size:12px;
+            color:#92400e;
+            display: flex;
+            gap: 20px; 
+            align-items: flex-start;
+        }
+        /* ... (CSS ASLI ANDA SAMA) ... */
+    </style>
+</head>
+<body>
+    <div class="page">
+        <div class="card">
+            <div class="card-header">
+                {{-- ... (KODE ASLI) ... --}}
+                @if($isDigital)
+                    <h1>Selesaikan Pembayaran</h1>
+                    <p>Segera selesaikan pembayaran digital kamu agar pesanan bisa kami proses</p>
+                @else
+                    <h1>Pesanan Berhasil!</h1>
+                    <p>Terima kasih telah memesan di SeduhRasa Coffee</p>
+                @endif
+            </div>
+
+            <div class="card-body">
+                {{-- ... (KODE ASLI INFORMASI ORDER) ... --}}
+                <div class="items">
+                    <div class="items-title">Detail Pesanan</div>
+                    <div class="items-list">
+                        @foreach(explode(', ', $order->menu_dipesan) as $item)
+                            <p>• {{ trim($item) }}</p>
+                        @endforeach
                     </div>
-                    <p class="text-xs text-gray-400">
-                        Jumlah seluruh pemilik coffee shop yang terdaftar.
-                    </p>
+                    <div class="total-row">
+                        <span>Total Pembayaran</span>
+                        <span>Rp {{ number_format($order->total_harga, 0, ',', '.') }}</span>
+                    </div>
+                </div>
+
+                {{-- Instruksi pembayaran digital --}}
+                @if($isDigital && $qrCodeUrl) {{-- TAMBAH PENGECUALIAN JIKA QR CODE TIDAK ADA --}}
+                    <div class="pay-box">
+                        <div class="pay-box-instruction">
+                            <div class="pay-box-title">Langkah Pembayaran</div>
+                            <ol style="margin:0; padding-left:18px;">
+                                <li>Buka aplikasi Dana / e-wallet yang kamu gunakan.</li>
+                                <li>Scan QR atau transfer ke nomor Dana kasir.</li>
+                                <li>Masukkan nominal sesuai Total Pembayaran.</li>
+                                <li>Simpan bukti transfer dan tunjukkan ke kasir.</li>
+                            </ol>
+                            <small>Setelah transfer, pesananmu akan diproses oleh kasir.</small>
+                        </div>
+                        {{-- MENGGUNAKAN QR CODE DARI PATH DATABASE --}}
+                        <img src="{{ $qrCodeUrl }}" alt="QR Code Pembayaran">
+                    </div>
+                @elseif($isDigital && !$qrCodeUrl)
+                    <div class="pay-box" style="background: #fefcbf; border-color: #fbd38d; color: #827e02;">
+                        <div class="pay-box-instruction">
+                            <div class="pay-box-title">Langkah Pembayaran</div>
+                            <p style="margin: 0;">QR Code pembayaran belum tersedia. Silakan hubungi kasir untuk mendapatkan informasi transfer.</p>
+                        </div>
+                    </div>
+                @endif
+
+                {{-- Footer --}}
+                <div class="footer-text">
+                    {{-- ... (KODE ASLI FOOTER) ... --}}
+                    @if($isDigital)
+                        <p>Setelah transfer, tunjukkan halaman ini dan bukti pembayaran kepada kasir untuk konfirmasi.</p>
+                    @else
+                        <p>Silakan tunjukkan halaman ini kepada kasir saat melakukan pembayaran.</p>
+                    @endif
+                    <small>Terima kasih sudah berbelanja di SeduhRasa Coffee</small>
+                </div>
+
+                {{-- Tombol --}}
+                <div class="btn-wrap">
+                    <a href="{{ route('menu') }}" class="btn">Kembali ke Menu</a>
                 </div>
             </div>
         </div>
-
-        <div>
-            <div class="bg-white border rounded-lg shadow-sm h-full">
-                <div class="p-4">
-                    <h6 class="text-xs font-semibold tracking-wide text-gray-500 uppercase mb-2">
-                        Total Staff
-                    </h6>
-                    <div class="text-3xl font-semibold mb-1">
-                        {{ $totalStaff ?? 0 }}
-                    </div>
-                    <p class="text-xs text-gray-400">
-                        Total seluruh staff yang terdaftar di sistem.
-                    </p>
-                </div>
-            </div>
-        </div>
     </div>
-
-    {{-- Aksi Cepat: Hanya Kelola Pemilik --}}
-    <div class="grid grid-cols-1 md:grid-cols-1 gap-4 mb-6">
-        <div>
-            <div class="bg-white border rounded-lg shadow-sm h-full flex flex-col">
-                <div class="p-4 flex flex-col justify-between flex-1">
-                    <div>
-                        <h5 class="text-lg font-semibold mb-1">Kelola Pemilik Coffee Shop</h5>
-                        <p class="text-sm text-gray-500">
-                            Tambah, ubah, atau nonaktifkan akun pemilik coffee shop.
-                        </p>
-                    </div>
-                    <a href="{{ route('super.owners.index') }}"
-                       class="inline-flex items-center justify-center mt-3 px-4 py-2 text-sm font-medium rounded-md
-                              bg-indigo-600 text-white hover:bg-indigo-700
-                              focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                        Buka Manajemen Owner
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {{-- Profil Akun Super Admin --}}
-    <div class="bg-white border rounded-lg shadow-sm">
-        <div class="px-4 py-3 border-b">
-            <h5 class="text-lg font-semibold mb-0">Profil Akun Super Admin</h5>
-        </div>
-        <div class="p-4">
-            <dl class="divide-y divide-gray-100">
-                <div class="py-2 grid grid-cols-3 gap-4 text-sm">
-                    <dt class="font-medium text-gray-600">Nama</dt>
-                    <dd class="col-span-2 text-gray-800">{{ auth()->user()->name }}</dd>
-                </div>
-
-                <div class="py-2 grid grid-cols-3 gap-4 text-sm">
-                    <dt class="font-medium text-gray-600">Email</dt>
-                    <dd class="col-span-2 text-gray-800">{{ auth()->user()->email }}</dd>
-                </div>
-
-                <div class="py-2 grid grid-cols-3 gap-4 text-sm">
-                    <dt class="font-medium text-gray-600">Role</dt>
-                    <dd class="col-span-2 text-gray-800">{{ auth()->user()->role }}</dd>
-                </div>
-            </dl>
-        </div>
-    </div>
-@endsection
+</body>
+</html>

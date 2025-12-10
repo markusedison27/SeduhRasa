@@ -1,4 +1,4 @@
-{{-- resources/views/frontend/order-success.blade.php (DIPERBAIKI) --}}
+{{-- resources/views/frontend/order-success.blade.php (SUDAH DIPERBAIKI) --}}
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -10,17 +10,17 @@
         use Carbon\Carbon;
         
         // Variabel $order dan $qrCodePath HARUS dikirim dari Controller
-        // JANGAN buat query atau data dummy di sini!
         
         $isDigital = isset($order->metode_pembayaran) && $order->metode_pembayaran !== 'cod';
         
-        // QR Code URL - gunakan default jika tidak ada
-        $qrCodeUrl = isset($qrCodePath) && $qrCodePath 
-            ? asset('storage/' . $qrCodePath) 
-            : asset('default-qr.png');
+        // QR Code URL: Menggunakan jalur statis 'qr.png' yang Anda letakkan di folder public/
+        // Perbaikan ini mengabaikan $qrCodePath dari database, langsung mengambil dari public/
+        $qrCodeUrl = asset('qr.png'); 
+        
     @endphp
 
     <style>
+        /* ... (CSS ASLI ANDA SAMA) ... */
         body{
             margin:0;
             font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -282,6 +282,7 @@
                             </ol>
                             <small>Setelah transfer, pesananmu akan diproses oleh kasir.</small>
                         </div>
+                        {{-- MENGGUNAKAN QR CODE DARI public/qr.png --}}
                         <img src="{{ $qrCodeUrl }}" alt="QR Code Pembayaran">
                     </div>
                 @endif

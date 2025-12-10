@@ -6,8 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\Order;        
 use App\Models\Pengeluaran;  
 use App\Models\Setting;
-use App\Models\User; // Ditambahkan jika Anda memerlukannya untuk menghitung staff
-use App\Http\Requests\ProfileUpdateRequest; // <-- SUMBER MASALAH 'CLASS NOT FOUND'
+use App\Models\User;
+use App\Http\Requests\ProfileUpdateRequest;
 
 // Import yang diperlukan
 use Illuminate\Support\Facades\Storage; 
@@ -31,9 +31,10 @@ class OwnerController extends Controller
         $perkiraanPendapatan = Order::where('status', 'selesai')
             ->sum('subtotal');
 
-        // Jumlah Staff Aktif (sebaiknya diambil dari tabel user)
-        // Contoh: $jumlahStaffAktif = User::where('role', 'staff')->count();
-        $jumlahStaffAktif = 0; 
+        // Jumlah Staff Aktif
+        $jumlahStaffAktif = User::where('role', 'staff')
+            ->where('owner_id', $owner->id)
+            ->count();
 
         // Ambil Path QR Code dari Database
         $qrCodePath = Setting::where('key', 'payment_qr_code_path')->value('value');
@@ -52,22 +53,81 @@ class OwnerController extends Controller
      */
     public function uploadQrCode(Request $request)
     {
-        // Logika untuk upload QR Code (asumsi sudah ada)
-        // ...
+        // Validasi file upload
+        $request->validate([
+            'qrcode_file' => 'required|image|mimes:jpeg,png,jpg|max:2048', // Max 2MB
+        ], [
+            'qrcode_file.required' => 'File QR Code wajib dipilih.',
+            'qrcode_file.image' => 'File harus berupa gambar.',
+            'qrcode_file.mimes' => 'Format file harus jpeg, png, atau jpg.',
+            'qrcode_file.max' => 'Ukuran file maksimal 2MB.',
+        ]);
+
+        try {
+            // Ambil QR Code lama dari database
+            $oldQrCodePath = Setting::where('key', 'payment_qr_code_path')->value('value');
+
+            // Hapus file lama jika ada
+            if ($oldQrCodePath && Storage::disk('public')->exists($oldQrCodePath)) {
+                Storage::disk('public')->delete($oldQrCodePath);
+            }
+
+            // Simpan file baru ke storage/app/public/qrcodes
+            $file = $request->file('qrcode_file');
+            $filename = 'qrcode_' . time() . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('qrcodes', $filename, 'public');
+
+            // Simpan path ke database menggunakan updateOrCreate
+            Setting::updateOrCreate(
+                ['key' => 'payment_qr_code_path'],
+                ['value' => $path]
+            );
+
+            return redirect()->route('owner.dashboard')
+                ->with('success', 'QR Code pembayaran berhasil diunggah dan disimpan!');
+
+        } catch (\Exception $e) {
+            // Log error untuk debugging
+            \Log::error('Error uploading QR Code: ' . $e->getMessage());
+
+            return redirect()->route('owner.dashboard')
+                ->with('error', 'Terjadi kesalahan saat mengunggah QR Code. Silakan coba lagi.');
+        }
     }
 
     /**
-     * Tampilkan halaman keuangan (placeholder)
+     * Tampilkan halaman keuangan
      */
     public function finance()
     {
-        // Logika untuk halaman finance (asumsi sudah ada)
-        // ...
+        $owner = auth()->user();
+
+        // Total pendapatan dari order selesai
+        $totalPendapatan = Order::where('status', 'selesai')->sum('subtotal');
+
+        // Total pengeluaran
+        $totalPengeluaran = Pengeluaran::sum('jumlah');
+
+        // Laba bersih
+        $labaBersih = $totalPendapatan - $totalPengeluaran;
+
+        // Data untuk chart (contoh: pendapatan per bulan)
+        $pendapatanPerBulan = Order::where('status', 'selesai')
+            ->selectRaw('MONTH(created_at) as bulan, SUM(subtotal) as total')
+            ->groupBy('bulan')
+            ->get();
+
+        return view('owner.finance', compact(
+            'owner',
+            'totalPendapatan',
+            'totalPengeluaran',
+            'labaBersih',
+            'pendapatanPerBulan'
+        ));
     }
 
-
     /**
-     * Menampilkan halaman edit profile (Digunakan oleh Owner & Staff/Admin)
+     * Menampilkan halaman edit profile
      */
     public function editProfile()
     {
@@ -76,9 +136,9 @@ class OwnerController extends Controller
     }
 
     /**
-     * Update profile owner (Informasi Dasar, Avatar, dan Password jika diisi)
+     * Update profile owner
      */
-    public function updateProfile(ProfileUpdateRequest $request) // <-- MASALAH UTAMA 1
+    public function updateProfile(ProfileUpdateRequest $request)
     {
         $owner = $request->user();
 
@@ -97,7 +157,7 @@ class OwnerController extends Controller
             $owner->avatar = $avatarPath; 
         }
 
-        // 3. Update password jika diisi (sudah divalidasi oleh ProfileUpdateRequest)
+        // 3. Update password jika diisi
         if ($request->filled('password')) {
             $owner->password = Hash::make($request->password); 
         }
@@ -109,19 +169,16 @@ class OwnerController extends Controller
     }
 
     /**
-     * Update password owner (Metode terpisah untuk formulir password)
+     * Update password owner
      */
-    public function updatePassword(ProfileUpdateRequest $request) // <-- MASALAH UTAMA 2
+    public function updatePassword(ProfileUpdateRequest $request)
     {
-        // Karena ProfileUpdateRequest memiliki aturan 'password', kita hanya perlu cek apakah diisi
         if (!$request->filled('password')) {
             return redirect()->route('owner.profile.edit')
                 ->with('error', 'Password baru tidak boleh kosong.');
         }
 
         $user = $request->user();
-
-        // Enkripsi dan simpan password baru
         $user->password = Hash::make($request->password);
         $user->save();
 
