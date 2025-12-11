@@ -11,13 +11,10 @@ use Carbon\Carbon;
 class LoginController extends Controller
 {
     // Percobaan maksimal sebelum terkunci
-    private const MAX_ATTEMPTS = 3; // setelah 3x gagal -> mulai di-lock
+    private const MAX_ATTEMPTS = 3;
 
     /**
-     * Durasi lock PROGRESIF (menit) berdasarkan total attempts
-     * - attempts <= 3  → 1 menit
-     * - attempts <= 5  → 5 menit
-     * - attempts > 5   → 15 menit
+     * Durasi lock PROGRESIF
      */
     private function getLockDuration(int $attempts): int
     {
@@ -29,29 +26,22 @@ class LoginController extends Controller
     }
 
     /**
-     * Format sisa waktu (detik) ke teks Indonesia yang enak dibaca.
-     * Contoh: 90 → "1 menit 30 detik"
+     * Format waktu sisa lock
      */
     private function formatRemainingTime(int $seconds): string
     {
-        if ($seconds <= 0) {
-            return '0 detik';
-        }
+        if ($seconds <= 0) return '0 detik';
 
         $minutes = intdiv($seconds, 60);
-        $sec     = $seconds % 60;
+        $sec = $seconds % 60;
 
-        if ($minutes > 0 && $sec > 0) {
-            return "{$minutes} menit {$sec} detik";
-        } elseif ($minutes > 0) {
-            return "{$minutes} menit";
-        }
-
-        return "{$sec} detik";
+        if ($minutes > 0 && $sec > 0) return "$minutes menit $sec detik";
+        if ($minutes > 0) return "$minutes menit";
+        return "$sec detik";
     }
 
     /**
-     * Menampilkan Form Login.
+     * Tampilkan form login
      */
     public function showLoginForm()
     {
@@ -59,11 +49,11 @@ class LoginController extends Controller
     }
 
     /**
-     * Menangani proses Login.
+     * Logic Login
      */
     public function login(Request $request)
     {
-        // 1. Validasi Input
+        // Validasi awal
         $credentials = $request->validate([
             'email'    => ['required', 'email'],
             'password' => ['required'],
@@ -72,7 +62,7 @@ class LoginController extends Controller
         $email     = $request->email;
         $ipAddress = $request->ip();
 
-        // 2. Cek / buat record login attempts
+        // Ambil atau buat record login attempt
         $loginAttempt = LoginAttempt::firstOrCreate(
             [
                 'email'      => $email,
@@ -85,80 +75,62 @@ class LoginController extends Controller
             ]
         );
 
-        // 3. Cek apakah akun masih terkunci
+        // Jika akun terkunci
         if ($loginAttempt->isLocked()) {
             $remainingSeconds = Carbon::now()->diffInSeconds($loginAttempt->locked_until, false);
 
-            // Kalau waktu lock sebenarnya sudah habis, reset supaya user bisa login lagi
             if ($remainingSeconds <= 0) {
                 $loginAttempt->reset();
             } else {
-                $timeMessage = $this->formatRemainingTime($remainingSeconds);
-
                 return back()
                     ->withErrors([
-                        'email' => "🔒 Akun Anda terkunci karena terlalu banyak percobaan login gagal. Silakan coba lagi dalam {$timeMessage}."
+                        'email' => "🔒 Akun terkunci. Coba lagi dalam " . $this->formatRemainingTime($remainingSeconds)
                     ])
-                    ->with('lock_remaining_seconds', $remainingSeconds) // buat countdown di Blade
+                    ->with('lock_remaining_seconds', $remainingSeconds)
                     ->onlyInput('email');
             }
         }
 
-        // 4. Coba Otentikasi
+        // Mencoba login
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
-            $request->session()->regenerate();
 
-            // Reset login attempts jika berhasil
+            $request->session()->regenerate();
             $loginAttempt->reset();
 
             $user = Auth::user();
-
-            // 5. Tentukan redirect berdasarkan role
-            if ($user->role === 'super_admin') {
-                $fallback = route('super.dashboard');
-            } elseif ($user->role === 'owner') {
-                $fallback = route('owner.dashboard');
-            } elseif ($user->role === 'admin' || $user->role === 'staff') {
-                $fallback = route('staff.dashboard');
-            } else {
-                $fallback = route('home');
-            }
-
-            return redirect($fallback);
+            return $this->redirectByRole($user);
         }
 
-        // 6. Login Gagal - Increment Attempts
+        // LOGIN GAGAL → tambahkan attempt
         $loginAttempt->incrementAttempts();
 
-        // 7. Cek apakah sudah mencapai batas maksimal → KUNCI
+        // Jika sudah mencapai batas lock
         if ($loginAttempt->attempts >= self::MAX_ATTEMPTS) {
-            // Durasi lock progresif
             $durationMinutes = $this->getLockDuration($loginAttempt->attempts);
             $loginAttempt->lockAccount($durationMinutes);
 
-            $seconds    = $durationMinutes * 60;
-            $timeString = $this->formatRemainingTime($seconds);
+            $seconds = $durationMinutes * 60;
 
             return back()
                 ->withErrors([
-                    'email' => "❌ Terlalu banyak percobaan login gagal! Akun Anda dikunci selama {$timeString}. Silakan coba lagi nanti."
+                    'email' => "❌ Terlalu banyak percobaan! Akun dikunci selama " . $this->formatRemainingTime($seconds)
                 ])
                 ->with('lock_remaining_seconds', $seconds)
                 ->onlyInput('email');
         }
 
-        // 8. Belum terkunci → tampilkan sisa percobaan
-        $remainingAttempts = self::MAX_ATTEMPTS - $loginAttempt->attempts;
+        // BELUM TERKUNCI → tampilkan sisa percobaan
+        $remaining = self::MAX_ATTEMPTS - $loginAttempt->attempts;
 
         return back()
             ->withErrors([
-                'email' => "⚠️ Email atau Password yang Anda masukkan salah. Sisa percobaan: {$remainingAttempts} kali."
+                'email' => "⚠️ Email/Password salah. Sisa percobaan: {$remaining} kali."
             ])
             ->onlyInput('email');
     }
 
     /**
-     * Menangani proses Logout.
+     * Logout
      */
     public function logout(Request $request)
     {
@@ -167,11 +139,25 @@ class LoginController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('login')->with('status', 'Berhasil keluar.');
+        return redirect()->route('login')->with('success', 'Berhasil keluar.');
     }
 
     /**
-     * Reset login attempts (opsional - untuk admin)
+     * Redirect berdasarkan role
+     */
+    protected function redirectByRole($user)
+    {
+        return match ($user->role) {
+            'super_admin' => redirect()->route('super.dashboard'),
+            'owner'       => redirect()->route('owner.dashboard'),
+            'admin', 
+            'staff'       => redirect()->route('staff.dashboard'),
+            default       => redirect()->route('home'),
+        };
+    }
+
+    /**
+     * Reset Login Attempt (optional)
      */
     public function resetLoginAttempts(Request $request)
     {
@@ -179,6 +165,6 @@ class LoginController extends Controller
 
         LoginAttempt::where('email', $request->email)->delete();
 
-        return back()->with('status', 'Login attempts berhasil direset.');
+        return back()->with('success', 'Percobaan login berhasil direset.');
     }
 }
