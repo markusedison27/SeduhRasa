@@ -54,7 +54,7 @@
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
                 @if($menu->gambar)
-                  <img src="{{ asset('storage/' . $menu->gambar) }}" 
+                  <img src="{{ asset('uploads/' . $menu->gambar) }}" 
                        alt="{{ $menu->nama_menu }}"
                        class="h-16 w-16 object-cover rounded-lg border border-neutral-200">
                 @else
