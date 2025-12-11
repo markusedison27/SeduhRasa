@@ -10,12 +10,8 @@ use Carbon\Carbon;
 
 class LoginController extends Controller
 {
-    // Percobaan maksimal sebelum terkunci
     private const MAX_ATTEMPTS = 3;
 
-    /**
-     * Durasi lock PROGRESIF
-     */
     private function getLockDuration(int $attempts): int
     {
         return match (true) {
@@ -25,9 +21,6 @@ class LoginController extends Controller
         };
     }
 
-    /**
-     * Format waktu sisa lock
-     */
     private function formatRemainingTime(int $seconds): string
     {
         if ($seconds <= 0) return '0 detik';
@@ -40,20 +33,14 @@ class LoginController extends Controller
         return "$sec detik";
     }
 
-    /**
-     * Tampilkan form login
-     */
     public function showLoginForm()
     {
         return view('auth.login');
     }
 
-    /**
-     * Logic Login
-     */
     public function login(Request $request)
     {
-        // Validasi awal
+        // Validasi input
         $credentials = $request->validate([
             'email'    => ['required', 'email'],
             'password' => ['required'],
@@ -62,36 +49,29 @@ class LoginController extends Controller
         $email     = $request->email;
         $ipAddress = $request->ip();
 
-        // Ambil atau buat record login attempt
+        // Ambil atau buat record attempts
         $loginAttempt = LoginAttempt::firstOrCreate(
-            [
-                'email'      => $email,
-                'ip_address' => $ipAddress,
-            ],
-            [
-                'attempts'        => 0,
-                'locked_until'    => null,
-                'last_attempt_at' => null,
-            ]
+            ['email' => $email, 'ip_address' => $ipAddress],
+            ['attempts' => 0, 'locked_until' => null, 'last_attempt_at' => null]
         );
 
-        // Jika akun terkunci
+        // Jika terkunci → tampilkan error + countdown
         if ($loginAttempt->isLocked()) {
-            $remainingSeconds = Carbon::now()->diffInSeconds($loginAttempt->locked_until, false);
+            $remaining = Carbon::now()->diffInSeconds($loginAttempt->locked_until, false);
 
-            if ($remainingSeconds <= 0) {
+            if ($remaining <= 0) {
                 $loginAttempt->reset();
             } else {
                 return back()
                     ->withErrors([
-                        'email' => "🔒 Akun terkunci. Coba lagi dalam " . $this->formatRemainingTime($remainingSeconds)
+                        'email' => "🔒 Akun terkunci. Coba lagi dalam " . $this->formatRemainingTime($remaining)
                     ])
-                    ->with('lock_remaining_seconds', $remainingSeconds)
+                    ->with('lock_remaining_seconds', $remaining)
                     ->onlyInput('email');
             }
         }
 
-        // Mencoba login
+        // Coba login
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
 
             $request->session()->regenerate();
@@ -101,15 +81,15 @@ class LoginController extends Controller
             return $this->redirectByRole($user);
         }
 
-        // LOGIN GAGAL → tambahkan attempt
+        // LOGIN GAGAL → tambah attempt
         $loginAttempt->incrementAttempts();
 
-        // Jika sudah mencapai batas lock
+        // Jika sudah mencapai batas → KUNCI AKUN
         if ($loginAttempt->attempts >= self::MAX_ATTEMPTS) {
-            $durationMinutes = $this->getLockDuration($loginAttempt->attempts);
-            $loginAttempt->lockAccount($durationMinutes);
+            $minutes = $this->getLockDuration($loginAttempt->attempts);
+            $loginAttempt->lockAccount($minutes);
 
-            $seconds = $durationMinutes * 60;
+            $seconds = $minutes * 60;
 
             return back()
                 ->withErrors([
@@ -119,19 +99,12 @@ class LoginController extends Controller
                 ->onlyInput('email');
         }
 
-        // BELUM TERKUNCI → tampilkan sisa percobaan
-        $remaining = self::MAX_ATTEMPTS - $loginAttempt->attempts;
-
+        // LOGIN GAGAL BIASA → tampilkan session('error')
         return back()
-            ->withErrors([
-                'email' => "⚠️ Email/Password salah. Sisa percobaan: {$remaining} kali."
-            ])
+            ->with('error', 'Email atau password salah! Periksa kembali data Anda.')
             ->onlyInput('email');
     }
 
-    /**
-     * Logout
-     */
     public function logout(Request $request)
     {
         Auth::logout();
@@ -139,26 +112,20 @@ class LoginController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('login')->with('success', 'Berhasil keluar.');
+        return redirect()->route('login')->with('success', 'Anda berhasil keluar.');
     }
 
-    /**
-     * Redirect berdasarkan role
-     */
     protected function redirectByRole($user)
     {
         return match ($user->role) {
             'super_admin' => redirect()->route('super.dashboard'),
             'owner'       => redirect()->route('owner.dashboard'),
-            'admin', 
+            'admin',
             'staff'       => redirect()->route('staff.dashboard'),
             default       => redirect()->route('home'),
         };
     }
 
-    /**
-     * Reset Login Attempt (optional)
-     */
     public function resetLoginAttempts(Request $request)
     {
         $request->validate(['email' => 'required|email']);

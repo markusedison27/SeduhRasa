@@ -8,59 +8,59 @@ use Laravel\Socialite\Facades\Socialite;
 
 class GoogleAuthController extends Controller
 {
-    // 1. Redirect ke Google
     public function redirect()
     {
         return Socialite::driver('google')->redirect();
     }
 
-    // 2. Terima callback dari Google
     public function callback()
     {
         try {
-            // kalau error CSRF / state bisa pakai ->stateless()
             $googleUser = Socialite::driver('google')->user();
         } catch (\Exception $e) {
             return redirect()
                 ->route('login')
-                ->with('error', 'Gagal login dengan Google.');
+                ->with('error', 'Gagal login dengan Google. Silakan coba lagi.');
         }
 
-        // CARI USER YANG SUDAH TERDAFTAR DI DB
+        // CARI USER
         $user = User::where('google_id', $googleUser->getId())
             ->orWhere('email', $googleUser->getEmail())
             ->first();
 
-        // JIKA TIDAK ADA → TOLAK LOGIN, JANGAN BUAT OWNER BARU
+        // TIDAK DITEMUKAN → MUNCULKAN NOTIFIKASI
         if (! $user) {
             return redirect()
                 ->route('login')
-                ->with('error', 'Akun Google Anda belum terdaftar di sistem. Silakan hubungi admin/owner.');
+                ->with('error', 'Akun Google Anda belum terdaftar di sistem.');
         }
 
-        // JIKA ADA TAPI BELUM PUNYA google_id → HUBUNGKAN
+        // SAMBUNGKAN GOOGLE ID
         if (! $user->google_id) {
             $user->google_id = $googleUser->getId();
         }
 
-        // opsional: update avatar / name jika mau
-        $user->avatar = $googleUser->getAvatar();
-        // $user->name   = $googleUser->getName(); // kalau mau ikut diupdate
+        // Optional update avatar
+        if (isset($user->avatar)) {
+            $user->avatar = $googleUser->getAvatar();
+        }
+
         $user->save();
 
-        // LOGIN-KAN USER
+        // LOGIN
         Auth::login($user, true);
 
-        // REDIRECT SESUAI ROLE
-        if ($user->role === 'super_admin') {
-            return redirect()->route('super.dashboard');   // routes/web.php :contentReference[oaicite:1]{index=1}
-        }
+        return $this->redirectByRole($user);
+    }
 
-        if ($user->role === 'owner') {
-            return redirect()->route('owner.dashboard');   // routes/web.php :contentReference[oaicite:2]{index=2}
-        }
-
-        // fallback: admin / staff
-        return redirect()->route('staff.dashboard');       // routes/web.php :contentReference[oaicite:3]{index=3}
+    protected function redirectByRole(User $user)
+    {
+        return match ($user->role) {
+            'super_admin' => redirect()->route('super.dashboard'),
+            'owner'       => redirect()->route('owner.dashboard'),
+            'admin',
+            'staff'       => redirect()->route('staff.dashboard'),
+            default       => redirect()->route('home'),
+        };
     }
 }
