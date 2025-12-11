@@ -102,27 +102,47 @@ class OwnerController extends Controller
     {
         $owner = auth()->user();
 
-        // Total pendapatan dari order selesai
-        $totalPendapatan = Order::where('status', 'selesai')->sum('subtotal');
+        // ==========================
+        // TOTAL PEMASUKAN (sesuai blade: $totalPemasukan)
+        // ==========================
+        $totalPemasukan = Order::where('status', 'selesai')
+            ->sum('subtotal');
 
-        // Total pengeluaran
-        $totalPengeluaran = Pengeluaran::sum('jumlah');
+        // ==========================
+        // TOTAL PENGELUARAN
+        // SEBELUMNYA: Pengeluaran::sum('jumlah'); -> ERROR (kolom 'jumlah' tidak ada)
+        // DI DB & BLADE: pakai kolom 'nominal'
+        // ==========================
+        $totalPengeluaran = Pengeluaran::sum('nominal');
 
-        // Laba bersih
-        $labaBersih = $totalPendapatan - $totalPengeluaran;
+        // ==========================
+        // LABA BERSIH (sesuai blade: $labaBersih)
+        // ==========================
+        $labaBersih = $totalPemasukan - $totalPengeluaran;
 
-        // Data untuk chart (contoh: pendapatan per bulan)
-        $pendapatanPerBulan = Order::where('status', 'selesai')
-            ->selectRaw('MONTH(created_at) as bulan, SUM(subtotal) as total')
-            ->groupBy('bulan')
+        // ==========================
+        // 10 PEMASUKAN TERBARU (sesuai blade: $daftarPemasukan)
+        // ==========================
+        $daftarPemasukan = Order::where('status', 'selesai')
+            ->orderBy('created_at', 'desc')
+            ->take(10)
             ->get();
 
+        // ==========================
+        // 10 PENGELUARAN TERBARU (sesuai blade: $daftarPengeluaran)
+        // ==========================
+        $daftarPengeluaran = Pengeluaran::orderBy('tanggal', 'desc')
+            ->take(10)
+            ->get();
+
+        // Kirim data yang DIPAKAI di owner.finance.blade.php
         return view('owner.finance', compact(
             'owner',
-            'totalPendapatan',
+            'totalPemasukan',
             'totalPengeluaran',
             'labaBersih',
-            'pendapatanPerBulan'
+            'daftarPemasukan',
+            'daftarPengeluaran'
         ));
     }
 

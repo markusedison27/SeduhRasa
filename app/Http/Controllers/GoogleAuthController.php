@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
 
 class GoogleAuthController extends Controller
@@ -27,52 +26,41 @@ class GoogleAuthController extends Controller
                 ->with('error', 'Gagal login dengan Google.');
         }
 
-        // cari user berdasarkan google_id
-        $user = User::where('google_id', $googleUser->getId())->first();
+        // CARI USER YANG SUDAH TERDAFTAR DI DB
+        $user = User::where('google_id', $googleUser->getId())
+            ->orWhere('email', $googleUser->getEmail())
+            ->first();
 
+        // JIKA TIDAK ADA → TOLAK LOGIN, JANGAN BUAT OWNER BARU
         if (! $user) {
-            // kalau belum ada, coba cek by email (biar tidak dobel akun)
-            $user = User::where('email', $googleUser->getEmail())->first();
-
-            if ($user) {
-                // kalau ada user dengan email yg sama, sambungkan google_id-nya
-                $user->google_id = $googleUser->getId();
-                $user->avatar    = $googleUser->getAvatar();
-                $user->save();
-            } else {
-                // kalau benar-benar user baru, buat user baru
-                $user = User::create([
-                    'name'      => $googleUser->getName(),
-                    'email'     => $googleUser->getEmail(),
-                    'google_id' => $googleUser->getId(),
-                    'avatar'    => $googleUser->getAvatar(),
-                    // SESUAIKAN DEFAULT ROLE & OWNER DI SINI
-                    'role'      => 'owner',      // atau 'admin' / 'staff' sesuai kebijakanmu
-                    'owner_id'  => null,         // kalau perlu
-                    'password'  => bcrypt(Str::random(16)), // random aja
-                ]);
-            }
+            return redirect()
+                ->route('login')
+                ->with('error', 'Akun Google Anda belum terdaftar di sistem. Silakan hubungi admin/owner.');
         }
 
-        // kalau user lama tapi role-nya masih null, kasih default juga
-        if (! $user->role) {
-            $user->role = 'owner'; // atau apa pun default kamu
-            $user->save();
+        // JIKA ADA TAPI BELUM PUNYA google_id → HUBUNGKAN
+        if (! $user->google_id) {
+            $user->google_id = $googleUser->getId();
         }
 
-        // login-kan user
+        // opsional: update avatar / name jika mau
+        $user->avatar = $googleUser->getAvatar();
+        // $user->name   = $googleUser->getName(); // kalau mau ikut diupdate
+        $user->save();
+
+        // LOGIN-KAN USER
         Auth::login($user, true);
 
-        // redirect JANGAN pakai intended(), pakai route sesuai role
+        // REDIRECT SESUAI ROLE
         if ($user->role === 'super_admin') {
-            return redirect()->route('super.dashboard');
+            return redirect()->route('super.dashboard');   // routes/web.php :contentReference[oaicite:1]{index=1}
         }
 
         if ($user->role === 'owner') {
-            return redirect()->route('owner.dashboard');
+            return redirect()->route('owner.dashboard');   // routes/web.php :contentReference[oaicite:2]{index=2}
         }
 
-        // fallback untuk admin / staff
-        return redirect()->route('staff.dashboard'); // ini /dashboard
+        // fallback: admin / staff
+        return redirect()->route('staff.dashboard');       // routes/web.php :contentReference[oaicite:3]{index=3}
     }
 }
