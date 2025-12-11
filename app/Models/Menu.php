@@ -6,30 +6,33 @@ use Illuminate\Database\Eloquent\Model;
 
 class Menu extends Model
 {
+    protected $table = 'menus';
+
     protected $fillable = [
         'nama_menu',
+        'kategori',
+        'gambar',       // ⬅️ kolom gambar di database
+        'suhu',
         'harga',
+        'stok',
         'group',
-        'image',
+        'image',        // kalau masih dipakai di tempat lain biarin aja
         'description',
         'serve_options',
-        'stok', // ✅ TAMBAHKAN INI
     ];
 
-    // Cast JSON untuk serve_options
     protected $casts = [
         'serve_options' => 'array',
-        'stok' => 'integer',
+        'stok'          => 'integer',
     ];
 
-    // Accessor agar bisa pakai $menu->nama (opsional)
     public function getNamaAttribute()
     {
         return $this->nama_menu;
     }
 
     /**
-     * Cek apakah menu tersedia (stok > 0)
+     * Apakah stok masih ada?
      */
     public function isAvailable(): bool
     {
@@ -37,7 +40,7 @@ class Menu extends Model
     }
 
     /**
-     * Kurangi stok menu
+     * Kurangi stok
      */
     public function decreaseStock(int $quantity): bool
     {
@@ -45,11 +48,12 @@ class Menu extends Model
             $this->stok -= $quantity;
             return $this->save();
         }
+
         return false;
     }
 
     /**
-     * Tambah stok menu
+     * Tambah stok
      */
     public function increaseStock(int $quantity): bool
     {

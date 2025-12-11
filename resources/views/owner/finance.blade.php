@@ -1,774 +1,424 @@
 @extends('layouts.app')
 
 @section('title', 'Keuangan Pemilik')
-@section('page-title', 'Keuangan Pemilik')
 
 @section('content')
-<div class="finance-modern-page">
+<div class="finance-wrapper">
     <div class="container-fluid py-4">
 
-        {{-- Premium Header --}}
-        <div class="premium-header mb-4">
-            <div class="row align-items-center">
-                <div class="col-lg-8">
-                    <div class="header-content">
-                        <div class="header-badge">
-                            <i class="bi bi-shield-check me-2"></i>
-                            Panel Keuangan Owner
-                        </div>
-                        <h2 class="header-title mt-2 mb-2">
-                            Selamat datang, {{ auth()->user()->name ?? 'Owner' }} ☕
-                        </h2>
-                        <p class="header-subtitle mb-0">
-                            Pantau kesehatan finansial coffee shop Anda secara real-time dengan visualisasi yang jelas
+        {{-- HEADER --}}
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="finance-header">
+                    <div>
+                        <div class="finance-pill">Panel Keuangan Owner</div>
+                        <h2 class="finance-title">Ringkasan Keuangan SeduhRasa</h2>
+                        <p class="finance-subtitle">
+                            Pantau pemasukan dan pengeluaran coffee shop Anda dengan visual yang rapi dan nyaman.
                         </p>
-                    </div>
-                </div>
-                <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
-                    <div class="header-actions">
-                        <a href="#pemasukan-section" class="btn btn-light-coffee me-2">
-                            <i class="bi bi-arrow-down-circle me-2"></i>Pemasukan
-                        </a>
-                        <a href="#pengeluaran-section" class="btn btn-outline-light">
-                            <i class="bi bi-arrow-up-circle me-2"></i>Pengeluaran
-                        </a>
                     </div>
                 </div>
             </div>
         </div>
 
-        {{-- Financial Summary Cards --}}
-        <div class="row g-4 mb-4">
+        {{-- 8 KARTU RINGKASAN --}}
+        <div class="row g-3 mb-4">
+
+            {{-- Pemasukan Hari Ini --}}
+            <div class="col-xl-3 col-md-6">
+                <div class="finance-stat-card income-today">
+                    <div class="icon-wrap">
+                        <i class="bi bi-sun"></i>
+                    </div>
+                    <div class="content">
+                        <span class="label">Pemasukan Hari Ini</span>
+                        <span class="value">
+                            Rp {{ number_format($stats['income_today'] ?? 0, 0, ',', '.') }}
+                        </span>
+                        <span class="hint">Total transaksi yang masuk hari ini</span>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Pemasukan Bulan Ini --}}
+            <div class="col-xl-3 col-md-6">
+                <div class="finance-stat-card income-month">
+                    <div class="icon-wrap">
+                        <i class="bi bi-calendar-week"></i>
+                    </div>
+                    <div class="content">
+                        <span class="label">Pemasukan Bulan Ini</span>
+                        <span class="value">
+                            Rp {{ number_format($stats['income_month'] ?? 0, 0, ',', '.') }}
+                        </span>
+                        <span class="hint">Akumulasi omset bulan berjalan</span>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Pemasukan Tahun Ini --}}
+            <div class="col-xl-3 col-md-6">
+                <div class="finance-stat-card income-year">
+                    <div class="icon-wrap">
+                        <i class="bi bi-calendar3"></i>
+                    </div>
+                    <div class="content">
+                        <span class="label">Pemasukan Tahun Ini</span>
+                        <span class="value">
+                            Rp {{ number_format($stats['income_year'] ?? 0, 0, ',', '.') }}
+                        </span>
+                        <span class="hint">Performa keuangan sepanjang tahun</span>
+                    </div>
+                </div>
+            </div>
+
             {{-- Total Pemasukan --}}
-            <div class="col-lg-4 col-md-6">
-                <div class="financial-card income-card">
-                    <div class="card-icon-wrapper">
-                        <div class="card-icon income">
-                            <i class="bi bi-arrow-down-circle"></i>
-                        </div>
-                        <div class="card-icon-bg">
-                            <i class="bi bi-currency-dollar"></i>
-                        </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="finance-stat-card income-total">
+                    <div class="icon-wrap">
+                        <i class="bi bi-cash-stack"></i>
                     </div>
-                    <div class="card-content">
-                        <div class="card-label">Total Pemasukan</div>
-                        <div class="card-value income">
-                            Rp {{ number_format($totalPemasukan, 0, ',', '.') }}
-                        </div>
-                        <div class="card-desc">
-                            <i class="bi bi-graph-up me-1"></i>
-                            Omzet seluruh transaksi penjualan
-                        </div>
+                    <div class="content">
+                        <span class="label">Total Pemasukan</span>
+                        <span class="value">
+                            Rp {{ number_format($stats['income_total'] ?? 0, 0, ',', '.') }}
+                        </span>
+                        <span class="hint">Omzet total sejak awal pencatatan</span>
                     </div>
-                    <div class="card-pattern"></div>
+                </div>
+            </div>
+
+            {{-- Pengeluaran Hari Ini --}}
+            <div class="col-xl-3 col-md-6">
+                <div class="finance-stat-card expense-today">
+                    <div class="icon-wrap">
+                        <i class="bi bi-arrow-down-circle"></i>
+                    </div>
+                    <div class="content">
+                        <span class="label">Pengeluaran Hari Ini</span>
+                        <span class="value">
+                            Rp {{ number_format($stats['expense_today'] ?? 0, 0, ',', '.') }}
+                        </span>
+                        <span class="hint">Biaya bahan baku, operasional, dll</span>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Pengeluaran Bulan Ini --}}
+            <div class="col-xl-3 col-md-6">
+                <div class="finance-stat-card expense-month">
+                    <div class="icon-wrap">
+                        <i class="bi bi-arrow-down-up"></i>
+                    </div>
+                    <div class="content">
+                        <span class="label">Pengeluaran Bulan Ini</span>
+                        <span class="value">
+                            Rp {{ number_format($stats['expense_month'] ?? 0, 0, ',', '.') }}
+                        </span>
+                        <span class="hint">Total biaya bulan berjalan</span>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Pengeluaran Tahun Ini --}}
+            <div class="col-xl-3 col-md-6">
+                <div class="finance-stat-card expense-year">
+                    <div class="icon-wrap">
+                        <i class="bi bi-arrow-down-right-circle"></i>
+                    </div>
+                    <div class="content">
+                        <span class="label">Pengeluaran Tahun Ini</span>
+                        <span class="value">
+                            Rp {{ number_format($stats['expense_year'] ?? 0, 0, ',', '.') }}
+                        </span>
+                        <span class="hint">Akumulasi biaya selama tahun ini</span>
+                    </div>
                 </div>
             </div>
 
             {{-- Total Pengeluaran --}}
-            <div class="col-lg-4 col-md-6">
-                <div class="financial-card expense-card">
-                    <div class="card-icon-wrapper">
-                        <div class="card-icon expense">
-                            <i class="bi bi-arrow-up-circle"></i>
-                        </div>
-                        <div class="card-icon-bg">
-                            <i class="bi bi-cart"></i>
-                        </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="finance-stat-card expense-total">
+                    <div class="icon-wrap">
+                        <i class="bi bi-wallet2"></i>
                     </div>
-                    <div class="card-content">
-                        <div class="card-label">Total Pengeluaran</div>
-                        <div class="card-value expense">
-                            Rp {{ number_format($totalPengeluaran, 0, ',', '.') }}
-                        </div>
-                        <div class="card-desc">
-                            <i class="bi bi-box me-1"></i>
-                            Operasional, gaji, dan bahan baku
-                        </div>
-                    </div>
-                    <div class="card-pattern"></div>
-                </div>
-            </div>
-
-            {{-- Laba Bersih --}}
-            <div class="col-lg-4 col-md-6">
-                <div class="financial-card profit-card">
-                    <div class="card-icon-wrapper">
-                        <div class="card-icon profit">
-                            <i class="bi bi-trophy"></i>
-                        </div>
-                        <div class="card-icon-bg">
-                            <i class="bi bi-star"></i>
-                        </div>
-                    </div>
-                    <div class="card-content">
-                        <div class="card-label">Laba Bersih</div>
-                        <div class="card-value profit">
-                            Rp {{ number_format($labaBersih, 0, ',', '.') }}
-                        </div>
-                        <div class="card-desc">
-                            <i class="bi bi-calculator me-1"></i>
-                            Pemasukan - Pengeluaran
-                        </div>
-                    </div>
-                    <div class="card-pattern"></div>
-                </div>
-            </div>
-        </div>
-
-        {{-- Chart Card --}}
-        <div class="chart-card mb-4">
-            <div class="chart-header">
-                <div>
-                    <h5 class="chart-title mb-1">
-                        <i class="bi bi-bar-chart-fill me-2"></i>
-                        Visualisasi Keuangan
-                    </h5>
-                    <p class="chart-subtitle mb-0">
-                        Perbandingan pemasukan, pengeluaran, dan laba bersih secara visual
-                    </p>
-                </div>
-            </div>
-            <div class="chart-body">
-                @php
-                    $maxValue = max($totalPemasukan, $totalPengeluaran, max($labaBersih, 1));
-                    $heightIncome = $totalPemasukan > 0 ? intval(($totalPemasukan / $maxValue) * 200) : 0;
-                    $heightExpense = $totalPengeluaran > 0 ? intval(($totalPengeluaran / $maxValue) * 200) : 0;
-                    $heightProfit = $labaBersih > 0 ? intval(($labaBersih / $maxValue) * 200) : 0;
-                @endphp
-
-                <div class="modern-chart">
-                    <div class="chart-grid"></div>
-                    <div class="chart-bars">
-                        {{-- Pemasukan Bar --}}
-                        <div class="chart-bar-item">
-                            <div class="bar-value">Rp {{ number_format($totalPemasukan, 0, ',', '.') }}</div>
-                            <div class="bar-container">
-                                <div class="bar bar-income" style="height: {{ $heightIncome }}px">
-                                    <div class="bar-glow"></div>
-                                </div>
-                            </div>
-                            <div class="bar-label">
-                                <i class="bi bi-arrow-down-circle me-1"></i>
-                                Pemasukan
-                            </div>
-                        </div>
-
-                        {{-- Pengeluaran Bar --}}
-                        <div class="chart-bar-item">
-                            <div class="bar-value">Rp {{ number_format($totalPengeluaran, 0, ',', '.') }}</div>
-                            <div class="bar-container">
-                                <div class="bar bar-expense" style="height: {{ $heightExpense }}px">
-                                    <div class="bar-glow"></div>
-                                </div>
-                            </div>
-                            <div class="bar-label">
-                                <i class="bi bi-arrow-up-circle me-1"></i>
-                                Pengeluaran
-                            </div>
-                        </div>
-
-                        {{-- Laba Bar --}}
-                        <div class="chart-bar-item">
-                            <div class="bar-value">Rp {{ number_format($labaBersih, 0, ',', '.') }}</div>
-                            <div class="bar-container">
-                                <div class="bar bar-profit" style="height: {{ $heightProfit }}px">
-                                    <div class="bar-glow"></div>
-                                </div>
-                            </div>
-                            <div class="bar-label">
-                                <i class="bi bi-trophy me-1"></i>
-                                Laba Bersih
-                            </div>
-                        </div>
+                    <div class="content">
+                        <span class="label">Total Pengeluaran</span>
+                        <span class="value">
+                            Rp {{ number_format($stats['expense_total'] ?? 0, 0, ',', '.') }}
+                        </span>
+                        <span class="hint">Total biaya sejak awal pencatatan</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        {{-- Tables Section --}}
-        <div class="row g-4">
-            {{-- Pemasukan Table --}}
-            <div class="col-lg-6" id="pemasukan-section">
-                <div class="data-table-card income-theme">
-                    <div class="table-card-header">
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="table-icon income">
-                                <i class="bi bi-receipt"></i>
-                            </div>
-                            <div>
-                                <h5 class="table-title mb-0">Pemasukan Terbaru</h5>
-                                <p class="table-subtitle mb-0">10 transaksi terakhir</p>
-                            </div>
+        {{-- GRAFIK + KALENDER --}}
+        <div class="row g-3">
+
+            {{-- GRAFIK --}}
+            <div class="col-lg-8">
+                <div class="finance-card">
+                    <div class="finance-card-header">
+                        <div>
+                            <h6 class="title">Grafik Pemasukan & Pengeluaran</h6>
+                            <span class="subtitle">Per bulan ({{ now()->year }})</span>
                         </div>
                     </div>
-                    <div class="table-card-body">
-                        <div class="table-responsive">
-                            <table class="modern-table">
-                                <thead>
-                                    <tr>
-                                        <th width="50">#</th>
-                                        <th>Tanggal</th>
-                                        <th>Kode Order</th>
-                                        <th class="text-end">Nominal</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @forelse ($daftarPemasukan as $i => $trx)
-                                        <tr>
-                                            <td>
-                                                <span class="row-number">{{ $i + 1 }}</span>
-                                            </td>
-                                            <td>
-                                                <div class="date-badge">
-                                                    <i class="bi bi-calendar3 me-1"></i>
-                                                    {{ $trx->created_at?->format('d/m/Y') ?? '-' }}
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span class="order-code income">{{ $trx->kode_order ?? $trx->id }}</span>
-                                            </td>
-                                            <td class="text-end">
-                                                <span class="amount income">
-                                                    Rp {{ number_format($trx->subtotal, 0, ',', '.') }}
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="4" class="text-center py-5">
-                                                <div class="empty-state">
-                                                    <i class="bi bi-inbox"></i>
-                                                    <p class="mb-0">Belum ada data pemasukan</p>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
-                        @if($daftarPemasukan->count() > 0)
-                            <div class="table-footer">
-                                <i class="bi bi-info-circle me-1"></i>
-                                Menampilkan {{ $daftarPemasukan->count() }} transaksi terbaru
-                            </div>
-                        @endif
+                    <div class="finance-card-body">
+                        <canvas id="financeChart" height="150"></canvas>
                     </div>
                 </div>
             </div>
 
-            {{-- Pengeluaran Table --}}
-            <div class="col-lg-6" id="pengeluaran-section">
-                <div class="data-table-card expense-theme">
-                    <div class="table-card-header">
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="table-icon expense">
-                                <i class="bi bi-box-seam"></i>
-                            </div>
-                            <div>
-                                <h5 class="table-title mb-0">Pengeluaran Terbaru</h5>
-                                <p class="table-subtitle mb-0">10 pengeluaran terakhir</p>
-                            </div>
-                        </div>
+            {{-- KALENDER --}}
+            <div class="col-lg-4">
+                <div class="finance-card">
+                    <div class="finance-card-header">
+                        <h6 class="title mb-0">
+                            <i class="bi bi-calendar3 me-1"></i> Kalender
+                        </h6>
+                        <span class="subtitle">Ringkasan tanggal aktivitas</span>
                     </div>
-                    <div class="table-card-body">
-                        <div class="table-responsive">
-                            <table class="modern-table">
-                                <thead>
-                                    <tr>
-                                        <th width="50">#</th>
-                                        <th>Tanggal</th>
-                                        <th>Kategori</th>
-                                        <th class="text-end">Nominal</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @forelse ($daftarPengeluaran as $i => $out)
-                                        <tr>
-                                            <td>
-                                                <span class="row-number">{{ $i + 1 }}</span>
-                                            </td>
-                                            <td>
-                                                <div class="date-badge">
-                                                    <i class="bi bi-calendar3 me-1"></i>
-                                                    {{ $out->tanggal?->format('d/m/Y') ?? '-' }}
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span class="category-badge">{{ $out->kategori ?? '-' }}</span>
-                                            </td>
-                                            <td class="text-end">
-                                                <span class="amount expense">
-                                                    Rp {{ number_format($out->nominal, 0, ',', '.') }}
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="4" class="text-center py-5">
-                                                <div class="empty-state">
-                                                    <i class="bi bi-inbox"></i>
-                                                    <p class="mb-0">Belum ada data pengeluaran</p>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
-                        @if($daftarPengeluaran->count() > 0)
-                            <div class="table-footer">
-                                <i class="bi bi-info-circle me-1"></i>
-                                Menampilkan {{ $daftarPengeluaran->count() }} pengeluaran terbaru
+                    <div class="finance-card-body">
+                        <div class="calendar">
+                            <div class="cal-header">
+                                {{ now()->translatedFormat('F Y') }}
                             </div>
-                        @endif
+                            <div class="cal-grid">
+                                <div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div>
+                                @for($i = 1; $i <= 35; $i++)
+                                    <span class="{{ $i == now()->day ? 'today' : '' }}">{{ $i <= 31 ? $i : '' }}</span>
+                                @endfor
+                            </div>
+                        </div>
+                        <small class="text-muted d-block mt-2">
+                            *Kalender dekoratif. Bisa di-upgrade jadi kalender interaktif jika dibutuhkan.
+                        </small>
                     </div>
                 </div>
             </div>
+
         </div>
 
     </div>
 </div>
+@endsection
 
 @push('styles')
 <style>
-:root {
-    --coffee-primary: #2B1810;
-    --coffee-secondary: #4B2C20;
-    --coffee-accent: #8B6F47;
-    --coffee-light: #D4A574;
-    --coffee-bg: #FAF7F4;
-    --income-color: #10B981;
-    --income-light: #D1FAE5;
-    --expense-color: #EF4444;
-    --expense-light: #FEE2E2;
-    --profit-color: #8B6F47;
-}
-
-.finance-modern-page {
-    background: linear-gradient(135deg, #FAF7F4 0%, #F5EFE6 100%);
-    min-height: 100vh;
-}
-
-.premium-header {
-    background: linear-gradient(135deg, var(--coffee-primary) 0%, var(--coffee-secondary) 100%);
-    border-radius: 24px;
-    padding: 2.5rem;
-    box-shadow: 0 20px 40px rgba(43, 24, 16, 0.2);
-    position: relative;
-    overflow: hidden;
-}
-
-.premium-header::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    right: -20%;
-    width: 500px;
-    height: 500px;
-    background: radial-gradient(circle, rgba(212, 165, 116, 0.15) 0%, transparent 70%);
-}
-
-.header-content {
-    position: relative;
-    z-index: 2;
-}
-
-.header-badge {
-    display: inline-flex;
-    align-items: center;
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(10px);
-    padding: 0.5rem 1rem;
-    border-radius: 50px;
-    color: white;
-    font-size: 0.85rem;
-    font-weight: 600;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.header-title {
-    color: white;
-    font-weight: 700;
-    font-size: 2.2rem;
-}
-
-.header-subtitle {
-    color: rgba(255, 255, 255, 0.85);
-    font-size: 1.05rem;
-}
-
-.header-actions {
-    position: relative;
-    z-index: 2;
-}
-
-.btn-light-coffee {
-    background: white;
-    color: var(--coffee-secondary);
-    border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 12px;
-    font-weight: 600;
-    transition: all 0.3s;
-}
-
-.btn-light-coffee:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(255, 255, 255, 0.3);
-}
-
-.btn-outline-light {
-    border: 2px solid rgba(255, 255, 255, 0.4);
-    color: white;
-    padding: 0.75rem 1.5rem;
-    border-radius: 12px;
-    font-weight: 600;
-}
-
-.btn-outline-light:hover {
-    background: white;
-    color: var(--coffee-secondary);
-}
-
-.financial-card {
-    background: white;
-    border-radius: 20px;
-    padding: 2rem;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-    transition: all 0.3s;
-}
-
-.financial-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
-}
-
-.card-icon {
-    width: 70px;
-    height: 70px;
-    border-radius: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2rem;
-    margin-bottom: 1.5rem;
-}
-
-.card-icon.income {
-    background: linear-gradient(135deg, var(--income-color), #059669);
-    color: white;
-}
-
-.card-icon.expense {
-    background: linear-gradient(135deg, var(--expense-color), #DC2626);
-    color: white;
-}
-
-.card-icon.profit {
-    background: linear-gradient(135deg, var(--coffee-accent), var(--coffee-secondary));
-    color: white;
-}
-
-.card-icon-bg {
-    position: absolute;
-    top: -40px;
-    right: -20px;
-    font-size: 150px;
-    opacity: 0.03;
-}
-
-.card-label {
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: #9CA3AF;
-    font-weight: 600;
-    margin-bottom: 0.75rem;
-}
-
-.card-value {
-    font-size: 2rem;
-    font-weight: 800;
-    margin-bottom: 0.75rem;
-}
-
-.card-value.income { color: var(--income-color); }
-.card-value.expense { color: var(--expense-color); }
-.card-value.profit { color: var(--profit-color); }
-
-.card-desc {
-    font-size: 0.9rem;
-    color: #6B7280;
-}
-
-.chart-card {
-    background: white;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-    overflow: hidden;
-}
-
-.chart-header {
-    background: linear-gradient(135deg, #F9FAFB, #F3F4F6);
-    padding: 2rem;
-    border-bottom: 2px solid #E5E7EB;
-}
-
-.chart-title {
-    color: var(--coffee-secondary);
-    font-weight: 700;
-    font-size: 1.3rem;
-}
-
-.chart-subtitle {
-    color: #6B7280;
-    font-size: 0.95rem;
-}
-
-.chart-body {
-    padding: 3rem 2rem;
-}
-
-.modern-chart {
-    position: relative;
-    min-height: 350px;
-}
-
-.chart-grid {
-    position: absolute;
-    inset: 20px 40px 80px 40px;
-    background-image: repeating-linear-gradient(to top, transparent, transparent 39px, rgba(0,0,0,0.03) 40px);
-}
-
-.chart-bars {
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-    gap: 4rem;
-    min-height: 300px;
-    padding-bottom: 60px;
-}
-
-.chart-bar-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-}
-
-.bar-value {
-    font-size: 0.9rem;
-    font-weight: 700;
-    color: var(--coffee-secondary);
-}
-
-.bar-container {
-    width: 70px;
-    height: 240px;
-    background: rgba(0, 0, 0, 0.02);
-    border-radius: 20px;
-    display: flex;
-    align-items: flex-end;
-    padding: 4px;
-}
-
-.bar {
-    width: 100%;
-    border-radius: 16px;
-    transition: height 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
-    position: relative;
-}
-
-.bar-income {
-    background: linear-gradient(180deg, var(--income-color), #059669);
-}
-
-.bar-expense {
-    background: linear-gradient(180deg, var(--expense-color), #DC2626);
-}
-
-.bar-profit {
-    background: linear-gradient(180deg, var(--coffee-accent), var(--coffee-secondary));
-}
-
-.bar-glow {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 50%;
-    background: linear-gradient(180deg, rgba(255,255,255,0.4), transparent);
-    border-radius: 16px 16px 0 0;
-}
-
-.bar-label {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: #6B7280;
-}
-
-.data-table-card {
-    background: white;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-    overflow: hidden;
-}
-
-.table-card-header {
-    padding: 1.75rem;
-    border-bottom: 2px solid #F3F4F6;
-}
-
-.income-theme .table-card-header {
-    background: linear-gradient(135deg, var(--income-light), #ECFDF5);
-}
-
-.expense-theme .table-card-header {
-    background: linear-gradient(135deg, var(--expense-light), #FEF2F2);
-}
-
-.table-icon {
-    width: 50px;
-    height: 50px;
-    border-radius: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-}
-
-.table-icon.income {
-    background: var(--income-color);
-    color: white;
-}
-
-.table-icon.expense {
-    background: var(--expense-color);
-    color: white;
-}
-
-.table-title {
-    color: var(--coffee-secondary);
-    font-weight: 700;
-    font-size: 1.15rem;
-}
-
-.table-subtitle {
-    color: #6B7280;
-    font-size: 0.85rem;
-}
-
-.modern-table {
-    width: 100%;
-    margin: 0;
-}
-
-.modern-table thead th {
-    padding: 1.25rem 1.5rem;
-    background: #F9FAFB;
-    border-bottom: 2px solid #E5E7EB;
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: #6B7280;
-    font-weight: 700;
-}
-
-.modern-table tbody td {
-    padding: 1.25rem 1.5rem;
-    border-bottom: 1px solid #F3F4F6;
-}
-
-.modern-table tbody tr:hover {
-    background: #FAFAFA;
-}
-
-.row-number {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 28px;
-    height: 28px;
-    background: #F3F4F6;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: #6B7280;
-}
-
-.date-badge {
-    font-size: 0.9rem;
-    color: #4B5563;
-}
-
-.order-code {
-    display: inline-block;
-    padding: 0.4rem 0.8rem;
-    border-radius: 8px;
-    font-size: 0.8rem;
-    font-weight: 700;
-    font-family: 'Courier New', monospace;
-}
-
-.order-code.income {
-    background: var(--income-light);
-    color: #065F46;
-}
-
-.category-badge {
-    padding: 0.4rem 0.8rem;
-    background: #FEF3C7;
-    color: #92400E;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    font-weight: 600;
-}
-
-.amount {
-    font-weight: 700;
-    font-size: 1rem;
-}
-
-.amount.income { color: var(--income-color); }
-.amount.expense { color: var(--expense-color); }
-
-.table-footer {
-    padding: 1rem 1.5rem;
-    background: #F9FAFB;
-    border-top: 1px solid #E5E7EB;
-    font-size: 0.85rem;
-    color: #6B7280;
-}
-
-.empty-state {
-    padding: 2rem;
-    text-align: center;
-}
-
-.empty-state i {
-    font-size: 4rem;
-    color: #D1D5DB;
-    margin-bottom: 1rem;
-}
-
-.empty-state p {
-    color: #9CA3AF;
-}
-
-@media (max-width: 992px) {
-    .premium-header { padding: 2rem; }
-    .header-title { font-size: 1.75rem; }
-    .chart-bars { gap: 2rem; }
-    .bar-container { width: 50px; }
-}
-
-@media (max-width: 768px) {
-    .financial-card { padding: 1.5rem; }
-    .card-value { font-size: 1.5rem; }
-}
+    .finance-wrapper{
+        background: #F7F3EE;
+        min-height: 100vh;
+    }
+
+    .finance-header{
+        background: linear-gradient(135deg, #3a2418, #5b3320);
+        border-radius: 22px;
+        padding: 1.8rem 2rem;
+        color: #FDFBF7;
+        box-shadow: 0 16px 40px rgba(0,0,0,0.35);
+    }
+
+    .finance-pill{
+        display:inline-flex;
+        padding: .25rem .9rem;
+        border-radius:999px;
+        border:1px solid rgba(252, 211, 77, .8);
+        font-size:.75rem;
+        letter-spacing:.08em;
+        text-transform:uppercase;
+        color:#FDE68A;
+        margin-bottom:.5rem;
+    }
+
+    .finance-title{
+        font-weight:700;
+        font-size:1.7rem;
+        margin-bottom:.35rem;
+    }
+
+    .finance-subtitle{
+        margin:0;
+        font-size:.9rem;
+        color:#F9E7D5;
+        max-width:480px;
+    }
+
+    .finance-stat-card{
+        background:#FFFFFF;
+        border-radius:18px;
+        padding:1rem 1.1rem;
+        display:flex;
+        gap:.9rem;
+        align-items:flex-start;
+        box-shadow:0 8px 20px rgba(0,0,0,0.06);
+        border:1px solid rgba(148, 124, 96, 0.18);
+    }
+    .finance-stat-card .icon-wrap{
+        width:40px;
+        height:40px;
+        border-radius:14px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        font-size:1.25rem;
+    }
+    .finance-stat-card .content .label{
+        display:block;
+        font-size:.8rem;
+        text-transform:uppercase;
+        letter-spacing:.08em;
+        color:#6B5B4B;
+        font-weight:600;
+        margin-bottom:.1rem;
+    }
+    .finance-stat-card .content .value{
+        display:block;
+        font-weight:700;
+        font-size:1.15rem;
+        color:#1F2933;
+    }
+    .finance-stat-card .content .hint{
+        display:block;
+        font-size:.78rem;
+        color:#9CA3AF;
+        margin-top:.1rem;
+    }
+
+    .income-today   .icon-wrap{ background:#DCFCE7; color:#15803D; }
+    .income-month   .icon-wrap{ background:#DBEAFE; color:#1D4ED8; }
+    .income-year    .icon-wrap{ background:#FEF3C7; color:#B45309; }
+    .income-total   .icon-wrap{ background:#E5E7EB; color:#111827; }
+    .expense-today  .icon-wrap{ background:#FEE2E2; color:#B91C1C; }
+    .expense-month  .icon-wrap{ background:#FFE4E6; color:#BE123C; }
+    .expense-year   .icon-wrap{ background:#FEF2F2; color:#B91C1C; }
+    .expense-total  .icon-wrap{ background:#F3E8FF; color:#6D28D9; }
+
+    .finance-card{
+        background:#FFFFFF;
+        border-radius:20px;
+        box-shadow:0 10px 24px rgba(15,23,42,0.08);
+        border:1px solid rgba(148, 124, 96, 0.15);
+        overflow:hidden;
+    }
+    .finance-card-header{
+        padding:.9rem 1.3rem;
+        border-bottom:1px solid rgba(229, 231, 235, 0.9);
+        display:flex;
+        align-items:flex-start;
+        justify-content:space-between;
+        gap:.5rem;
+    }
+    .finance-card-header .title{
+        font-weight:600;
+        font-size:.95rem;
+        margin-bottom:.1rem;
+    }
+    .finance-card-header .subtitle{
+        font-size:.78rem;
+        color:#9CA3AF;
+    }
+    .finance-card-body{
+        padding:1.1rem 1.3rem 1.3rem;
+    }
+
+    /* CALENDAR */
+    .calendar{
+        border-radius:14px;
+        border:1px solid #E5E7EB;
+        overflow:hidden;
+    }
+    .cal-header{
+        background:#166534;
+        color:#F9FAFB;
+        padding:.6rem 0;
+        text-align:center;
+        font-weight:600;
+        font-size:.85rem;
+    }
+    .cal-grid{
+        display:grid;
+        grid-template-columns:repeat(7,1fr);
+        text-align:center;
+        font-size:.78rem;
+        padding:.35rem;
+        gap:2px;
+    }
+    .cal-grid div{
+        font-weight:600;
+        color:#6B7280;
+        padding:.2rem 0;
+    }
+    .cal-grid span{
+        padding:.3rem 0;
+        border-radius:6px;
+        color:#374151;
+    }
+    .cal-grid span.today{
+        background:#16A34A;
+        color:#F9FAFB;
+        font-weight:700;
+    }
+
+    /* CHART */
+    #financeChart{
+        width:100%;
+    }
+
+    @media (max-width: 768px) {
+        .finance-header{
+            padding:1.4rem 1.3rem;
+        }
+        .finance-title{
+            font-size:1.35rem;
+        }
+    }
 </style>
 @endpush
-@endsection
+
+@push('scripts')
+{{-- Chart.js via CDN --}}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const ctx = document.getElementById('financeChart').getContext('2d');
+
+        const labels  = @json($monthLabels);
+        const income  = @json($incomeByMonth);
+        const expense = @json($expenseByMonth);
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Pemasukan',
+                        data: income,
+                        backgroundColor: 'rgba(34, 197, 94, 0.7)'
+                    },
+                    {
+                        label: 'Pengeluaran',
+                        data: expense,
+                        backgroundColor: 'rgba(248, 113, 113, 0.8)'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        ticks: {
+                            callback: function(value){
+                                return 'Rp ' + value.toLocaleString('id-ID');
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+@endpush
