@@ -1,4 +1,4 @@
-{{-- resources/views/frontend/order-success.blade.php (SUDAH DIPERBAIKI) --}}
+{{-- resources/views/frontend/order-success.blade.php (FINAL FIX WARNA) --}}
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -13,14 +13,23 @@
         
         $isDigital = isset($order->metode_pembayaran) && $order->metode_pembayaran !== 'cod';
         
-        // QR Code URL: Menggunakan jalur statis 'qr.png' yang Anda letakkan di folder public/
-        // Perbaikan ini mengabaikan $qrCodePath dari database, langsung mengambil dari public/
-        $qrCodeUrl = asset('qr.png'); 
+        // Asumsi: QR Code URL diambil dari database/storage (PENTING untuk fitur Owner)
+        // Jika Anda TIDAK mengirim $qrCodePath dari Controller, ganti baris ini:
+        // $qrCodeUrl = asset('qr.png'); // <-- Jika Anda kembali ke file statis
+        $qrCodeUrl = ($qrCodePath) ? asset('storage/' . $qrCodePath) : asset('qr.png'); 
+        
+        // Konstanta Warna Tema Coffee Shop
+        $color_primary = '#4B2C20'; // Cokelat Tua
+        $color_accent = '#8B6F47'; // Amber Tua
+        $color_light_bg = '#F5EFE6'; // Background Kartu/Container
+        $color_btn_bg = '#7B3F00'; // Warna Tombol Utama
+        $color_pay_box_bg = '#FAF4E3'; // Background Kotak Pembayaran
+        $color_pay_box_border = '#D4A574'; // Border Kotak Pembayaran
+        $color_pay_box_text = '#4B2C20'; // Teks Kotak Pembayaran
         
     @endphp
 
     <style>
-        /* ... (CSS ASLI ANDA SAMA) ... */
         body{
             margin:0;
             font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -41,10 +50,11 @@
             border-radius:18px;
             box-shadow:0 20px 40px rgba(15,23,42,.12);
             overflow:hidden;
-            border:1px solid #f3e8d5;
+            border:1px solid <?php echo $color_light_bg; ?>; /* Border Kartu */
         }
         .card-header{
-            background:linear-gradient(135deg,#f97316,#facc15);
+            /* Ganti gradien oranye/kuning menjadi gradien cokelat/amber */
+            background:linear-gradient(135deg, <?php echo $color_btn_bg; ?>, <?php echo $color_accent; ?>); 
             color:#fff;
             padding:18px 22px;
             text-align:center;
@@ -120,7 +130,7 @@
         }
         .total-row span:last-child{
             font-weight:700;
-            color:#1f2933; 
+            color:<?php echo $color_primary; ?>; /* Total harga menggunakan warna cokelat */
         }
         .footer-text{
             margin-top:12px;
@@ -144,7 +154,7 @@
             display:inline-block;
             padding:12px 24px; 
             border-radius:999px;
-            background:#f59e0b;
+            background:<?php echo $color_btn_bg; ?>; /* Warna Tombol Cokelat */
             color:#fff;
             font-size:16px; 
             font-weight:600;
@@ -156,17 +166,17 @@
             transition: background 0.2s;
         }
         .btn:hover{
-            background:#ea580c;
+            background:<?php echo $color_accent; ?>; /* Warna Hover Cokelat Lebih Terang */
         }
 
         .pay-box{
             margin-top:20px; 
             padding:16px 12px; 
             border-radius:10px;
-            background:#fffbeb;
-            border:1px solid #facc15;
+            background:<?php echo $color_pay_box_bg; ?>; /* Background Krem */
+            border:1px solid <?php echo $color_pay_box_border; ?>; /* Border Amber */
             font-size:12px;
-            color:#92400e;
+            color:<?php echo $color_pay_box_text; ?>; /* Teks Cokelat Tua */
             display: flex;
             gap: 20px; 
             align-items: flex-start;
@@ -182,7 +192,7 @@
             display:block;
             margin-top:8px; 
             font-size:11px;
-            color:#b45309;
+            color:<?php echo $color_primary; ?>; /* Teks Info Cokelat Tua */
         }
         .pay-box img {
             width: 100px; 
