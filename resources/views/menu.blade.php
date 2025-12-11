@@ -313,7 +313,7 @@
                                     <div class="flex items-start gap-3 sm:gap-4">
                                         <div class="thumb ring-1 ring-stone-200 relative">
                                             @if ($item->gambar)
-                                                <img loading="lazy" src="{{ asset('storage/' . $item->gambar) }}"
+                                                <img loading="lazy" src="{{ asset('uploads/' . $item->gambar) }}"
                                                     alt="{{ $item->nama_menu }}">
                                             @else
                                                 <div
