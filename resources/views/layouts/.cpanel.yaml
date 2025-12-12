@@ -1,0 +1,4 @@
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/ourj2192/public_html/  # <-- Cek Path ini!
+    - /bin/cp -R * $DEPLOYPATH
