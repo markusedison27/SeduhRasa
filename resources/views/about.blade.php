@@ -19,9 +19,11 @@
             @php
                 // Data tim pengembang
                 $team = [
-                    ['name' => 'M. Arifin Ilham', 'img' => 'https://cdn-icons-png.flaticon.com/512/4140/4140048.png', 'ig' => 'https://instagram.com/arifinilham'],
+                    // URL GAMBAR SUDAH DIUBAH KE asset('arifin.png')
+                    ['name' => 'M. Arifin Ilham', 'img' => asset('arifin.png'), 'ig' => 'https://instagram.com/arifinilham'],
                     ['name' => 'Mazira', 'img' => 'https://cdn-icons-png.flaticon.com/512/4140/4140051.png', 'ig' => 'https://instagram.com/mazira'],
-                    ['name' => 'Markus Edison', 'img' => 'https://cdn-icons-png.flaticon.com/512/4140/4140037.png', 'ig' => 'https://instagram.com/markusedison'],
+                    // URL GAMBAR SUDAH DIUBAH KE asset('markus.png')
+                    ['name' => 'Markus Edison', 'img' => asset('markus.png'), 'ig' => 'https://instagram.com/markusedison'],
                     ['name' => 'Elsa Syafitriani', 'img' => 'https://cdn-icons-png.flaticon.com/512/4140/4140051.png', 'ig' => 'https://instagram.com/elsasyafitriani'],
                 ];
             @endphp
