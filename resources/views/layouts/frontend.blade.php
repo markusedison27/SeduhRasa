@@ -154,6 +154,9 @@
                 <div class="flex items-center gap-4">
                     {{-- MENU DESKTOP (hanya muncul ≥ md) --}}
                     <div class="hidden md:flex items-center gap-8 text-[#f5e6d3] font-medium">
+                        <a href="https://ours.web.id" target="_blank" class="hover:text-[#c4905c] transition-colors">
+                            Portal
+                        </a>
                         <a href="{{ route('home') }}" class="hover:text-[#c4905c] transition-colors">
                             Home
                         </a>
@@ -183,6 +186,9 @@
 
         {{-- MENU MOBILE: hanya < md --}}
         <div id="mobile-menu" class="md:hidden hidden">
+            <a href="https://ours.web.id" target="_blank" class="mobile-link">
+                Portal
+            </a>
             <a href="{{ route('home') }}" class="mobile-link">
                 Home
             </a>
