@@ -495,7 +495,8 @@
     </div>
 
     <footer class="w-full bg-[#ff8c00] text-white text-center py-4 text-xs sm:text-sm">
-        © {{ date('Y') }} SeduhRasa Coffee. All rights reserved.
+        class="bg-gradient-to-r from-[#2a1810] to-[#3d2817] text-[#e8d4b8] py-8 text-center border-t border-[#5c3d2e]">
+        <p class="text-sm">© {{ date('Y') }} SeduhRasa Coffee. All rights reserved.</p>
     </footer>
 
     <script>
