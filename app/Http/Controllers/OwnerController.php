@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Order;        
 use App\Models\Pengeluaran;  
-use App\Models\Setting;
+use App\Models\QrCode;  // ✅ TAMBAHAN: Import Model QrCode
 use App\Models\User;
 use App\Http\Requests\ProfileUpdateRequest;
 
@@ -36,8 +36,9 @@ class OwnerController extends Controller
             ->where('owner_id', $owner->id)
             ->count();
 
-        // Ambil Path QR Code dari Database
-        $qrCodePath = Setting::where('key', 'payment_qr_code_path')->value('value');
+        // ✅ UBAH: Ambil QR Code Aktif dari tabel qr_codes (bukan settings)
+        $activeQrCode = QrCode::where('is_active', true)->first();
+        $qrCodePath = $activeQrCode ? $activeQrCode->file_path : null;
 
         return view('owner.dashboard', compact(
             'owner',
@@ -49,7 +50,7 @@ class OwnerController extends Controller
     }
 
     /**
-     * Logic untuk mengunggah dan menyimpan path QR Code
+     * Logic untuk mengunggah dan menyimpan QR Code
      */
     public function uploadQrCode(Request $request)
     {
@@ -64,24 +65,28 @@ class OwnerController extends Controller
         ]);
 
         try {
-            // Ambil QR Code lama dari database
-            $oldQrCodePath = Setting::where('key', 'payment_qr_code_path')->value('value');
+            // ✅ UBAH: Ambil QR Code aktif dari tabel qr_codes
+            $oldQrCode = QrCode::where('is_active', true)->first();
 
-            // Hapus file lama jika ada
-            if ($oldQrCodePath && Storage::disk('public')->exists($oldQrCodePath)) {
-                Storage::disk('public')->delete($oldQrCodePath);
+            // ✅ Hapus file lama jika ada
+            if ($oldQrCode && Storage::disk('public')->exists($oldQrCode->file_path)) {
+                Storage::disk('public')->delete($oldQrCode->file_path);
+                // Hapus record lama dari database
+                $oldQrCode->delete();
             }
 
-            // Simpan file baru ke storage/app/public/qrcodes
+            // ✅ Simpan file baru ke storage/app/public/qrcodes
             $file = $request->file('qrcode_file');
             $filename = 'qrcode_' . time() . '.' . $file->getClientOriginalExtension();
             $path = $file->storeAs('qrcodes', $filename, 'public');
 
-            // Simpan path ke database menggunakan updateOrCreate
-            Setting::updateOrCreate(
-                ['key' => 'payment_qr_code_path'],
-                ['value' => $path]
-            );
+            // ✅ UBAH: Simpan ke tabel qr_codes (bukan settings)
+            QrCode::create([
+                'file_path' => $path,
+                'payment_method' => 'dana', // Default, bisa disesuaikan
+                'is_active' => true,
+                'description' => 'QR Code pembayaran untuk pelanggan',
+            ]);
 
             return redirect()->route('owner.dashboard')
                 ->with('success', 'QR Code pembayaran berhasil diunggah dan disimpan!');
@@ -102,40 +107,27 @@ class OwnerController extends Controller
     {
         $owner = auth()->user();
 
-        // ==========================
-        // TOTAL PEMASUKAN (sesuai blade: $totalPemasukan)
-        // ==========================
+        // Total pemasukan dari order selesai
         $totalPemasukan = Order::where('status', 'selesai')
             ->sum('subtotal');
 
-        // ==========================
-        // TOTAL PENGELUARAN
-        // SEBELUMNYA: Pengeluaran::sum('jumlah'); -> ERROR (kolom 'jumlah' tidak ada)
-        // DI DB & BLADE: pakai kolom 'nominal'
-        // ==========================
+        // Total pengeluaran dari tabel pengeluaran
         $totalPengeluaran = Pengeluaran::sum('nominal');
 
-        // ==========================
-        // LABA BERSIH (sesuai blade: $labaBersih)
-        // ==========================
+        // Laba bersih
         $labaBersih = $totalPemasukan - $totalPengeluaran;
 
-        // ==========================
-        // 10 PEMASUKAN TERBARU (sesuai blade: $daftarPemasukan)
-        // ==========================
+        // 10 Pemasukan terbaru
         $daftarPemasukan = Order::where('status', 'selesai')
             ->orderBy('created_at', 'desc')
             ->take(10)
             ->get();
 
-        // ==========================
-        // 10 PENGELUARAN TERBARU (sesuai blade: $daftarPengeluaran)
-        // ==========================
+        // 10 Pengeluaran terbaru
         $daftarPengeluaran = Pengeluaran::orderBy('tanggal', 'desc')
             ->take(10)
             ->get();
 
-        // Kirim data yang DIPAKAI di owner.finance.blade.php
         return view('owner.finance', compact(
             'owner',
             'totalPemasukan',

@@ -1,0 +1,8 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/ourj2192/public_html/
+    # Jalankan Composer
+    - /usr/local/bin/composer install --no-dev --no-interaction
+    # Salin semua file ke folder live
+    - /bin/cp -R * $DEPLOYPATH

@@ -17,9 +17,9 @@
 
             {{-- background image crossfade --}}
             <img id="heroA" src="{{ $slides[0] }}"
-                 class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 opacity-100">
+                class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 opacity-100">
             <img id="heroB" src="{{ $slides[0] }}"
-                 class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 opacity-0">
+                class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 opacity-0">
 
             {{-- overlay gelap --}}
             <div class="absolute inset-0 bg-gradient-to-br from-[#3d2817]/70 via-[#5c3d2e]/60 to-[#2a1810]/70"></div>
@@ -33,9 +33,9 @@
                         </span>
                     </div>
 
-                    {{-- Animated Title --}}
-                    <h1 class="text-7xl md:text-8xl lg:text-[10rem] text-[#f5e6d3] mb-6 leading-none min-h-[8rem] font-serif tracking-tight">
-                        <span id="hero-title" class="inline-block font-light"></span>
+                    {{-- Animated Title: Font style diubah menjadi Great Vibes (skrip) --}}
+                    <h1 class="text-7xl md:text-8xl lg:text-[10rem] text-[#f5e6d3] mb-6 leading-none min-h-[8rem] font-['Great_Vibes'] tracking-tight">
+                        <span id="hero-title" class="inline-block"></span>
                     </h1>
 
                     <p class="text-[#e8d4b8] text-2xl md:text-3xl mb-12 font-light tracking-wide max-w-3xl mx-auto">
@@ -45,7 +45,7 @@
                     <div class="flex flex-col sm:flex-row gap-5 justify-center">    
                         {{-- Order Sekarang --}}
                         <a href="{{ url('/order') }}"
-                           class="group bg-[#a67c52] text-white px-12 py-5 rounded-full font-semibold text-lg hover:bg-[#8b6f47] transition-all duration-300 shadow-xl hover:scale-105">
+                            class="group bg-[#a67c52] text-white px-12 py-5 rounded-full font-semibold text-lg hover:bg-[#8b6f47] transition-all duration-300 shadow-xl hover:scale-105">
                             Order Sekarang
                         </a>
                     </div>
@@ -56,7 +56,7 @@
             <div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce">
                 <svg class="w-8 h-8 text-[#f5e6d3]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                            d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                 </svg>
             </div>
         </section>
@@ -80,19 +80,20 @@
                     <div class="relative">
                         <div class="absolute -top-8 -left-8 w-64 h-64 bg-[#c4905c]/20 rounded-full blur-3xl"></div>
                         <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=800&q=80"
-                             class="relative z-10 rounded-3xl shadow-2xl w-full h-[600px] object-cover">
+                            class="relative z-10 rounded-3xl shadow-2xl w-full h-[600px] object-cover">
                     </div>
 
                     <div class="space-y-8">
-                        {{-- card 1 --}}
-                        <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
+                        {{-- card 1: Tambahkan class animate-float dan style delay kustom --}}
+                        <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300 animate-float"
+                            style="--float-duration: 3.5s; --float-delay: 0s;">
                             <div class="flex items-start gap-6">
                                 <div
                                     class="flex-shrink-0 w-16 h-16 bg-gradient-to-br from-[#8b6f47] to-[#c4905c] rounded-2xl flex items-center justify-center">
                                     <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor"
-                                         viewBox="0 0 24 24">
+                                            viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                              d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                                                d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
                                     </svg>
                                 </div>
                                 <div>
@@ -105,15 +106,16 @@
                             </div>
                         </div>
 
-                        {{-- card 2 --}}
-                        <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
+                        {{-- card 2: Tambahkan class animate-float dan style delay kustom --}}
+                        <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300 animate-float"
+                            style="--float-duration: 4.0s; --float-delay: 0.5s;">
                             <div class="flex items-start gap-6">
                                 <div
                                     class="flex-shrink-0 w-16 h-16 bg-gradient-to-br from-[#8b6f47] to-[#c4905c] rounded-2xl flex items-center justify-center">
                                     <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor"
-                                         viewBox="0 0 24 24">
+                                            viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                              d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
+                                                d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
                                     </svg>
                                 </div>
                                 <div>
@@ -126,15 +128,16 @@
                             </div>
                         </div>
 
-                        {{-- card 3 --}}
-                        <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300">
+                        {{-- card 3: Tambahkan class animate-float dan style delay kustom --}}
+                        <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300 animate-float"
+                            style="--float-duration: 3.8s; --float-delay: 1s;">
                             <div class="flex items-start gap-6">
                                 <div
                                     class="flex-shrink-0 w-16 h-16 bg-gradient-to-br from-[#8b6f47] to-[#c4905c] rounded-2xl flex items-center justify-center">
                                     <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor"
-                                         viewBox="0 0 24 24">
+                                            viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                                     </svg>
                                 </div>
                                 <div>
@@ -176,6 +179,19 @@
 @endsection
 
 @push('scripts')
+    {{-- CSS Kustom untuk animasi 'float' --}}
+    <style>
+        @keyframes float {
+            0% { transform: translateY(0px) }
+            50% { transform: translateY(-5px) }
+            100% { transform: translateY(0px) }
+        }
+
+        .animate-float {
+            animation: float var(--float-duration, 3s) ease-in-out var(--float-delay, 0s) infinite;
+        }
+    </style>
+
     <script>
         // Background slideshow
         (function () {
@@ -219,7 +235,8 @@
             
             if (!titleElement) return;
 
-            const text = 'SeduhRasa';
+            // PERUBAHAN UTAMA: Teks diubah menjadi 'Seduh Rasa' dengan spasi, sesuai style di gambar
+            const text = 'Seduh Rasa'; 
             let index = 0;
             let isDeleting = false;
 

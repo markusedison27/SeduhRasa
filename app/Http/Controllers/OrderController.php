@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\Menu;
-use App\Models\Setting;
+use App\Models\QrCode; // ✅ TAMBAHAN: Import QrCode Model
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -211,14 +211,35 @@ class OrderController extends Controller
     }
 
     /**
-     * Halaman sukses untuk pelanggan
-     * Route: GET /pesanan/{order}/berhasil  (name: customer.orders.show)
+     * ✅ BARU: Halaman konfirmasi pembayaran dengan QR Code
+     * Route: GET /pesanan/{order}/berhasil (name: customer.orders.show)
      */
     public function showCustomer(Order $order)
     {
-        $qrCodePath = Setting::where('key', 'payment_qr_code_path')->value('value');
+        // Ambil QR Code aktif dari tabel qr_codes
+        $activeQrCode = QrCode::where('is_active', true)->first();
+        $qrCodePath = $activeQrCode ? $activeQrCode->file_path : null;
+
+        // Load relasi items dan menu untuk ditampilkan di halaman
+        $order->load('items.menu');
 
         return view('frontend.order-success', compact('order', 'qrCodePath'));
+    }
+
+    /**
+     * ✅ BARU: Method terpisah untuk halaman konfirmasi pembayaran
+     * (Opsional - jika ingin route terpisah)
+     * Route: GET /pesanan/{order}/konfirmasi-pembayaran
+     */
+    public function showPaymentConfirmation(Order $order)
+    {
+        // Ambil QR Code aktif
+        $activeQrCode = QrCode::where('is_active', true)->first();
+        
+        // Load relasi
+        $order->load('items.menu');
+
+        return view('payment-confirmation', compact('order', 'activeQrCode'));
     }
 
     /**

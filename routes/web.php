@@ -21,7 +21,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\SuperAdminController;
 use App\Http\Controllers\OwnerController;
-use App\Http\Controllers\StaffController; // <-- ASUMSI: StaffController sudah dibuat
+use App\Http\Controllers\StaffController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\GoogleAuthController;
@@ -69,8 +69,13 @@ Route::get('/orders/{order}', [OrderController::class, 'show'])
 Route::get('/orders/{order}/status-json', [OrderController::class, 'statusJson'])
     ->name('orders.statusJson');
 
+// ✅ UPDATED: Halaman sukses pesanan dengan QR Code
 Route::get('/pesanan/{order}/berhasil', [OrderController::class, 'showCustomer'])
     ->name('customer.orders.show');
+
+// ✅ BARU: Route opsional untuk halaman konfirmasi pembayaran terpisah
+Route::get('/pesanan/{order}/konfirmasi-pembayaran', [OrderController::class, 'showPaymentConfirmation'])
+    ->name('customer.orders.payment');
 
 /*
 |--------------------------------------------------------------------------
@@ -281,14 +286,33 @@ Route::middleware(['auth', 'role:super_admin'])->group(function () {
 
 Route::middleware(['auth', 'role:owner'])->prefix('owner')->name('owner.')->group(function () {
 
+    // Dashboard
     Route::get('/dashboard', [OwnerController::class, 'index'])
         ->name('dashboard');
 
+    // Finance
     Route::get('/finance', [OwnerController::class, 'finance'])
         ->name('finance');
 
+    // ========== ✅ QR CODE MANAGEMENT ==========
+    
+    // Upload QR Code baru
     Route::post('/qrcode/upload', [OwnerController::class, 'uploadQrCode'])
         ->name('qrcode.upload');
+
+    // Halaman kelola QR Code (opsional - jika ingin halaman terpisah)
+    Route::get('/qrcode/manage', [OwnerController::class, 'manageQrCodes'])
+        ->name('qrcode.manage');
+
+    // Aktifkan QR Code tertentu
+    Route::patch('/qrcode/{qrCode}/activate', [OwnerController::class, 'activateQrCode'])
+        ->name('qrcode.activate');
+
+    // Hapus QR Code
+    Route::delete('/qrcode/{qrCode}/delete', [OwnerController::class, 'deleteQrCode'])
+        ->name('qrcode.delete');
+
+    // ========== END QR CODE MANAGEMENT ==========
 
     // --- Manajemen Kasir (Karyawan) ---
     Route::get('/kasir', [KaryawanController::class, 'index'])
@@ -301,9 +325,12 @@ Route::middleware(['auth', 'role:owner'])->prefix('owner')->name('owner.')->grou
         ->name('kasir.store');
 
     // --- Profil Owner ---
-    Route::get('/profile/edit', [OwnerController::class, 'editProfile'])->name('profile.edit');
-    Route::put('/profile', [OwnerController::class, 'updateProfile'])->name('profile.update');
-    Route::put('/password', [OwnerController::class, 'updatePassword'])->name('password.update');
+    Route::get('/profile/edit', [OwnerController::class, 'editProfile'])
+        ->name('profile.edit');
+    Route::put('/profile', [OwnerController::class, 'updateProfile'])
+        ->name('profile.update');
+    Route::put('/password', [OwnerController::class, 'updatePassword'])
+        ->name('password.update');
 });
 
 /*
