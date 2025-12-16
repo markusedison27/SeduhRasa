@@ -10,7 +10,6 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        dd('tessss');
         // total penjualan hari ini (sementara dari semua order hari ini)
         $today = now()->toDateString();
 
@@ -46,7 +45,7 @@ class DashboardController extends Controller
 
         $totalMessages  = ContactMessage::count(); // total semua pesan
 
-        return view('dashboard', [
+         dd([
             'totalPenjualanHariIni'  => $totalPenjualanHariIni,
             'totalPesananBulanIni'   => $totalPesananBulanIni,
             'pengeluaranOperasional' => $pengeluaranOperasional,
