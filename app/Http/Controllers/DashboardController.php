@@ -45,7 +45,7 @@ class DashboardController extends Controller
 
         $totalMessages  = ContactMessage::count(); // total semua pesan
 
-         dd([
+        return view('dashboard', [
             'totalPenjualanHariIni'  => $totalPenjualanHariIni,
             'totalPesananBulanIni'   => $totalPesananBulanIni,
             'pengeluaranOperasional' => $pengeluaranOperasional,
