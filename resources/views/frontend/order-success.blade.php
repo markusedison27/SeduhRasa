@@ -1,4 +1,4 @@
-{{-- resources/views/frontend/order-success.blade.php (FINAL FIX WARNA) --}}
+{{-- resources/views/frontend/order-success.blade.php (FINAL - STATUS REALTIME, TANPA QR) --}}
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -8,25 +8,15 @@
 
     @php
         use Carbon\Carbon;
-        
-        // Variabel $order dan $qrCodePath HARUS dikirim dari Controller
-        
-        $isDigital = isset($order->metode_pembayaran) && $order->metode_pembayaran !== 'cod';
-        
-        // Asumsi: QR Code URL diambil dari database/storage (PENTING untuk fitur Owner)
-        // Jika Anda TIDAK mengirim $qrCodePath dari Controller, ganti baris ini:
-        // $qrCodeUrl = asset('qr.png'); // <-- Jika Anda kembali ke file statis
-        $qrCodeUrl = ($qrCodePath) ? asset('storage/' . $qrCodePath) : asset('qr.png'); 
-        
-        // Konstanta Warna Tema Coffee Shop
-        $color_primary = '#4B2C20'; // Cokelat Tua
-        $color_accent = '#8B6F47'; // Amber Tua
-        $color_light_bg = '#F5EFE6'; // Background Kartu/Container
-        $color_btn_bg = '#7B3F00'; // Warna Tombol Utama
-        $color_pay_box_bg = '#FAF4E3'; // Background Kotak Pembayaran
-        $color_pay_box_border = '#D4A574'; // Border Kotak Pembayaran
-        $color_pay_box_text = '#4B2C20'; // Teks Kotak Pembayaran
-        
+
+        // Status order: pending / proses / selesai (fallback aman)
+        $status = $order->status ?? 'pending';
+
+        // Tema warna
+        $color_primary   = '#4B2C20';
+        $color_accent    = '#8B6F47';
+        $color_light_bg  = '#F5EFE6';
+        $color_btn_bg    = '#7B3F00';
     @endphp
 
     <style>
@@ -45,16 +35,15 @@
         }
         .card{
             width:100%;
-            max-width:480px;
+            max-width:520px;
             background:#fff;
             border-radius:18px;
             box-shadow:0 20px 40px rgba(15,23,42,.12);
             overflow:hidden;
-            border:1px solid <?php echo $color_light_bg; ?>; /* Border Kartu */
+            border:1px solid {{ $color_light_bg }};
         }
         .card-header{
-            /* Ganti gradien oranye/kuning menjadi gradien cokelat/amber */
-            background:linear-gradient(135deg, <?php echo $color_btn_bg; ?>, <?php echo $color_accent; ?>); 
+            background:linear-gradient(135deg, {{ $color_btn_bg }}, {{ $color_accent }});
             color:#fff;
             padding:18px 22px;
             text-align:center;
@@ -64,7 +53,7 @@
             font-size:22px;
         }
         .card-header p{
-            margin:4px 0 0;
+            margin:6px 0 0;
             font-size:13px;
             opacity:.9;
         }
@@ -81,12 +70,57 @@
             font-size:20px;
             font-weight:700;
             margin-top:3px;
-            margin-bottom: 14px;
+            margin-bottom: 10px;
         }
-        
-        .info-box p{
+
+        .status-row{
+            display:flex;
+            gap:10px;
+            align-items:center;
+            justify-content:space-between;
+            background:#faf7f2;
+            border:1px solid rgba(139,111,71,.25);
+            border-radius:12px;
+            padding:10px 12px;
+            margin: 10px 0 16px;
+        }
+        .status-left{
+            display:flex;
+            flex-direction:column;
+            gap:3px;
+        }
+        .badge{
+            display:inline-flex;
+            align-items:center;
+            gap:8px;
+            padding:8px 12px;
+            border-radius:999px;
+            font-weight:700;
+            font-size:12px;
+            letter-spacing:.02em;
+            border:1px solid transparent;
+            white-space:nowrap;
+        }
+        .dot{
+            width:8px; height:8px; border-radius:999px; background:#999;
+        }
+        .badge.pending{ background:#fff7ed; color:#9a3412; border-color:#fed7aa; }
+        .badge.proses{  background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe; }
+        .badge.selesai{ background:#ecfdf5; color:#047857; border-color:#a7f3d0; }
+
+        .hint{
+            font-size:12px;
+            color:#6b7280;
             margin:0;
         }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .info-box p{ margin:0; }
         .info-box .value{
             font-size:13px;
             font-weight:600;
@@ -94,23 +128,12 @@
             margin-top:2px;
         }
 
-        .detail-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px; 
-            margin-bottom: 16px; 
-        }
-
-        .items{
-            margin-top:0;
-            padding: 0; 
-        }
         .items-title{
             font-size:11px;
             text-transform:uppercase;
             letter-spacing:.08em;
             color:#9ca3af;
-            margin-bottom:4px;
+            margin-bottom:6px;
         }
         .items-list p{
             margin:2px 0;
@@ -121,17 +144,15 @@
             justify-content:space-between;
             align-items:center;
             padding-top: 10px;
-            margin-top: 10px; 
+            margin-top: 10px;
             border-top: 1px dashed #e5e7eb;
-            font-size:16px; 
-        }
-        .total-row span:first-child {
-            font-weight: 500;
+            font-size:16px;
         }
         .total-row span:last-child{
-            font-weight:700;
-            color:<?php echo $color_primary; ?>; /* Total harga menggunakan warna cokelat */
+            font-weight:800;
+            color:{{ $color_primary }};
         }
+
         .footer-text{
             margin-top:12px;
             text-align:center;
@@ -146,120 +167,93 @@
             text-transform:uppercase;
             color:#9ca3af;
         }
+
         .btn-wrap{
-            margin-top:25px; 
+            margin-top:22px;
             text-align:center;
         }
         .btn{
             display:inline-block;
-            padding:12px 24px; 
+            padding:12px 24px;
             border-radius:999px;
-            background:<?php echo $color_btn_bg; ?>; /* Warna Tombol Cokelat */
+            background:{{ $color_btn_bg }};
             color:#fff;
-            font-size:16px; 
-            font-weight:600;
+            font-size:16px;
+            font-weight:700;
             text-decoration:none;
-            border: none;
-            cursor: pointer;
-            width: 80%; 
-            max-width: 300px;
+            width: 80%;
+            max-width: 320px;
             transition: background 0.2s;
         }
         .btn:hover{
-            background:<?php echo $color_accent; ?>; /* Warna Hover Cokelat Lebih Terang */
-        }
-
-        .pay-box{
-            margin-top:20px; 
-            padding:16px 12px; 
-            border-radius:10px;
-            background:<?php echo $color_pay_box_bg; ?>; /* Background Krem */
-            border:1px solid <?php echo $color_pay_box_border; ?>; /* Border Amber */
-            font-size:12px;
-            color:<?php echo $color_pay_box_text; ?>; /* Teks Cokelat Tua */
-            display: flex;
-            gap: 20px; 
-            align-items: flex-start;
-        }
-        .pay-box-instruction {
-            flex: 1;
-        }
-        .pay-box-title{
-            font-weight:600;
-            margin-bottom:4px;
-        }
-        .pay-box small{
-            display:block;
-            margin-top:8px; 
-            font-size:11px;
-            color:<?php echo $color_primary; ?>; /* Teks Info Cokelat Tua */
-        }
-        .pay-box img {
-            width: 100px; 
-            height: auto;
-            display: block;
-            border-radius: 4px;
+            background:{{ $color_accent }};
         }
 
         @media(max-width:480px){
             .card{border-radius:14px;}
             .card-header{padding:14px 16px;}
             .card-body{padding:14px 16px 16px;}
-            .pay-box {
-                flex-direction: column;
-                align-items: center;
-                text-align: center;
-            }
-            .pay-box img {
-                width: 120px;
-                margin-top: 10px;
-            }
+            .detail-grid{ grid-template-columns: 1fr; }
+            .status-row{ flex-direction:column; align-items:flex-start; }
+            .badge{ width:100%; justify-content:center; }
         }
     </style>
 </head>
 <body>
     <div class="page">
         <div class="card">
+
             <div class="card-header">
-                @if($isDigital)
-                    <h1>Selesaikan Pembayaran</h1>
-                    <p>Segera selesaikan pembayaran digital kamu agar pesanan bisa kami proses</p>
-                @else
-                    <h1>Pesanan Berhasil!</h1>
-                    <p>Terima kasih telah memesan di SeduhRasa Coffee</p>
-                @endif
+                <h1>Pesanan Berhasil!</h1>
+                <p>Terima kasih telah memesan di SeduhRasa Coffee</p>
             </div>
 
             <div class="card-body">
+
                 {{-- Nomor pesanan --}}
                 <div>
                     <div class="label">Nomor Pesanan</div>
                     <div class="order-id">#{{ $order->id }}</div>
                 </div>
 
+                {{-- STATUS (REALTIME) --}}
+                <div class="status-row">
+                    <div class="status-left">
+                        <div class="label">Status Pesanan</div>
+                        <p id="statusText" class="hint">Sedang memuat status...</p>
+                    </div>
+
+                    <div id="statusBadge" class="badge pending">
+                        <span class="dot" id="statusDot"></span>
+                        <span id="statusBadgeText">PENDING</span>
+                    </div>
+                </div>
+
                 {{-- Info utama --}}
                 <div class="detail-grid">
                     <div class="info-box">
                         <p class="label">Nama Pelanggan</p>
-                        <p class="value">{{ $order->nama_pelanggan ?? 'Pelanggan' }}</p>
+                        <p class="value">{{ $order->customer_name ?? 'Pelanggan' }}</p>
                     </div>
                     <div class="info-box">
                         <p class="label">Waktu</p>
                         <p class="value">{{ Carbon::parse($order->created_at)->format('d M Y, H:i') }} WIB</p>
                     </div>
-                    @if($order->no_meja)
+
+                    @if(!empty($order->no_meja))
                         <div class="info-box">
                             <p class="label">Nomor Meja</p>
                             <p class="value">{{ $order->no_meja }}</p>
                         </div>
                     @endif
+
                     <div class="info-box">
                         <p class="label">Pembayaran</p>
                         <p class="value">
-                            @if($order->metode_pembayaran === 'cod')
+                            @if(($order->metode_pembayaran ?? 'cod') === 'cod')
                                 Bayar di Tempat (Cash)
                             @else
-                                Transfer / Dana
+                                Non-Tunai
                             @endif
                         </p>
                     </div>
@@ -268,42 +262,36 @@
                 {{-- Detail pesanan --}}
                 <div class="items">
                     <div class="items-title">Detail Pesanan</div>
+
                     <div class="items-list">
-                        @foreach(explode(', ', $order->menu_dipesan) as $item)
-                            <p>• {{ trim($item) }}</p>
-                        @endforeach
+                        @php
+                            $detail = $order->keterangan ?? '';
+                            $items = $detail ? explode(', ', $detail) : [];
+                        @endphp
+
+                        @if(count($items) > 0)
+                            @foreach($items as $item)
+                                @if(trim($item) !== '')
+                                    <p>• {{ trim($item) }}</p>
+                                @endif
+                            @endforeach
+                        @else
+                            <p style="color:#6b7280;">(Detail pesanan tidak tersedia)</p>
+                        @endif
                     </div>
+
                     <div class="total-row">
                         <span>Total Pembayaran</span>
-                        <span>Rp {{ number_format($order->total_harga, 0, ',', '.') }}</span>
+                        <span>Rp {{ number_format((int)($order->subtotal ?? 0), 0, ',', '.') }}</span>
                     </div>
                 </div>
 
-                {{-- Instruksi pembayaran digital --}}
-                @if($isDigital)
-                    <div class="pay-box">
-                        <div class="pay-box-instruction">
-                            <div class="pay-box-title">Langkah Pembayaran</div>
-                            <ol style="margin:0; padding-left:18px;">
-                                <li>Buka aplikasi Dana / e-wallet yang kamu gunakan.</li>
-                                <li>Scan QR atau transfer ke nomor Dana kasir.</li>
-                                <li>Masukkan nominal sesuai Total Pembayaran.</li>
-                                <li>Simpan bukti transfer dan tunjukkan ke kasir.</li>
-                            </ol>
-                            <small>Setelah transfer, pesananmu akan diproses oleh kasir.</small>
-                        </div>
-                        {{-- MENGGUNAKAN QR CODE DARI public/qr.png --}}
-                        <img src="{{ $qrCodeUrl }}" alt="QR Code Pembayaran">
-                    </div>
-                @endif
-
                 {{-- Footer --}}
                 <div class="footer-text">
-                    @if($isDigital)
-                        <p>Setelah transfer, tunjukkan halaman ini dan bukti pembayaran kepada kasir untuk konfirmasi.</p>
-                    @else
-                        <p>Silakan tunjukkan halaman ini kepada kasir saat melakukan pembayaran.</p>
-                    @endif
+                    <p>
+                        Halaman ini akan otomatis berubah kalau status pesanan sudah
+                        <b>Diproses</b> atau <b>Selesai</b>.
+                    </p>
                     <small>Terima kasih sudah berbelanja di SeduhRasa Coffee</small>
                 </div>
 
@@ -311,8 +299,68 @@
                 <div class="btn-wrap">
                     <a href="{{ route('menu') }}" class="btn">Kembali ke Menu</a>
                 </div>
+
             </div>
         </div>
     </div>
+
+<script>
+(function(){
+    const badge      = document.getElementById('statusBadge');
+    const badgeText  = document.getElementById('statusBadgeText');
+    const statusText = document.getElementById('statusText');
+    const dot        = document.getElementById('statusDot');
+
+    const url = "{{ route('customer.orders.status', $order->id) }}";
+
+    function renderStatus(statusRaw){
+        const s = (statusRaw || 'pending').toString().toLowerCase();
+
+        // reset class
+        badge.classList.remove('pending','proses','selesai');
+
+        if (s === 'selesai') {
+            badge.classList.add('selesai');
+            badgeText.textContent = 'SELESAI';
+            dot.style.background = '#10b981';
+            statusText.textContent = 'Pesanan kamu sudah selesai ✅';
+            return;
+        }
+
+        if (s === 'proses' || s === 'diproses' || s === 'process') {
+            badge.classList.add('proses');
+            badgeText.textContent = 'DIPROSES';
+            dot.style.background = '#3b82f6';
+            statusText.textContent = 'Pesanan kamu sedang diproses ☕ Tunggu sebentar ya.';
+            return;
+        }
+
+        // default pending
+        badge.classList.add('pending');
+        badgeText.textContent = 'PENDING';
+        dot.style.background = '#f97316';
+        statusText.textContent = 'Pesanan kamu sudah masuk. Menunggu kasir mengonfirmasi.';
+    }
+
+    async function fetchStatus(){
+        try{
+            const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+            if(!res.ok) throw new Error('HTTP ' + res.status);
+            const data = await res.json();
+            renderStatus(data.status);
+        }catch(e){
+            // kalau gagal, jangan bikin blank
+            statusText.textContent = 'Gagal memuat status (cek koneksi). Akan coba lagi...';
+        }
+    }
+
+    // pertama kali
+    fetchStatus();
+
+    // polling tiap 3 detik
+    setInterval(fetchStatus, 3000);
+})();
+</script>
+
 </body>
 </html>

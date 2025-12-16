@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\LoginAttempt;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 
 class LoginController extends Controller
@@ -56,38 +58,66 @@ class LoginController extends Controller
         );
 
         // Jika terkunci → tampilkan error + countdown
-        if ($loginAttempt->isLocked()) {
+        if (method_exists($loginAttempt, 'isLocked') && $loginAttempt->isLocked()) {
             $remaining = Carbon::now()->diffInSeconds($loginAttempt->locked_until, false);
 
-            if ($remaining <= 0) {
+            if ($remaining <= 0 && method_exists($loginAttempt, 'reset')) {
                 $loginAttempt->reset();
             } else {
                 return back()
                     ->withErrors([
-                        'email' => "🔒 Akun terkunci. Coba lagi dalam " . $this->formatRemainingTime($remaining)
+                        'email' => "🔒 Akun terkunci. Coba lagi dalam " . $this->formatRemainingTime(max(0, $remaining))
                     ])
-                    ->with('lock_remaining_seconds', $remaining)
+                    ->with('lock_remaining_seconds', max(0, $remaining))
                     ->onlyInput('email');
             }
         }
 
-        // Coba login
-        if (Auth::attempt($credentials, $request->boolean('remember'))) {
+        /**
+         * ✅ ANTI 500 untuk kasus password di DB bukan bcrypt
+         * - Auth::attempt bisa throw RuntimeException
+         * - kita tangkap dan kasih pesan yang jelas
+         */
+        try {
+            if (Auth::attempt($credentials, $request->boolean('remember'))) {
+                $request->session()->regenerate();
 
-            $request->session()->regenerate();
-            $loginAttempt->reset();
+                if (method_exists($loginAttempt, 'reset')) {
+                    $loginAttempt->reset();
+                }
 
-            $user = Auth::user();
-            return $this->redirectByRole($user);
+                return $this->redirectByRole(Auth::user());
+            }
+        } catch (\RuntimeException $e) {
+            // Kasus paling sering: "This password does not use the Bcrypt algorithm."
+            return back()
+                ->withErrors([
+                    'email' => '⚠️ Password akun ini di database belum terenkripsi (bcrypt). Reset password admin dulu (bcrypt), lalu coba login lagi.'
+                ])
+                ->onlyInput('email');
         }
 
         // LOGIN GAGAL → tambah attempt
-        $loginAttempt->incrementAttempts();
+        if (method_exists($loginAttempt, 'incrementAttempts')) {
+            $loginAttempt->incrementAttempts();
+        } else {
+            // fallback kalau method belum ada
+            $loginAttempt->attempts = ($loginAttempt->attempts ?? 0) + 1;
+            $loginAttempt->last_attempt_at = now();
+            $loginAttempt->save();
+        }
 
         // Jika sudah mencapai batas → KUNCI AKUN
-        if ($loginAttempt->attempts >= self::MAX_ATTEMPTS) {
-            $minutes = $this->getLockDuration($loginAttempt->attempts);
-            $loginAttempt->lockAccount($minutes);
+        if (($loginAttempt->attempts ?? 0) >= self::MAX_ATTEMPTS) {
+            $minutes = $this->getLockDuration((int) $loginAttempt->attempts);
+
+            if (method_exists($loginAttempt, 'lockAccount')) {
+                $loginAttempt->lockAccount($minutes);
+            } else {
+                // fallback lock sederhana
+                $loginAttempt->locked_until = now()->addMinutes($minutes);
+                $loginAttempt->save();
+            }
 
             $seconds = $minutes * 60;
 
@@ -99,7 +129,6 @@ class LoginController extends Controller
                 ->onlyInput('email');
         }
 
-        // LOGIN GAGAL BIASA → tampilkan session('error')
         return back()
             ->with('error', 'Email atau password salah! Periksa kembali data Anda.')
             ->onlyInput('email');
@@ -108,7 +137,6 @@ class LoginController extends Controller
     public function logout(Request $request)
     {
         Auth::logout();
-
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
@@ -120,8 +148,7 @@ class LoginController extends Controller
         return match ($user->role) {
             'super_admin' => redirect()->route('super.dashboard'),
             'owner'       => redirect()->route('owner.dashboard'),
-            'admin',
-            'staff'       => redirect()->route('staff.dashboard'),
+            'admin', 'staff' => redirect()->route('staff.dashboard'),
             default       => redirect()->route('home'),
         };
     }
@@ -129,7 +156,6 @@ class LoginController extends Controller
     public function resetLoginAttempts(Request $request)
     {
         $request->validate(['email' => 'required|email']);
-
         LoginAttempt::where('email', $request->email)->delete();
 
         return back()->with('success', 'Percobaan login berhasil direset.');

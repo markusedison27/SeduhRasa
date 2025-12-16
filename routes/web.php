@@ -48,34 +48,30 @@ Route::post('/contact', [ContactController::class, 'store'])
 |--------------------------------------------------------------------------
 */
 
-Route::get('/order', [OrderController::class, 'create'])
-    ->name('order');
+Route::get('/order', [OrderController::class, 'create'])->name('order');
+Route::post('/order', [OrderController::class, 'storeCustomerInfo'])->name('order.storeInfo');
 
-Route::post('/order', [OrderController::class, 'storeCustomerInfo'])
-    ->name('order.storeInfo');
+Route::get('/menu', [MenuController::class, 'publicMenu'])->name('menu');
 
-Route::get('/menu', [MenuController::class, 'publicMenu'])
-    ->name('menu');
-
-Route::get('/orders', [OrderController::class, 'index'])
-    ->name('orders.index');
-
-Route::post('/orders', [OrderController::class, 'store'])
-    ->name('orders.store');
-
-Route::get('/orders/{order}', [OrderController::class, 'show'])
-    ->name('orders.show');
+Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
 
 Route::get('/orders/{order}/status-json', [OrderController::class, 'statusJson'])
     ->name('orders.statusJson');
 
-// ✅ UPDATED: Halaman sukses pesanan dengan QR Code
+// Halaman sukses pesanan
 Route::get('/pesanan/{order}/berhasil', [OrderController::class, 'showCustomer'])
     ->name('customer.orders.show');
 
-// ✅ BARU: Route opsional untuk halaman konfirmasi pembayaran terpisah
+// ✅ BARU: status untuk halaman pembeli (buat “diproses/selesai” realtime)
+Route::get('/pesanan/{order}/status', [OrderController::class, 'customerStatusJson'])
+    ->name('customer.orders.status');
+
+// Route opsional untuk konfirmasi pembayaran (kalau view-nya masih dipakai)
 Route::get('/pesanan/{order}/konfirmasi-pembayaran', [OrderController::class, 'showPaymentConfirmation'])
     ->name('customer.orders.payment');
+
 
 /*
 |--------------------------------------------------------------------------
@@ -84,10 +80,8 @@ Route::get('/pesanan/{order}/konfirmasi-pembayaran', [OrderController::class, 's
 */
 
 // Login
-Route::get('/login', [LoginController::class, 'showLoginForm'])
-    ->name('login');
-Route::post('/login', [LoginController::class, 'login'])
-    ->name('login.post');
+Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [LoginController::class, 'login'])->name('login.post');
 
 // Logout
 Route::post('/logout', [LoginController::class, 'logout'])
@@ -95,10 +89,8 @@ Route::post('/logout', [LoginController::class, 'logout'])
     ->name('logout');
 
 // Google Auth
-Route::get('/oauth/google', [GoogleAuthController::class, 'redirect'])
-    ->name('google.redirect');
-Route::get('/oauth/google/callback', [GoogleAuthController::class, 'callback'])
-    ->name('google.callback');
+Route::get('/oauth/google', [GoogleAuthController::class, 'redirect'])->name('google.redirect');
+Route::get('/oauth/google/callback', [GoogleAuthController::class, 'callback'])->name('google.callback');
 
 
 // ================== LUPA SANDI PAKAI KODE OTP ==================
@@ -250,18 +242,17 @@ Route::middleware('guest')->group(function () {
 | NOTIFIKASI
 |--------------------------------------------------------------------------
 */
-
 Route::middleware(['auth'])->group(function () {
     Route::get('/notifications/orders', [OrderController::class, 'notificationsJson'])
         ->name('notifications.orders');
 });
+
 
 /*
 |--------------------------------------------------------------------------
 | SUPER ADMIN
 |--------------------------------------------------------------------------
 */
-
 Route::middleware(['auth', 'role:super_admin'])->group(function () {
 
     Route::get('/super-admin/dashboard', [SuperAdminController::class, 'index'])
@@ -278,67 +269,34 @@ Route::middleware(['auth', 'role:super_admin'])->group(function () {
         ->name('super.owners.store');
 });
 
+
 /*
 |--------------------------------------------------------------------------
 | OWNER
 |--------------------------------------------------------------------------
 */
-
 Route::middleware(['auth', 'role:owner'])->prefix('owner')->name('owner.')->group(function () {
 
-    // Dashboard
-    Route::get('/dashboard', [OwnerController::class, 'index'])
-        ->name('dashboard');
-
-    // Finance
-    Route::get('/finance', [OwnerController::class, 'finance'])
-        ->name('finance');
-
-    // ========== ✅ QR CODE MANAGEMENT ==========
-    
-    // Upload QR Code baru
-    Route::post('/qrcode/upload', [OwnerController::class, 'uploadQrCode'])
-        ->name('qrcode.upload');
-
-    // Halaman kelola QR Code (opsional - jika ingin halaman terpisah)
-    Route::get('/qrcode/manage', [OwnerController::class, 'manageQrCodes'])
-        ->name('qrcode.manage');
-
-    // Aktifkan QR Code tertentu
-    Route::patch('/qrcode/{qrCode}/activate', [OwnerController::class, 'activateQrCode'])
-        ->name('qrcode.activate');
-
-    // Hapus QR Code
-    Route::delete('/qrcode/{qrCode}/delete', [OwnerController::class, 'deleteQrCode'])
-        ->name('qrcode.delete');
-
-    // ========== END QR CODE MANAGEMENT ==========
+    Route::get('/dashboard', [OwnerController::class, 'index'])->name('dashboard');
+    Route::get('/finance', [OwnerController::class, 'finance'])->name('finance');
 
     // --- Manajemen Kasir (Karyawan) ---
-    Route::get('/kasir', [KaryawanController::class, 'index'])
-        ->name('kasir.index');
-
-    Route::get('/kasir/create', [KaryawanController::class, 'create'])
-        ->name('kasir.create');
-
-    Route::post('/kasir', [KaryawanController::class, 'store'])
-        ->name('kasir.store');
+    Route::get('/kasir', [KaryawanController::class, 'index'])->name('kasir.index');
+    Route::get('/kasir/create', [KaryawanController::class, 'create'])->name('kasir.create');
+    Route::post('/kasir', [KaryawanController::class, 'store'])->name('kasir.store');
 
     // --- Profil Owner ---
-    Route::get('/profile/edit', [OwnerController::class, 'editProfile'])
-        ->name('profile.edit');
-    Route::put('/profile', [OwnerController::class, 'updateProfile'])
-        ->name('profile.update');
-    Route::put('/password', [OwnerController::class, 'updatePassword'])
-        ->name('password.update');
+    Route::get('/profile/edit', [OwnerController::class, 'editProfile'])->name('profile.edit');
+    Route::put('/profile', [OwnerController::class, 'updateProfile'])->name('profile.update');
+    Route::put('/password', [OwnerController::class, 'updatePassword'])->name('password.update');
 });
+
 
 /*
 |--------------------------------------------------------------------------
 | STAFF / KARYAWAN (KASIR) + ADMIN + OWNER
 |--------------------------------------------------------------------------
 */
-
 Route::middleware(['auth', 'role:admin,staff,owner'])->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])
@@ -353,10 +311,8 @@ Route::middleware(['auth', 'role:admin,staff,owner'])->group(function () {
             ->name('transaksi.export');
 
         Route::resource('pelanggan', PelangganController::class);
-
         Route::resource('karyawan', KaryawanController::class);
 
-        // ✅ ROUTE PENGELUARAN BAHAN BAKU
         Route::resource('pengeluaran', PengeluaranController::class);
 
         Route::resource('orders', OrderController::class)->only(['index', 'show', 'destroy']);
@@ -375,5 +331,4 @@ Route::middleware(['auth', 'role:admin,staff,owner'])->group(function () {
 | TEST ROUTE
 |--------------------------------------------------------------------------
 */
-
 Route::get('/ping', fn() => 'PONG from ' . base_path());

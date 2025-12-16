@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\Menu;
-use App\Models\QrCode; // ✅ TAMBAHAN: Import QrCode Model
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -60,7 +59,6 @@ class OrderController extends Controller
     public function store(Request $request)
     {
         try {
-            // ✅ VALIDASI INPUT WAJIB: METODE PEMBAYARAN & NO MEJA
             $validator = Validator::make($request->all(), [
                 'metode_pembayaran' => 'required|string|max:50',
                 'no_meja'           => 'required|string|max:10',
@@ -77,17 +75,8 @@ class OrderController extends Controller
                 ], 422);
             }
 
-            /*
-             * AMBIL ITEMS
-             * items bisa berupa array langsung atau JSON string
-             */
             $rawItems = $request->input('items');
-
-            if (is_array($rawItems)) {
-                $items = $rawItems;
-            } else {
-                $items = json_decode($rawItems, true);
-            }
+            $items = is_array($rawItems) ? $rawItems : json_decode($rawItems, true);
 
             if (!$items || !is_array($items) || count($items) === 0) {
                 return response()->json([
@@ -96,18 +85,15 @@ class OrderController extends Controller
                 ], 422);
             }
 
-            // ✅ VALIDASI STOK SEBELUM PROSES ORDER
+            // Validasi stok
             $stockErrors = [];
             foreach ($items as $item) {
                 $menuName = $item['name'] ?? null;
                 $qty      = (int)($item['qty'] ?? 1);
 
-                if (!$menuName || $qty <= 0) {
-                    continue;
-                }
+                if (!$menuName || $qty <= 0) continue;
 
                 $menu = Menu::where('nama_menu', $menuName)->first();
-
                 if (!$menu) {
                     $stockErrors[] = "Menu '{$menuName}' tidak ditemukan.";
                     continue;
@@ -125,7 +111,6 @@ class OrderController extends Controller
                 ], 422);
             }
 
-            // ✅ TRANSACTION UNTUK KEAMANAN DATA
             DB::beginTransaction();
 
             $totalQty   = 0;
@@ -137,11 +122,8 @@ class OrderController extends Controller
                 $qty      = (int)($item['qty']   ?? 1);
                 $price    = (int)($item['price'] ?? 0);
 
-                if (!$menuName || $qty <= 0 || $price < 0) {
-                    continue;
-                }
+                if (!$menuName || $qty <= 0 || $price < 0) continue;
 
-                // Kurangi stok menu
                 $menu = Menu::where('nama_menu', $menuName)->first();
                 if ($menu) {
                     $menu->decreaseStock($qty);
@@ -161,19 +143,15 @@ class OrderController extends Controller
                 ], 422);
             }
 
-            // Data pelanggan dari session
             $namaPelanggan = session('customer.name', 'Umum');
             $pelangganId   = session('customer.id');
 
             $metodePembayaran = $request->input('metode_pembayaran', 'cod');
             $noMeja           = $request->input('no_meja');
 
-            // Generate kode order unik
             $kodeOrder = 'ORD-' . date('Ymd') . '-' . Str::upper(Str::random(5));
-
             $menuDipesan = implode(', ', $listMenu);
 
-            // Simpan ke tabel orders
             $order = Order::create([
                 'pelanggan_id'      => $pelangganId,
                 'kode_order'        => $kodeOrder,
@@ -187,16 +165,12 @@ class OrderController extends Controller
 
             DB::commit();
 
-            // ✅ DI SINI KALAU MAU TRIGGER REALTIME NOTIF (Pusher/Broadcast) BOLEH DITAMBAH
-            // event(new OrderCreated($order));
-
             return response()->json([
                 'success'      => true,
                 'message'      => 'Pesanan berhasil dibuat.',
                 'order_id'     => $order->id,
                 'redirect_url' => route('customer.orders.show', $order->id),
             ], 201);
-
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -211,33 +185,26 @@ class OrderController extends Controller
     }
 
     /**
-     * ✅ BARU: Halaman konfirmasi pembayaran dengan QR Code
+     * Halaman sukses pesanan (TANPA QR)
      * Route: GET /pesanan/{order}/berhasil (name: customer.orders.show)
      */
     public function showCustomer(Order $order)
     {
-        // Ambil QR Code aktif dari tabel qr_codes
-        $activeQrCode = QrCode::where('is_active', true)->first();
-        $qrCodePath = $activeQrCode ? $activeQrCode->file_path : null;
-
-        // Load relasi items dan menu untuk ditampilkan di halaman
         $order->load('items.menu');
+
+        $qrCodePath = null; // tetap dikirim biar view aman kalau masih ada variabelnya
 
         return view('frontend.order-success', compact('order', 'qrCodePath'));
     }
 
     /**
-     * ✅ BARU: Method terpisah untuk halaman konfirmasi pembayaran
-     * (Opsional - jika ingin route terpisah)
-     * Route: GET /pesanan/{order}/konfirmasi-pembayaran
+     * Halaman konfirmasi pembayaran (opsional) - TANPA QR
      */
     public function showPaymentConfirmation(Order $order)
     {
-        // Ambil QR Code aktif
-        $activeQrCode = QrCode::where('is_active', true)->first();
-        
-        // Load relasi
         $order->load('items.menu');
+
+        $activeQrCode = null;
 
         return view('payment-confirmation', compact('order', 'activeQrCode'));
     }
@@ -261,11 +228,12 @@ class OrderController extends Controller
 
     /**
      * Update status order (admin)
+     * status yang diterima: pending | proses | selesai | batal
      */
     public function updateStatus(Request $request, Order $order)
     {
         $request->validate([
-            'status' => 'required|string|max:50',
+            'status' => 'required|in:pending,proses,selesai,batal',
         ]);
 
         $order->status = $request->status;
@@ -287,20 +255,38 @@ class OrderController extends Controller
     }
 
     /**
-     * API: cek status order (JSON)
-     * Route: GET /orders/{order}/status-json
+     * API: cek status order (JSON) - bisa dipakai admin
      */
     public function statusJson(Order $order)
     {
         return response()->json([
+            'id'         => $order->id,
             'status'     => $order->status,
             'kode_order' => $order->kode_order,
         ]);
     }
 
     /**
+     * ✅ API: status untuk halaman pembeli (order-success)
+     * Route rekomendasi: GET /pesanan/{order}/status
+     */
+    public function customerStatusJson(Order $order)
+    {
+        return response()->json([
+            'id' => $order->id,
+            'status' => $order->status,
+            'status_label' => match ($order->status) {
+                'pending' => 'Menunggu diproses kasir',
+                'proses'  => 'Pesanan anda sedang diproses',
+                'selesai' => 'Pesanan selesai ✅',
+                'batal'   => 'Pesanan dibatalkan',
+                default   => 'Status tidak diketahui',
+            }
+        ]);
+    }
+
+    /**
      * API: notifikasi order baru (JSON)
-     * Route: GET /notifications/orders
      * Dipakai untuk badge notif di kasir/admin (cek order pending 5 menit terakhir)
      */
     public function notificationsJson()
