@@ -13,7 +13,7 @@
             <span class="sr-pill">Owner Panel</span>
             <h1>Dashboard Pemilik Coffee Shop</h1>
             <p>
-                Selamat datang, <strong>{{ $owner->name }}</strong>.  
+                Selamat datang, <strong>{{ $owner->name }}</strong>.
                 Berikut ringkasan singkat performa usaha SeduhRasa hari ini.
             </p>
         </div>
@@ -29,7 +29,7 @@
             </div>
             <div class="content">
                 <span class="label">Transaksi Hari Ini</span>
-                <span class="value">{{ $totalTransaksiHariIni }}</span>
+                <span class="value">{{ $totalTransaksiHariIni ?? 0 }}</span>
                 <span class="hint">Order selesai hari ini</span>
             </div>
         </div>
@@ -42,7 +42,7 @@
             <div class="content">
                 <span class="label">Perkiraan Pendapatan</span>
                 <span class="value">
-                    Rp {{ number_format($perkiraanPendapatan, 0, ',', '.') }}
+                    Rp {{ number_format($perkiraanPendapatan ?? 0, 0, ',', '.') }}
                 </span>
                 <span class="hint">Total omzet transaksi selesai</span>
             </div>
@@ -55,7 +55,7 @@
             </div>
             <div class="content">
                 <span class="label">Staff Aktif</span>
-                <span class="value">{{ $jumlahStaffAktif }}</span>
+                <span class="value">{{ $jumlahStaffAktif ?? 0 }}</span>
                 <span class="hint">Kasir terdaftar</span>
             </div>
         </div>
@@ -91,38 +91,19 @@
             </a>
         </div>
 
-    </div>
-
-    {{-- QR CODE --}}
-    <div class="sr-card">
-        <h3 class="sr-card-title">
-            <i class="bi bi-qr-code-scan"></i>
-            QR Code Pembayaran
-        </h3>
-
-        <p class="sr-muted">
-            QR Code (QRIS / Dana / dll) yang tampil di halaman konfirmasi pelanggan.
-        </p>
-
-        @if($qrCodePath)
-            <div class="qr-preview">
-                <img src="{{ asset('storage/' . $qrCodePath) }}" alt="QR Code">
-                <span>QR Code aktif saat ini</span>
+        {{-- Kelola Kasir --}}
+        <div class="sr-action-card">
+            <div>
+                <h3>Kelola Kasir</h3>
+                <p>
+                    Tambah & kelola akun kasir untuk operasional harian.
+                </p>
             </div>
-        @else
-            <div class="qr-empty">
-                <i class="bi bi-exclamation-circle"></i>
-                Belum ada QR Code diunggah
-            </div>
-        @endif
+            <a href="{{ route('owner.kasir.index') }}" class="btn-soft">
+                Kelola Kasir
+            </a>
+        </div>
 
-        <form action="{{ route('owner.qrcode.upload') }}" method="POST" enctype="multipart/form-data">
-            @csrf
-            <input type="file" name="qrcode_file" required>
-            <button type="submit" class="btn-success">
-                Upload & Simpan QR Code
-            </button>
-        </form>
     </div>
 
     {{-- PROFIL --}}
@@ -145,6 +126,12 @@
                 <span>Role</span>
                 <strong class="badge">{{ ucfirst($owner->role) }}</strong>
             </div>
+        </div>
+
+        <div class="sr-profile-actions">
+            <a href="{{ route('owner.profile.edit') }}" class="btn-outline w-100">
+                Edit Profil
+            </a>
         </div>
     </div>
 
@@ -169,16 +156,16 @@
     margin-bottom:1.5rem;
     box-shadow:0 20px 40px rgba(0,0,0,.35);
 }
-.sr-hero h1{font-size:1.6rem;font-weight:700;}
-.sr-hero p{font-size:.9rem;color:#F9E7D5;}
+.sr-hero h1{font-size:1.6rem;font-weight:700;margin:0 0 .35rem;}
+.sr-hero p{font-size:.9rem;color:#F9E7D5;margin:0;}
 .sr-pill{
     display:inline-block;
     font-size:.7rem;
     padding:.3rem .8rem;
     border-radius:999px;
-    border:1px solid #FCD34D;
+    border:1px solid rgba(252,211,77,.9);
     color:#FCD34D;
-    margin-bottom:.5rem;
+    margin-bottom:.6rem;
 }
 
 /* STATS */
@@ -191,13 +178,14 @@
 .sr-stat-card{
     background:#FFF;
     border-radius:18px;
-    padding:1rem;
+    padding:1rem 1.1rem;
     display:flex;
     gap:1rem;
     box-shadow:0 10px 20px rgba(0,0,0,.06);
+    border:1px solid rgba(148,124,96,.18);
 }
 .sr-stat-card .icon{
-    width:42px;height:42px;
+    width:44px;height:44px;
     border-radius:14px;
     display:flex;align-items:center;justify-content:center;
     font-size:1.3rem;
@@ -206,9 +194,9 @@
 .bg-amber{background:#FEF3C7;color:#B45309;}
 .bg-blue{background:#DBEAFE;color:#1D4ED8;}
 
-.sr-stat-card .label{font-size:.75rem;color:#6B7280;text-transform:uppercase;}
-.sr-stat-card .value{font-size:1.2rem;font-weight:700;}
-.sr-stat-card .hint{font-size:.75rem;color:#9CA3AF;}
+.sr-stat-card .label{font-size:.72rem;color:#6B7280;text-transform:uppercase;letter-spacing:.08em;}
+.sr-stat-card .value{font-size:1.25rem;font-weight:800;color:#111827;display:block;margin-top:.1rem;}
+.sr-stat-card .hint{font-size:.78rem;color:#9CA3AF;}
 
 /* ACTION */
 .sr-action-grid{
@@ -220,69 +208,76 @@
 .sr-action-card{
     background:#FFF;
     border-radius:18px;
-    padding:1.2rem;
+    padding:1.2rem 1.25rem;
     display:flex;
     flex-direction:column;
     justify-content:space-between;
     box-shadow:0 8px 18px rgba(0,0,0,.06);
+    border:1px solid rgba(148,124,96,.12);
 }
-.sr-action-card h3{font-weight:600;margin-bottom:.3rem;}
-.sr-action-card p{font-size:.85rem;color:#6B7280;}
+.sr-action-card h3{font-weight:700;margin:0 0 .35rem;}
+.sr-action-card p{font-size:.88rem;color:#6B7280;margin:0 0 1rem;}
 
-.btn-primary{
-    background:#4F46E5;color:#FFF;
-    padding:.6rem;border-radius:10px;
-    text-align:center;font-size:.85rem;
+.btn-primary, .btn-outline, .btn-soft{
+    display:inline-block;
+    padding:.7rem .9rem;
+    border-radius:12px;
+    text-align:center;
+    font-size:.88rem;
+    font-weight:700;
+    text-decoration:none;
+    transition:.2s ease;
 }
+.btn-primary{
+    background:#4F46E5;
+    color:#FFF;
+}
+.btn-primary:hover{opacity:.92;}
 .btn-outline{
     border:1px solid #D1D5DB;
-    padding:.6rem;border-radius:10px;
-    text-align:center;font-size:.85rem;
+    color:#111827;
+    background:#fff;
 }
+.btn-outline:hover{background:#F3F4F6;}
+.btn-soft{
+    background:#FFF7ED;
+    border:1px solid #FED7AA;
+    color:#9A3412;
+}
+.btn-soft:hover{background:#FFEDD5;}
 
 /* CARD */
 .sr-card{
     background:#FFF;
     border-radius:18px;
     padding:1.3rem;
-    margin-bottom:1.5rem;
+    margin-bottom:1.2rem;
     box-shadow:0 10px 24px rgba(0,0,0,.08);
+    border:1px solid rgba(148,124,96,.12);
 }
 .sr-card-title{
-    font-weight:600;
+    font-weight:800;
     display:flex;
     align-items:center;
-    gap:.5rem;
-    margin-bottom:.6rem;
+    gap:.6rem;
+    margin:0 0 .8rem;
 }
-.sr-muted{font-size:.85rem;color:#6B7280;margin-bottom:1rem;}
-
-/* QR */
-.qr-preview{text-align:center;}
-.qr-preview img{width:160px;border-radius:12px;border:1px solid #E5E7EB;}
-.qr-preview span{display:block;font-size:.75rem;color:#6B7280;margin-top:.3rem;}
-.qr-empty{background:#FEF3C7;color:#92400E;padding:.6rem;border-radius:10px;font-size:.85rem;margin-bottom:1rem;}
-
-.btn-success{
-    background:#16A34A;color:#FFF;
-    padding:.6rem 1rem;
-    border-radius:10px;
-    margin-top:.6rem;
-}
-
-/* PROFILE */
 .sr-profile div{
     display:flex;
     justify-content:space-between;
-    font-size:.85rem;
-    padding:.4rem 0;
+    font-size:.9rem;
+    padding:.45rem 0;
+    border-bottom:1px dashed #E5E7EB;
 }
+.sr-profile div:last-child{border-bottom:none;}
 .badge{
     background:#E0E7FF;
     color:#3730A3;
-    padding:.2rem .6rem;
+    padding:.25rem .7rem;
     border-radius:999px;
-    font-size:.7rem;
+    font-size:.72rem;
 }
+.sr-profile-actions{margin-top:1rem;}
+.w-100{width:100%;}
 </style>
 @endpush
