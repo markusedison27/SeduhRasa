@@ -496,7 +496,7 @@
 
     {{-- FOOTER --}}
     <footer class="w-full bg-[#ff8c00] text-white text-center py-4 text-sm">
-        © {{ date('Y') }} SeduhRasa Coffee. All rights reserved.
+        
     </footer>
     
     <script>
