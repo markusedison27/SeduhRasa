@@ -10,6 +10,7 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        dd('tessss');
         // total penjualan hari ini (sementara dari semua order hari ini)
         $today = now()->toDateString();
 
