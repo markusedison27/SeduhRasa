@@ -1,248 +1,288 @@
 @extends('layouts.app')
 
-@section('title', 'dashboard')
+@section('title', 'Dashboard Owner')
+@section('page-title', 'Dashboard')
 
 @section('content')
 
-    <div class="flex items-center justify-between mb-6">
+<div class="sr-dashboard-wrapper">
+
+    {{-- HEADER HERO --}}
+    <div class="sr-hero">
         <div>
-            <h1 class="text-2xl font-semibold mb-1">Dashboard Pemilik Coffee Shop</h1>
-            <p class="text-sm text-gray-500">
-                Selamat datang, {{ $owner->name }}. Berikut ringkasan singkat usahamu.
+            <span class="sr-pill">Owner Panel</span>
+            <h1>Dashboard Pemilik Coffee Shop</h1>
+            <p>
+                Selamat datang, <strong>{{ $owner->name }}</strong>.  
+                Berikut ringkasan singkat performa usaha SeduhRasa hari ini.
             </p>
         </div>
     </div>
 
-    {{-- Alert untuk Success/Error Messages --}}
-    @if(session('success'))
-        <div class="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-            <div class="flex items-center">
-                <svg class="w-5 h-5 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                </svg>
-                <span class="text-green-800 font-medium">{{ session('success') }}</span>
-            </div>
-        </div>
-    @endif
+    {{-- STAT CARDS --}}
+    <div class="sr-stats-grid">
 
-    @if(session('error'))
-        <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <div class="flex items-center">
-                <svg class="w-5 h-5 text-red-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-                </svg>
-                <span class="text-red-800 font-medium">{{ session('error') }}</span>
+        {{-- Transaksi Hari Ini --}}
+        <div class="sr-stat-card">
+            <div class="icon bg-green">
+                <i class="bi bi-receipt"></i>
             </div>
-        </div>
-    @endif
-
-    @if($errors->any())
-        <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <div class="flex items-start">
-                <svg class="w-5 h-5 text-red-600 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-                </svg>
-                <div class="flex-1">
-                    <p class="text-red-800 font-medium mb-1">Terjadi kesalahan:</p>
-                    <ul class="list-disc list-inside text-red-700 text-sm">
-                        @foreach($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            </div>
-        </div>
-    @endif
-
-    {{-- Ringkasan --}}
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div>
-            <div class="bg-white border rounded-lg shadow-sm">
-                <div class="p-4">
-                    <h6 class="text-xs font-semibold tracking-wide text-gray-500 uppercase mb-2">
-                        Total Transaksi Hari Ini
-                    </h6>
-                    <div class="text-2xl font-semibold mb-1">
-                        {{ $totalTransaksiHariIni }}
-                    </div>
-                    <small class="text-xs text-gray-400">
-                        Total pesanan selesai hari ini.
-                    </small>
-                </div>
+            <div class="content">
+                <span class="label">Transaksi Hari Ini</span>
+                <span class="value">{{ $totalTransaksiHariIni }}</span>
+                <span class="hint">Order selesai hari ini</span>
             </div>
         </div>
 
-        <div>
-            <div class="bg-white border rounded-lg shadow-sm">
-                <div class="p-4">
-                    <h6 class="text-xs font-semibold tracking-wide text-gray-500 uppercase mb-2">
-                        Perkiraan Pendapatan
-                    </h6>
-                    <div class="text-2xl font-semibold mb-1">
-                        Rp {{ number_format($perkiraanPendapatan, 0, ',', '.') }}
-                    </div>
-                    <small class="text-xs text-gray-400">
-                        Total omzet dari transaksi selesai.
-                    </small>
-                </div>
+        {{-- Pendapatan --}}
+        <div class="sr-stat-card">
+            <div class="icon bg-amber">
+                <i class="bi bi-cash-stack"></i>
+            </div>
+            <div class="content">
+                <span class="label">Perkiraan Pendapatan</span>
+                <span class="value">
+                    Rp {{ number_format($perkiraanPendapatan, 0, ',', '.') }}
+                </span>
+                <span class="hint">Total omzet transaksi selesai</span>
             </div>
         </div>
 
-        <div>
-            <div class="bg-white border rounded-lg shadow-sm">
-                <div class="p-4">
-                    <h6 class="text-xs font-semibold tracking-wide text-gray-500 uppercase mb-2">
-                        Jumlah Staff Aktif
-                    </h6>
-                    <div class="text-2xl font-semibold mb-1">
-                        {{ $jumlahStaffAktif }}
-                    </div>
-                    <small class="text-xs text-gray-400">
-                        Staff yang terdaftar di sistem.
-                    </small>
-                </div>
+        {{-- Staff --}}
+        <div class="sr-stat-card">
+            <div class="icon bg-blue">
+                <i class="bi bi-people"></i>
+            </div>
+            <div class="content">
+                <span class="label">Staff Aktif</span>
+                <span class="value">{{ $jumlahStaffAktif }}</span>
+                <span class="hint">Kasir terdaftar</span>
+            </div>
+        </div>
+
+    </div>
+
+    {{-- QUICK ACTION --}}
+    <div class="sr-action-grid">
+
+        {{-- Keuangan --}}
+        <div class="sr-action-card">
+            <div>
+                <h3>Keuangan Usaha</h3>
+                <p>
+                    Pantau pemasukan, pengeluaran, dan laba usaha secara real-time.
+                </p>
+            </div>
+            <a href="{{ route('owner.finance') }}" class="btn-primary">
+                Buka Halaman Keuangan
+            </a>
+        </div>
+
+        {{-- Pesanan --}}
+        <div class="sr-action-card">
+            <div>
+                <h3>Daftar Pesanan</h3>
+                <p>
+                    Lihat semua pesanan pelanggan dari website.
+                </p>
+            </div>
+            <a href="{{ route('admin.orders.index') }}" class="btn-outline">
+                Lihat Pesanan
+            </a>
+        </div>
+
+    </div>
+
+    {{-- QR CODE --}}
+    <div class="sr-card">
+        <h3 class="sr-card-title">
+            <i class="bi bi-qr-code-scan"></i>
+            QR Code Pembayaran
+        </h3>
+
+        <p class="sr-muted">
+            QR Code (QRIS / Dana / dll) yang tampil di halaman konfirmasi pelanggan.
+        </p>
+
+        @if($qrCodePath)
+            <div class="qr-preview">
+                <img src="{{ asset('storage/' . $qrCodePath) }}" alt="QR Code">
+                <span>QR Code aktif saat ini</span>
+            </div>
+        @else
+            <div class="qr-empty">
+                <i class="bi bi-exclamation-circle"></i>
+                Belum ada QR Code diunggah
+            </div>
+        @endif
+
+        <form action="{{ route('owner.qrcode.upload') }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            <input type="file" name="qrcode_file" required>
+            <button type="submit" class="btn-success">
+                Upload & Simpan QR Code
+            </button>
+        </form>
+    </div>
+
+    {{-- PROFIL --}}
+    <div class="sr-card">
+        <h3 class="sr-card-title">
+            <i class="bi bi-person-circle"></i>
+            Profil Owner
+        </h3>
+
+        <div class="sr-profile">
+            <div>
+                <span>Nama</span>
+                <strong>{{ $owner->name }}</strong>
+            </div>
+            <div>
+                <span>Email</span>
+                <strong>{{ $owner->email }}</strong>
+            </div>
+            <div>
+                <span>Role</span>
+                <strong class="badge">{{ ucfirst($owner->role) }}</strong>
             </div>
         </div>
     </div>
 
-    {{-- Aksi cepat --}}
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <div>
-            <div class="bg-white border rounded-lg shadow-sm h-full flex flex-col">
-                <div class="p-4 flex flex-col justify-between flex-1">
-                    <div>
-                        <h5 class="text-lg font-semibold mb-1">Laporan Keuangan</h5>
-                        <p class="text-sm text-gray-500">
-                            Lihat ringkasan pemasukan dan pengeluaran kedai kopi kamu.
-                        </p>
-                    </div>
-                    <a href="{{ route('owner.finance') }}"
-                       class="inline-flex items-center justify-center mt-3 px-4 py-2 text-sm font-medium rounded-md
-                              bg-indigo-600 text-white hover:bg-indigo-700
-                              focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                        Buka Halaman Keuangan
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <div>
-            <div class="bg-white border rounded-lg shadow-sm h-full flex flex-col">
-                <div class="p-4 flex flex-col justify-between flex-1">
-                    <div>
-                        <h5 class="text-lg font-semibold mb-1">Daftar Pesanan</h5>
-                        <p class="text-sm text-gray-500">
-                            Lihat pesanan yang pernah dibuat pelanggan dari website.
-                        </p>
-                    </div>
-                    <a href="{{ route('orders.index') }}"
-                       class="inline-flex items-center justify-center mt-3 px-4 py-2 text-sm font-medium rounded-md
-                              border border-gray-300 bg-white text-gray-700
-                              hover:bg-gray-50 focus:outline-none focus:ring-2
-                              focus:ring-indigo-500 focus:ring-offset-2">
-                        Lihat Pesanan
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {{-- FITUR: Pengaturan QR Code Pembayaran --}}
-    <div class="bg-white border rounded-lg shadow-sm mb-6">
-        <div class="px-4 py-3 border-b">
-            <h5 class="text-lg font-semibold mb-0">📸 Pengaturan QR Code Pembayaran</h5>
-        </div>
-        <div class="p-4">
-            <p class="text-sm text-gray-500 mb-4">
-                Unggah gambar QR Code (misalnya QRIS/Dana) yang akan ditampilkan di halaman konfirmasi pesanan pelanggan.
-            </p>
-            
-            <form action="{{ route('owner.qrcode.upload') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
-                @csrf
-                
-                {{-- Tampilkan QR Code yang sudah terupload (Jika ada) --}}
-                @if(isset($qrCodePath) && $qrCodePath)
-                    <div class="mb-4">
-                        <p class="font-medium text-gray-600 mb-2">QR Code Aktif Saat Ini:</p>
-                        <img src="{{ asset('storage/' . $qrCodePath) }}" 
-                             alt="QR Code Pembayaran Aktif" 
-                             class="w-48 h-48 object-contain border-2 border-gray-200 p-2 rounded-lg shadow-sm">
-                        <small class="text-gray-500 block mt-2">
-                            <svg class="w-4 h-4 inline-block mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
-                            </svg>
-                            Ganti QR Code di bawah jika ada perubahan.
-                        </small>
-                    </div>
-                @else
-                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
-                        <div class="flex items-start">
-                            <svg class="w-5 h-5 text-yellow-600 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                            </svg>
-                            <span class="text-yellow-800 text-sm">Belum ada QR Code yang diunggah. Harap unggah QR Code baru.</span>
-                        </div>
-                    </div>
-                @endif
-                
-                <div class="space-y-2">
-                    <label for="qrcode_file" class="block text-sm font-medium text-gray-700">
-                        Pilih Gambar QR Code (JPG/PNG, Maks 2MB)
-                    </label>
-                    <input type="file" 
-                           name="qrcode_file" 
-                           id="qrcode_file" 
-                           accept="image/jpeg,image/png,image/jpg"
-                           class="block w-full text-sm text-gray-500
-                                  file:mr-4 file:py-2 file:px-4
-                                  file:rounded-full file:border-0
-                                  file:text-sm file:font-semibold
-                                  file:bg-indigo-50 file:text-indigo-700
-                                  hover:file:bg-indigo-100 cursor-pointer">
-                    <p class="text-xs text-gray-500 mt-1">Format: JPEG, PNG, JPG. Ukuran maksimal: 2MB</p>
-                </div>
-                
-                <div class="flex justify-end">
-                    <button type="submit"
-                            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md
-                                   shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors">
-                        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
-                        </svg>
-                        Unggah & Simpan QR Code
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-    {{-- AKHIR FITUR QR CODE --}}
-
-    {{-- Info akun owner --}}
-    <div class="bg-white border rounded-lg shadow-sm">
-        <div class="px-4 py-3 border-b">
-            <h5 class="text-lg font-semibold mb-0">Profil Akun Owner</h5>
-        </div>
-        <div class="p-4">
-            <dl class="divide-y divide-gray-100">
-                <div class="py-2 grid grid-cols-3 gap-4 text-sm">
-                    <dt class="font-medium text-gray-600">Nama</dt>
-                    <dd class="col-span-2 text-gray-800">{{ $owner->name }}</dd>
-                </div>
-
-                <div class="py-2 grid grid-cols-3 gap-4 text-sm">
-                    <dt class="font-medium text-gray-600">Email</dt>
-                    <dd class="col-span-2 text-gray-800">{{ $owner->email }}</dd>
-                </div>
-
-                <div class="py-2 grid grid-cols-3 gap-4 text-sm">
-                    <dt class="font-medium text-gray-600">Role</dt>
-                    <dd class="col-span-2 text-gray-800">
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
-                            {{ ucfirst($owner->role) }}
-                        </span>
-                    </dd>
-                </div>
-            </dl>
-        </div>
-    </div>
+</div>
 @endsection
+
+@push('styles')
+<style>
+/* WRAPPER */
+.sr-dashboard-wrapper{
+    background:#F7F3EE;
+    padding:1rem;
+    border-radius:24px;
+}
+
+/* HERO */
+.sr-hero{
+    background:linear-gradient(135deg,#2B1B12,#4B2E1F);
+    border-radius:22px;
+    padding:1.8rem 2rem;
+    color:#FFF;
+    margin-bottom:1.5rem;
+    box-shadow:0 20px 40px rgba(0,0,0,.35);
+}
+.sr-hero h1{font-size:1.6rem;font-weight:700;}
+.sr-hero p{font-size:.9rem;color:#F9E7D5;}
+.sr-pill{
+    display:inline-block;
+    font-size:.7rem;
+    padding:.3rem .8rem;
+    border-radius:999px;
+    border:1px solid #FCD34D;
+    color:#FCD34D;
+    margin-bottom:.5rem;
+}
+
+/* STATS */
+.sr-stats-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:1rem;
+    margin-bottom:1.5rem;
+}
+.sr-stat-card{
+    background:#FFF;
+    border-radius:18px;
+    padding:1rem;
+    display:flex;
+    gap:1rem;
+    box-shadow:0 10px 20px rgba(0,0,0,.06);
+}
+.sr-stat-card .icon{
+    width:42px;height:42px;
+    border-radius:14px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:1.3rem;
+}
+.bg-green{background:#DCFCE7;color:#15803D;}
+.bg-amber{background:#FEF3C7;color:#B45309;}
+.bg-blue{background:#DBEAFE;color:#1D4ED8;}
+
+.sr-stat-card .label{font-size:.75rem;color:#6B7280;text-transform:uppercase;}
+.sr-stat-card .value{font-size:1.2rem;font-weight:700;}
+.sr-stat-card .hint{font-size:.75rem;color:#9CA3AF;}
+
+/* ACTION */
+.sr-action-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:1rem;
+    margin-bottom:1.5rem;
+}
+.sr-action-card{
+    background:#FFF;
+    border-radius:18px;
+    padding:1.2rem;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    box-shadow:0 8px 18px rgba(0,0,0,.06);
+}
+.sr-action-card h3{font-weight:600;margin-bottom:.3rem;}
+.sr-action-card p{font-size:.85rem;color:#6B7280;}
+
+.btn-primary{
+    background:#4F46E5;color:#FFF;
+    padding:.6rem;border-radius:10px;
+    text-align:center;font-size:.85rem;
+}
+.btn-outline{
+    border:1px solid #D1D5DB;
+    padding:.6rem;border-radius:10px;
+    text-align:center;font-size:.85rem;
+}
+
+/* CARD */
+.sr-card{
+    background:#FFF;
+    border-radius:18px;
+    padding:1.3rem;
+    margin-bottom:1.5rem;
+    box-shadow:0 10px 24px rgba(0,0,0,.08);
+}
+.sr-card-title{
+    font-weight:600;
+    display:flex;
+    align-items:center;
+    gap:.5rem;
+    margin-bottom:.6rem;
+}
+.sr-muted{font-size:.85rem;color:#6B7280;margin-bottom:1rem;}
+
+/* QR */
+.qr-preview{text-align:center;}
+.qr-preview img{width:160px;border-radius:12px;border:1px solid #E5E7EB;}
+.qr-preview span{display:block;font-size:.75rem;color:#6B7280;margin-top:.3rem;}
+.qr-empty{background:#FEF3C7;color:#92400E;padding:.6rem;border-radius:10px;font-size:.85rem;margin-bottom:1rem;}
+
+.btn-success{
+    background:#16A34A;color:#FFF;
+    padding:.6rem 1rem;
+    border-radius:10px;
+    margin-top:.6rem;
+}
+
+/* PROFILE */
+.sr-profile div{
+    display:flex;
+    justify-content:space-between;
+    font-size:.85rem;
+    padding:.4rem 0;
+}
+.badge{
+    background:#E0E7FF;
+    color:#3730A3;
+    padding:.2rem .6rem;
+    border-radius:999px;
+    font-size:.7rem;
+}
+</style>
+@endpush
